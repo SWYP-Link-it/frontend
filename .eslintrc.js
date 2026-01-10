@@ -5,6 +5,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    "plugin:tailwindcss/recommended",
   ],
   plugins: ['react', 'react-hooks', '@typescript-eslint', 'prettier'],
   rules: {
