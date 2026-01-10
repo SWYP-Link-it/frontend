@@ -1,0 +1,19 @@
+# dependencies
+node_modules
+
+# build output
+.next
+out
+dist
+build
+
+# lock files
+pnpm-lock.yaml
+
+# configs
+.vscode/**
+.github/**
+.eslintrc.*
+.prettierrc.*
+postcss.config.*
+pnpm-workspace.yaml
