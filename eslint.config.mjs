@@ -6,7 +6,6 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import prettierPlugin from 'eslint-plugin-prettier';
-import tailwindcssPlugin from 'eslint-plugin-tailwindcss';
 
 export default defineConfig([
   // Next.js Core Web Vitals 규칙
@@ -31,7 +30,6 @@ export default defineConfig([
       'react-hooks': reactHooksPlugin,
       '@typescript-eslint': tsPlugin,
       prettier: prettierPlugin,
-      tailwindcss: tailwindcssPlugin,
     },
     rules: {
       'prettier/prettier': 'error',

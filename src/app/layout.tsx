@@ -22,7 +22,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const a = { foo: 1, bar: 2 };
   return (
     <html lang="ko">
       <body
