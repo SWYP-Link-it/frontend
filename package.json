@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prepare": "husky"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4",
@@ -28,8 +29,16 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
