@@ -1,14 +1,21 @@
 'use client';
 
+import { useAuthStore } from '@/src/stores/authStore';
 import axios from 'axios';
 import Image from 'next/image';
 
 export default function Login() {
+  const { setAccessToken } = useAuthStore();
+
   const handleLogin = () => {
-    axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/login`, {
-      email: 'user@example.com',
-      password: 'password123',
-    });
+    axios
+      .post(`${process.env.NEXT_PUBLIC_SERVER_URL}/login`, {
+        email: 'user@example.com',
+        password: 'password123',
+      })
+      .then(() => {
+        setAccessToken('Access_Token_Example');
+      });
   };
 
   return (
