@@ -19,20 +19,22 @@ export default function Login() {
   };
 
   return (
-    <div className="relative flex h-full w-full items-center justify-center bg-[#17171C]">
+    <div className="relative flex h-full w-full items-center justify-center bg-sky-50">
       <Image
         className="absolute top-12.5 left-25"
         src="/icons/logo.svg"
         alt="logo"
-        width={111}
-        height={48}
+        width={134}
+        height={54}
       />
-      <div className="flex w-120 flex-col items-center gap-[50px] rounded-2xl bg-black px-[50px] py-15 text-white">
+      <div className="flex w-120 flex-col items-center gap-[50px] rounded-2xl bg-white px-[50px] py-15">
         <div className="flex flex-col items-center gap-[29px]">
-          <Image src="/icons/logo.svg" alt="logo" width={152} height={66} />
+          <Image src="/icons/logo.svg" alt="logo" width={167.24} height={72} />
           <div className="flex flex-col items-center gap-4">
-            <div className="text-2xl font-bold">링킷에 오신걸 환영합니다!</div>
-            <div className="text-center text-base font-medium whitespace-pre-wrap text-[#9599A4]">
+            <div className="text-2xl font-bold text-gray-900">
+              링킷에 오신걸 환영합니다!
+            </div>
+            <div className="text-center text-base font-medium whitespace-pre-wrap text-gray-500">
               {` 재능을 나누고 필요한 스킬을 배우는 가장 쉬운 방법,\n링킷에서 당신의 스킬을 나눠보세요.`}
             </div>
           </div>
@@ -43,7 +45,7 @@ export default function Login() {
             onClick={handleLogin}
           >
             <Image src="/icons/kakao.svg" alt="kakao" width={24} height={24} />
-            <span className="font-semibold text-black">
+            <span className="font-semibold text-gray-900">
               카카오 계정으로 계속하기
             </span>
           </button>
