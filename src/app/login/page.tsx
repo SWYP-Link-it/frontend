@@ -1,5 +1,3 @@
-'use client';
-
 import { LoginContent } from '@/src/features/auth/LoginContent';
 import Image from 'next/image';
 
