@@ -2,6 +2,7 @@
 
 import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
+import { ProgressBar } from '@/src/components/ProgressBar';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -38,7 +39,7 @@ export default function Login() {
         height={54}
       />
       <div className="flex w-[490px] flex-col items-center">
-        <div className="border-brand-600 w-full border">progress bar</div>
+        <ProgressBar step={1} totalSteps={4} />
         <div className="mt-10 text-center text-3xl leading-[1.4] font-bold whitespace-pre-wrap">
           {`링킷에서 사용할 프로필을\n등록해주세요.`}
         </div>
