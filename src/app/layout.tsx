@@ -12,6 +12,9 @@ const pretendard = localFont({
 export const metadata: Metadata = {
   title: 'Link it',
   description: 'Skill shop for amateur teachers and learners',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
