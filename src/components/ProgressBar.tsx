@@ -1,5 +1,7 @@
 type ProgressBarProps = {
+  /** 현재 단계 */
   step: number;
+  /** 총 단계 수 */
   totalSteps: number;
 };
 

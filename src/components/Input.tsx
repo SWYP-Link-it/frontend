@@ -3,7 +3,9 @@
 import { useState } from 'react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /** 입력 필드 위쪽에 표시될 라벨 */
   label: string;
+  /** 아래쪽에 표시할 에러 메시지 */
   errorMessage?: string;
 }
 
