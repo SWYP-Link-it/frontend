@@ -6,7 +6,7 @@ import { ProfileStep } from '@/src/features/auth/steps/ProfileStep';
 import Image from 'next/image';
 import { useState } from 'react';
 
-export default function Login() {
+export default function Onboarding() {
   const [step, setStep] = useState(1);
 
   return (

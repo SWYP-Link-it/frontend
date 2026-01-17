@@ -15,6 +15,7 @@ export const LoginContent = () => {
       })
       .then(() => {
         setAccessToken('Access_Token_Example');
+        document.cookie = 'refresh_token=Refresh_Token_Example; path=/;';
       });
   };
 
