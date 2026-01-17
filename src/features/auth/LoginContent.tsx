@@ -1,21 +1,25 @@
 'use client';
 
+import { api } from '@/src/lib/api/api';
 import { useAuthStore } from '@/src/stores/authStore';
-import axios from 'axios';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export const LoginContent = () => {
+  const router = useRouter();
   const { setAccessToken } = useAuthStore();
 
   const handleLogin = () => {
-    axios
-      .post(`${process.env.NEXT_PUBLIC_SERVER_URL}/login`, {
+    api
+      .post('/login', {
         email: 'user@example.com',
         password: 'password123',
       })
-      .then(() => {
-        setAccessToken('Access_Token_Example');
-        document.cookie = 'refresh_token=Refresh_Token_Example; path=/;';
+      .then((response) => {
+        const { accessToken, refreshToken } = response.data;
+        setAccessToken(accessToken);
+        document.cookie = `refresh_token=${refreshToken}; path=/;`;
+        router.push('/');
       });
   };
 
