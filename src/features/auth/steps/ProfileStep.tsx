@@ -17,7 +17,7 @@ export const ProfileStep = ({ setStep }: ProfileStepProps) => {
       : undefined;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const allowedRegex = /^[a-zA-Z0-9가-힣\b]$/;
+    const allowedRegex = /^[a-zA-Z0-9가-힣]$/;
     const isControlKey =
       e.ctrlKey ||
       e.metaKey ||

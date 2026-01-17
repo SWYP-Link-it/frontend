@@ -29,8 +29,6 @@ export const Input = ({
             : isFocused
               ? 'border-brand-600 border-2'
               : 'border border-gray-300'
-        } ${
-          errorMessage ? 'border-2 border-[#FF4242]/60' : ''
         } rounded-[15px] bg-white px-6 py-[14px] text-xl placeholder-gray-400 outline-none`}
         onFocus={(e) => {
           setIsFocused(true);
