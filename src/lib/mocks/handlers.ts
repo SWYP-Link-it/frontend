@@ -1,7 +1,9 @@
 import { http, HttpResponse } from 'msw';
 
+const API_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
 export const handlers = [
-  http.post('*/login', async ({ request }) => {
+  http.post(`${API_URL}/login`, async ({ request }) => {
     const data = (await request.json()) as { email: string; password: string };
 
     return HttpResponse.json({
@@ -15,7 +17,7 @@ export const handlers = [
     });
   }),
 
-  http.get('*/refresh', async () => {
+  http.get(`${API_URL}/refresh`, async () => {
     // return HttpResponse.json({}, { status: 401 });
     return HttpResponse.json(
       {
@@ -25,7 +27,7 @@ export const handlers = [
     );
   }),
 
-  http.post('*/signup', async ({ request }) => {
+  http.post(`${API_URL}/signup`, async ({ request }) => {
     const data = (await request.json()) as { email: string; password: string };
 
     return HttpResponse.json({
@@ -38,7 +40,7 @@ export const handlers = [
     });
   }),
 
-  http.get('*/me', async ({ request }) => {
+  http.get(`${API_URL}/me`, async ({ request }) => {
     const accessToken = request.headers.get('Authorization')?.split(' ')[1];
 
     if (accessToken === 'New_Access_Token') {
