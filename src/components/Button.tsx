@@ -1,5 +1,11 @@
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** 버튼에 표시될 텍스트 */
   text: string;
+  /** 버튼의 상태 (기본값: 'default')
+   * - 'inactive': 비활성화 상태 (클릭 불가)
+   * - 'active': 활성화 상태 (클릭 가능)
+   * - 'default': 기본 상태 (클릭 가능)
+   */
   mode?: 'inactive' | 'active' | 'default';
 }
 

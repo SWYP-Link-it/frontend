@@ -1,5 +1,7 @@
 type ProgressBarProps = {
+  /** 현재 단계 */
   step: number;
+  /** 총 단계 수 */
   totalSteps: number;
 };
 
@@ -9,7 +11,7 @@ export const ProgressBar = ({ step, totalSteps }: ProgressBarProps) => {
     <div className="flex h-7 w-full items-center gap-5">
       <div className="h-1.5 w-full rounded-full bg-gray-200">
         <div
-          className="bg-brand-600 h-1.5 rounded-full duration-700 ease-in-out"
+          className="h-1.5 rounded-full bg-linear-to-r from-[#5E9EFF] to-[#784FF7] duration-700 ease-in-out"
           style={{ width: `${progressPercentage}%` }}
         ></div>
       </div>
