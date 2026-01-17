@@ -42,7 +42,9 @@ api.interceptors.response.use(
         useAuthStore.getState().setAccessToken(newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
-      } catch (e) {}
+      } catch (error) {
+        console.error('토큰 재발급 실패:', error);
+      }
 
       // TODO: 백엔드에서 refresh token cookie 세팅으로 변경
       document.cookie = 'refresh_token=; Max-Age=0; path=/;';
