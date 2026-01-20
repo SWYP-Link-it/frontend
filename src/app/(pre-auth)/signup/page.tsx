@@ -2,13 +2,9 @@
 
 import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 
-type ProfileStepProps = {
-  setStep: Dispatch<SetStateAction<number>>;
-};
-
-export const ProfileStep = ({ setStep }: ProfileStepProps) => {
+export default function Signup() {
   const [nickname, setNickname] = useState('');
   const [showError, setShowError] = useState(false);
   const errorMessage =
@@ -32,7 +28,7 @@ export const ProfileStep = ({ setStep }: ProfileStepProps) => {
   };
 
   return (
-    <>
+    <div className="mx-auto flex h-full w-[490px] flex-col items-center justify-center">
       <div className="mt-10 text-center text-3xl leading-[1.4] font-bold whitespace-pre-wrap">
         {`링킷에서 사용할 프로필을\n등록해주세요.`}
       </div>
@@ -52,11 +48,10 @@ export const ProfileStep = ({ setStep }: ProfileStepProps) => {
       </div>
       <div className="mt-10 w-[380px]">
         <Button
-          text="다음으로"
+          text="회원가입"
           mode={!nickname || errorMessage ? 'inactive' : 'active'}
-          onClick={() => setStep((step) => step + 1)}
         />
       </div>
-    </>
+    </div>
   );
-};
+}
