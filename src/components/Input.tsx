@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** 입력 필드 위쪽에 표시될 라벨 */
-  label: string;
+  label?: string;
   /** 아래쪽에 표시할 에러 메시지 */
   errorMessage?: string;
 }
@@ -20,7 +20,9 @@ export const Input = ({
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <span className="text-xl leading-[30px] font-medium">{label}</span>
+      {label && (
+        <span className="text-xl leading-[30px] font-medium">{label}</span>
+      )}
       <input
         {...props}
         className={`${
