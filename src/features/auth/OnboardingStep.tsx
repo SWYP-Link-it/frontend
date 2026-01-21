@@ -14,15 +14,15 @@ export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
 
   return (
     <>
-      <div className="mt-10 text-center text-3xl leading-[1.4] font-bold whitespace-pre-wrap">
+      <div className="mt-[46px] text-center text-3xl leading-[1.4] font-bold whitespace-pre-wrap">
         {TITLE_LIST[step - 1]}
       </div>
-      <div className="border-brand-600 mt-10 h-[350px] w-[500px] border">
+      <div className="border-brand-600 mt-8 h-[350px] w-[500px] border">
         {IMAGE[step - 1]}
       </div>
 
       {step !== 3 && (
-        <div className="mt-10 w-[380px]">
+        <div className="mt-15 w-[380px]">
           <Button
             text="다음으로"
             mode="active"
@@ -31,7 +31,7 @@ export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
         </div>
       )}
       {step === 3 && (
-        <div className="mt-5 flex w-[380px] flex-col gap-3">
+        <div className="mt-15 flex w-[380px] flex-col gap-3">
           <Button
             text="스킬 등록하고 2크레딧 받기"
             // TODO: 경로 변경 필요

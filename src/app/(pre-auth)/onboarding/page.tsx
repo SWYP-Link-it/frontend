@@ -2,7 +2,6 @@
 
 import { ProgressBar } from '@/src/components/ProgressBar';
 import { OnboardingStep } from '@/src/features/auth/OnboardingStep';
-import Image from 'next/image';
 import { useState } from 'react';
 
 export default function Onboarding() {

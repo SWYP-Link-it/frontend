@@ -3,9 +3,9 @@ import Image from 'next/image';
 
 export default function Login() {
   return (
-    <div className="relative flex h-full w-full items-center justify-center bg-sky-50">
+    <div className="flex h-full w-full items-center justify-center bg-sky-50">
       <Image
-        className="absolute top-12.5 left-25"
+        className="fixed top-12.5 left-25"
         src="/icons/logo.svg"
         alt="logo"
         width={134}

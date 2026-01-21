@@ -51,17 +51,17 @@ export default function Signup() {
   };
 
   return (
-    <div className="mx-auto flex h-full w-[490px] flex-col items-center justify-center">
-      <div className="mt-10 text-center text-3xl leading-[1.4] font-bold whitespace-pre-wrap">
+    <div className="mx-auto flex h-full w-[490px] flex-col items-center justify-center gap-12">
+      <div className="text-center text-3xl leading-[1.4] font-bold whitespace-pre-wrap">
         {`링킷에서 사용할 프로필을\n등록해주세요.`}
       </div>
       <input
-        className="border-brand-600 mt-10 h-[200px] w-[300px] cursor-pointer border"
+        className="border-brand-600 h-[200px] w-[300px] cursor-pointer border"
         type="file"
         accept="image/jpeg,image/png"
         onChange={handleFileChange}
       />
-      <div className="mt-10 w-full">
+      <div className="w-full">
         <Input
           label="닉네임"
           placeholder="사용할 이름을 입력해주세요."
@@ -72,7 +72,7 @@ export default function Signup() {
           onKeyDown={handleKeyDown}
         />
       </div>
-      <div className="mt-10 w-[380px]">
+      <div className="w-[380px]">
         <Button
           text="회원가입"
           mode={!nickname || errorMessage ? 'inactive' : 'active'}

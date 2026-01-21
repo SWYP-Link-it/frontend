@@ -24,19 +24,17 @@ export const LoginContent = () => {
   };
 
   return (
-    <div className="flex w-120 flex-col items-center gap-[50px] rounded-2xl bg-white px-[50px] py-15">
-      <div className="flex flex-col items-center gap-[29px]">
+    <div className="flex w-120 flex-col items-center gap-[50px] rounded-2xl bg-white py-[59px]">
+      <div className="flex flex-col items-center">
         <Image src="/icons/logo.svg" alt="logo" width={167.24} height={72} />
-        <div className="flex flex-col items-center gap-4">
-          <div className="text-2xl font-bold text-gray-900">
-            링킷에 오신걸 환영합니다!
-          </div>
-          <div className="text-center text-base font-medium whitespace-pre-wrap text-gray-500">
-            {` 재능을 나누고 필요한 스킬을 배우는 가장 쉬운 방법,\n링킷에서 당신의 스킬을 나눠보세요.`}
-          </div>
+        <div className="mt-6 mb-4 text-2xl font-bold text-gray-900">
+          링킷에 오신걸 환영합니다!
+        </div>
+        <div className="text-center text-base font-medium whitespace-pre-wrap text-gray-500">
+          {` 재능을 나누고 필요한 스킬을 배우는 가장 쉬운 방법,\n링킷에서 당신의 스킬을 나눠보세요.`}
         </div>
       </div>
-      <div className="flex w-full flex-col gap-3">
+      <div className="flex w-[380px] flex-col gap-3">
         <button
           className="flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#FEE501] py-2"
           onClick={handleLogin}
