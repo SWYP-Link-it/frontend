@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, passthrough } from 'msw';
 
 export const handlers = [
   http.get('*/auth/me', () => {
@@ -35,5 +35,14 @@ export const handlers = [
       token: 'fake-jwt-token',
       expiredAt: '2026-01-25T23:59:59Z',
     });
+  }),
+
+  // TODO: 실제 서버와 연동 중이므로 MSW가 가로채지 않도록 설정 (테스트 후 정리 예정)
+  http.get('https://api.desklab.kr/*', () => {
+    return passthrough();
+  }),
+
+  http.post('https://api.desklab.kr/*', () => {
+    return passthrough();
   }),
 ];
