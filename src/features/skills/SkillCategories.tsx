@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const categories = [
   '개발',
   '디자인',
@@ -15,12 +17,13 @@ export const SkillCategories = () => {
   return (
     <div className="flex">
       {categories.map((category) => (
-        <span
-          className="w-[90px] pb-2 text-center text-lg leading-7 font-semibold text-gray-700"
+        <Link
+          href={`?category=${category}`}
+          className="w-[90px] cursor-pointer pb-2 text-center text-lg leading-7 font-semibold text-gray-700"
           key={category}
         >
           {category}
-        </span>
+        </Link>
       ))}
     </div>
   );
