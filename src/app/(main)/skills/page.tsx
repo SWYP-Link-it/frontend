@@ -19,7 +19,7 @@ export default async function Skills({
           게시글을 확인하고 진짜 실력자에게 스킬을 배워보세요!
         </span>
       </div>
-      <SkillCategories />
+      <SkillCategories category={selectedCategory} />
       <div className="my-7">
         <CreditInfoBanner />
       </div>
