@@ -1,3 +1,4 @@
+import { CardBanner } from './CardBanner';
 import { SkillCard } from './SkillCard';
 
 type SkillListProps = {
@@ -55,7 +56,16 @@ export const SkillList = ({ category }: SkillListProps) => {
     <>
       {list?.length > 0 && (
         <div className="grid grid-cols-4 gap-4">
-          {list.map((skill) => (
+          {list.slice(0, 3).map((skill) => (
+            <SkillCard key={skill.id} skill={skill} />
+          ))}
+          {list.length < 3 &&
+            Array.from({ length: 3 - list.length }).map((_, i) => (
+              <div key={`empty-${i}`} />
+            ))}
+
+          <CardBanner />
+          {list.slice(3).map((skill) => (
             <SkillCard key={skill.id} skill={skill} />
           ))}
         </div>
