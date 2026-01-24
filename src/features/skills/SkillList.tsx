@@ -41,13 +41,13 @@ export const SkillList = () => {
       id: 6,
       nickname: '이영희',
       title: '마케팅 전략',
-      description: '효과적인 마케팅 전략을 수립하는 방법',
-      rate: 4.8,
+      description:
+        '효과적인 마케팅 전략을 수립하는 방법효과적인 마케팅 전략을 수립하는 방법효과적인 마케팅 전략을 수립하는 방법',
     },
   ];
 
   return (
-    <div className="grid grid-cols-4">
+    <div className="grid grid-cols-4 gap-4">
       {list.map((skill) => (
         <SkillCard key={skill.id} skill={skill} />
       ))}

@@ -13,9 +13,14 @@ const categories = [
 
 export const SkillCategories = () => {
   return (
-    <div>
+    <div className="flex">
       {categories.map((category) => (
-        <span key={category}>{category}</span>
+        <span
+          className="w-[90px] pb-2 text-center text-lg leading-7 font-semibold text-gray-700"
+          key={category}
+        >
+          {category}
+        </span>
       ))}
     </div>
   );
