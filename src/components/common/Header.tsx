@@ -3,7 +3,7 @@ import { Input } from '@/src/components/Input';
 
 export const Header = () => {
   return (
-    <header className="flex w-full items-center justify-between px-[112px] py-5">
+    <header className="bg-brand-50 sticky top-0 flex h-[77px] w-full items-center justify-between px-[112px] py-5">
       {/* TODO: 로고 바뀌면 재조정 */}
       <Image src="/icons/logo.svg" alt="logo" width={67} height={26} />
       <div className="h-[37px] w-[342px]">
