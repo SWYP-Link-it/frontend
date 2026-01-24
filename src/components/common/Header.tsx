@@ -8,7 +8,7 @@ export const Header = () => {
       <Image src="/icons/logo.svg" alt="logo" width={67} height={26} />
       <div className="h-[37px] w-[342px]">
         {/* TODO: 검색어 Input padding이 공통 컴포넌트 padding이랑 다름 */}
-        <Input placeholder="찾는 스킬을 입력해주세요." />
+        <Input placeholder="찾는 스킬을 입력해주세요 ." />
       </div>
     </header>
   );
