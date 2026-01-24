@@ -1,3 +1,4 @@
+import { Header } from '@/src/components/common/Header';
 import Sidebar from '@/src/components/common/Sidebar';
 
 export default function MainLayout({
@@ -8,7 +9,10 @@ export default function MainLayout({
   return (
     <div className="flex h-screen w-full">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex flex-1 flex-col overflow-y-auto">
+        <Header />
+        {children}
+      </main>
     </div>
   );
 }
