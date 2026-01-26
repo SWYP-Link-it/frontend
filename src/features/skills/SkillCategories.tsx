@@ -1,4 +1,7 @@
-import Link from 'next/link';
+'use client';
+
+import { Tabbar } from '@/src/components/Tabbar';
+import { useRouter } from 'next/navigation';
 
 const categories = [
   '전체',
@@ -17,29 +20,19 @@ type SkillCategoriesProps = {
   category: string;
 };
 export const SkillCategories = ({ category }: SkillCategoriesProps) => {
-  const position =
-    categories.indexOf(category as (typeof categories)[number]) * 90;
+  const router = useRouter();
+
+  const handleCategoryClick = (category: string) => {
+    const params = new URLSearchParams();
+    params.set('category', category);
+    router.replace(`?${params.toString()}`, { scroll: true });
+  };
 
   return (
-    <div className="w-fit">
-      <div className="flex">
-        {categories.map((category) => (
-          <Link
-            href={`?category=${category}`}
-            className="w-[90px] cursor-pointer pb-2 text-center text-lg leading-7 font-semibold text-gray-700"
-            key={category}
-          >
-            {category}
-          </Link>
-        ))}
-      </div>
-      <div
-        className="bg-brand-600 h-[2px] w-[90px] rounded-full duration-300 ease-in-out"
-        style={{
-          transform: `translateX(${position}px)`,
-        }}
-      ></div>
-      <div className="bg-brand-200 h-[1px] w-full rounded-full"></div>
-    </div>
+    <Tabbar
+      items={categories}
+      currentItem={category}
+      onClickItem={handleCategoryClick}
+    />
   );
 };
