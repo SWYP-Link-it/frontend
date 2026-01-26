@@ -1,7 +1,9 @@
-import dayjs from 'dayjs';
 import { ChatListItem } from './ChatListItem';
+import dayjs from 'dayjs';
+
 export const ChatSidebar = () => {
   // TODO: 테스트용 목데이터(추후 삭제 예정)
+  // const MOCK_CHAT_ROOMS: any[] = [];
   const MOCK_CHAT_ROOMS = [
     {
       id: 1,
@@ -26,13 +28,23 @@ export const ChatSidebar = () => {
     },
   ];
   return (
-    <div className="w-[320px] bg-blue-50">
-      <div className="flex h-14 w-full items-center justify-center px-4 font-semibold text-gray-600">
-        메세지 목록
+    <div className="flex h-full w-full flex-col">
+      <div className="flex h-[48px] items-center px-[20px] pt-[10px]">
+        <span className="text-[16px] font-bold text-gray-800">대화 목록</span>
+        <span className="ml-1 text-gray-300">●</span>
       </div>
-      {MOCK_CHAT_ROOMS.map((item) => {
-        return <ChatListItem data={item} key={item.id} />;
-      })}
+      {MOCK_CHAT_ROOMS.length > 0 ? (
+        <div className="flex-1 overflow-y-auto pr-1">
+          {MOCK_CHAT_ROOMS.map((item) => {
+            return <ChatListItem data={item} key={item.id} />;
+          })}
+        </div>
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-[14px] text-gray-500">
+          대화 목록이 없습니다
+        </div>
+      )}
+      {/* 리스트 영역 */}
     </div>
   );
 };
