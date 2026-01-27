@@ -13,5 +13,5 @@ export const MSWProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  return <>{children}</>;
+  return children;
 };
