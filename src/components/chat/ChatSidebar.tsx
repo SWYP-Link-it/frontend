@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { ChatListItem } from './ChatListItem';
 import { ChatRoomListItem } from '@/src/types/chat';
+import { api } from '@/src/lib/api/api';
 
 export const ChatSidebar = () => {
   const router = useRouter();
@@ -12,12 +12,7 @@ export const ChatSidebar = () => {
 
   const fetchRooms = useCallback(async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
-
-      const response = await axios.get('https://api.desklab.kr/chat/rooms', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get('/chat/rooms');
 
       const roomList = response.data.data || [];
 
@@ -44,37 +39,26 @@ export const ChatSidebar = () => {
 
   const handleCreateTestRoom = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        alert('로그인이 필요합니다.');
-        return;
-      }
-
       const targetPartnerId = Number(
         prompt('대화할 상대방 ID를 입력하세요 (예: 2)', '2'),
       );
       if (!targetPartnerId) return;
 
-      const response = await axios.post(
-        'https://api.desklab.kr/chat/rooms',
-        {
-          partnerId: targetPartnerId,
-          type: 'MENTORING',
-        },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const response = await api.post('/chat/rooms', {
+        partnerId: targetPartnerId,
+        type: 'MENTORING',
+      });
 
       const newRoomId = response.data.data.roomId;
       alert(`방 생성 성공! ID: ${newRoomId}`);
 
-      fetchRooms(); // 목록 새로고침
+      fetchRooms();
       router.push(`/chat/${newRoomId}`);
     } catch (error) {
       console.error('방 생성 실패:', error);
       alert('방 생성 중 오류가 발생했습니다.');
     }
   };
-
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[48px] items-center justify-between px-[20px] pt-[10px]">

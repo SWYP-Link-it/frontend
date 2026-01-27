@@ -1,6 +1,4 @@
-// src/hooks/useChat.ts
 import { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
 import { ChatMessage, ChatRoomDetail } from '@/src/types/chat';
 import {
   connectSocket,
@@ -11,6 +9,7 @@ import {
   sendMessage as sendSocketMessage,
   ChatPayload,
 } from '@/src/utils/socket';
+import { api } from '../lib/api/api';
 
 export const useChat = (roomId: number) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -22,15 +21,9 @@ export const useChat = (roomId: number) => {
   const fetchInitialData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
-
-      const headers = { Authorization: `Bearer ${token}` };
-      const BASE_URL = 'https://api.desklab.kr';
-
       const [roomRes, msgsRes] = await Promise.all([
-        axios.get(`${BASE_URL}/chat/rooms/${roomId}`, { headers }),
-        axios.get(`${BASE_URL}/chat/rooms/${roomId}/messages`, { headers }),
+        api.get(`/chat/rooms/${roomId}`),
+        api.get(`/chat/rooms/${roomId}/messages`),
       ]);
 
       if (roomRes.data && roomRes.data.success) {
@@ -53,7 +46,7 @@ export const useChat = (roomId: number) => {
 
     const setupSocket = async () => {
       try {
-        await connectSocket(token);
+        await connectSocket(token); // 여긴 그대로 유지
 
         subscriptionRef.current = subscribeToRoom(
           roomId,
