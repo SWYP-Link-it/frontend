@@ -1,42 +1,100 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { ChatListItem } from './ChatListItem';
-import dayjs from 'dayjs';
+import { ChatRoomListItem } from '@/src/types/chat';
 
 export const ChatSidebar = () => {
-  // TODO: 테스트용 목데이터(추후 삭제 예정)
-  // const MOCK_CHAT_ROOMS: any[] = [];
-  const MOCK_CHAT_ROOMS = [
-    {
-      id: 1,
-      nickname: '김개발',
-      profileUrl: 'https://i.pravatar.cc/150?img=11',
-      lastMessage: '오! 그 기능 진짜 편하네요. 고생하셨습니다! 👍',
-      createdAt: dayjs().subtract(10, 'minute').toISOString(),
-    },
-    {
-      id: 2,
-      nickname: '이디자이너',
-      profileUrl: 'https://i.pravatar.cc/150?img=5',
-      lastMessage: '시안 수정본 전달드렸습니다. 확인 부탁드려요~',
-      createdAt: dayjs().subtract(1, 'day').toISOString(),
-    },
-    {
-      id: 3,
-      nickname: '박기획',
-      profileUrl: 'https://i.pravatar.cc/150?img=3',
-      lastMessage: '혹시 다음 주 미팅 시간 조율 가능하실까요?',
-      createdAt: '2023-12-25T14:30:00',
-    },
-  ];
+  const router = useRouter();
+  const [rooms, setRooms] = useState<ChatRoomListItem[]>([]);
+
+  const fetchRooms = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      const response = await axios.get('https://api.desklab.kr/chat/rooms', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const roomList = response.data.data || [];
+
+      const sortedList = roomList.sort(
+        (a: ChatRoomListItem, b: ChatRoomListItem) => {
+          const timeA = a.lastMessageAtEpochMs || 0;
+          const timeB = b.lastMessageAtEpochMs || 0;
+          return timeB - timeA;
+        },
+      );
+
+      setRooms(sortedList);
+    } catch (error) {
+      console.error('채팅방 목록 로딩 실패:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      await fetchRooms();
+    };
+    init();
+  }, [fetchRooms]);
+
+  const handleCreateTestRoom = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      const targetPartnerId = Number(
+        prompt('대화할 상대방 ID를 입력하세요 (예: 2)', '2'),
+      );
+      if (!targetPartnerId) return;
+
+      const response = await axios.post(
+        'https://api.desklab.kr/chat/rooms',
+        {
+          partnerId: targetPartnerId,
+          type: 'MENTORING',
+        },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      const newRoomId = response.data.data.roomId;
+      alert(`방 생성 성공! ID: ${newRoomId}`);
+
+      fetchRooms(); // 목록 새로고침
+      router.push(`/chat/${newRoomId}`);
+    } catch (error) {
+      console.error('방 생성 실패:', error);
+      alert('방 생성 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex h-[48px] items-center px-[20px] pt-[10px]">
-        <span className="text-[16px] font-bold text-gray-800">대화 목록</span>
-        <span className="ml-1 text-gray-300">●</span>
+      <div className="flex h-[48px] items-center justify-between px-[20px] pt-[10px]">
+        <div className="flex items-center">
+          <span className="text-[16px] font-bold text-gray-800">대화 목록</span>
+          <span className="ml-1 text-gray-300">● {rooms.length}</span>
+        </div>
+
+        <button
+          onClick={handleCreateTestRoom}
+          className="text-brand-600 rounded bg-blue-100 px-2 py-1 text-xs hover:bg-blue-200"
+        >
+          + 방 만들기
+        </button>
       </div>
-      {MOCK_CHAT_ROOMS.length > 0 ? (
+
+      {rooms.length > 0 ? (
         <div className="flex-1 overflow-y-auto pr-1">
-          {MOCK_CHAT_ROOMS.map((item) => {
-            return <ChatListItem data={item} key={item.id} />;
+          {rooms.map((room) => {
+            return <ChatListItem key={room.roomId} data={room} />;
           })}
         </div>
       ) : (
@@ -44,7 +102,6 @@ export const ChatSidebar = () => {
           대화 목록이 없습니다
         </div>
       )}
-      {/* 리스트 영역 */}
     </div>
   );
 };
