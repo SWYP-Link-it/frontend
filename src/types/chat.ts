@@ -1,11 +1,49 @@
-// src/types/chat.ts (없으면 만드셔도 됩니다)
+// 📂 src/types/chat.ts
 
-export interface ChatMessage {
+export type ApiResponse<T> = {
+  success: boolean;
+  code: string | null;
+  message: string;
+  data: T;
+};
+
+// GET /chat/rooms/{roomId}
+export type ChatRoomDetail = {
   roomId: number;
+  mentorId: number;
+  menteeId: number;
+  status: 'ACTIVE' | 'INACTIVE';
+  partnerId: number;
+  partnerNickname: string;
+  partnerProfileImageUrl: string;
+  lastMessageId: number;
+  lastMessageContent: string;
+  lastMessageAtEpochMs: number;
+  unreadCount: number;
+  unreadMentorCount: number;
+  unreadMenteeCount: number;
+  createdAtEpochMs: number;
+  modifiedAtEpochMs: number;
+};
+
+// GET /chat/rooms/{roomId}/messages
+export type ChatMessage = {
   messageId: number;
+  roomId: number;
   senderId: number;
   senderRole: 'MENTOR' | 'MENTEE';
-  text: string;
-  sentAtEpochMs: number; // 시간값 (new Date(sentAtEpochMs)로 변환해서 사용)
-  system: boolean; // true면 시스템 메시지(입장/퇴장 등)
+  content: string;
+  createdAtEpochMs: number;
+  isMine: boolean;
+};
+
+export interface ChatRoomListItem {
+  roomId: number;
+  roomName: string;
+  partnerId: number;
+  partnerNickname: string;
+  partnerProfileImageUrl: string | null;
+  lastMessage: string | null;
+  lastMessageAtEpochMs: number | null;
+  unreadCount: number;
 }
