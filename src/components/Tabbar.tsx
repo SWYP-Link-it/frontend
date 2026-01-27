@@ -8,7 +8,7 @@ export const Tabbar = ({ items, currentItem, onClickItem }: TabbarProps) => {
   const itemIndex = items.indexOf(currentItem);
 
   return (
-    <div className="w-full">
+    <div className="flex h-[57px] w-full flex-col justify-end">
       <div className="flex">
         {items.map((item) => (
           <button
