@@ -11,7 +11,7 @@ export default async function Skills({
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="sticky top-[77px] bg-white px-28">
+      <div className="sticky top-[77px] z-50 bg-white px-28">
         <div className="my-6 flex flex-col gap-[2px]">
           <h1 className="text-2xl leading-[1.5] font-semibold text-gray-800">
             스킬 게시판
