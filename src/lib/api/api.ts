@@ -31,8 +31,8 @@ api.interceptors.response.use(
 
     if (status === 401) {
       try {
-        const reissueResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/refresh`,
+        const reissueResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/refresh`,
           {
             withCredentials: true,
           },
