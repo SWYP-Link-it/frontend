@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** 입력 필드 위쪽에 표시될 라벨 */
-  label: string;
+  label?: string;
   /** 아래쪽에 표시할 에러 메시지 */
   errorMessage?: string;
 }
@@ -20,16 +20,18 @@ export const Input = ({
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <span className="text-xl leading-[30px] font-medium">{label}</span>
+      {label && (
+        <span className="text-xl leading-[30px] font-medium">{label}</span>
+      )}
       <input
         {...props}
         className={`${
           errorMessage
-            ? 'border-2 border-[#FF4242]/60'
+            ? 'border-[#FF4242]/60'
             : isFocused
-              ? 'border-brand-600 border-2'
-              : 'border border-gray-300'
-        } rounded-[15px] bg-white px-6 py-[14px] text-xl placeholder-gray-400 outline-none`}
+              ? 'border-brand-600'
+              : 'border-gray-300'
+        } rounded-[15px] border-2 bg-white px-6 py-[14px] text-xl placeholder-gray-400 outline-none`}
         onFocus={(e) => {
           setIsFocused(true);
           onFocus?.(e);

@@ -8,7 +8,7 @@ type ProgressBarProps = {
 export const ProgressBar = ({ step, totalSteps }: ProgressBarProps) => {
   const progressPercentage = (step / totalSteps) * 100;
   return (
-    <div className="flex h-7 w-full items-center gap-5">
+    <div className="flex h-7 w-full items-center gap-[22px]">
       <div className="h-1.5 w-full rounded-full bg-gray-200">
         <div
           className="h-1.5 rounded-full bg-linear-to-r from-[#5E9EFF] to-[#784FF7] duration-700 ease-in-out"

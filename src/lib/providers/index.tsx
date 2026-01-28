@@ -1,5 +1,6 @@
 'use client';
 
+import { AuthProvider } from './AuthProvider';
 import { MSWProvider } from './MSWProvider';
 
 export const ClientProviders = ({
@@ -7,5 +8,9 @@ export const ClientProviders = ({
 }: {
   children: React.ReactNode;
 }) => {
-  return <MSWProvider>{children}</MSWProvider>;
+  return (
+    <MSWProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </MSWProvider>
+  );
 };
