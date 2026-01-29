@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { LoginContent } from './LoginContent';
 import { useIsLoggedIn } from '@/src/stores/selectors';
+import { createPortal } from 'react-dom';
 
 type RequiredAuthProps = {
   children: React.ReactNode;
@@ -27,18 +28,21 @@ export const RequiredAuth = ({ children }: RequiredAuthProps) => {
       <div className="contents" onClickCapture={(e) => handleClick(e)}>
         {children}
       </div>
-      {isOpened && (
-        <div
-          className="fixed top-0 left-0 z-[999] flex h-screen w-screen items-center justify-center bg-black/20"
-          onClick={() => {
-            setIsOpened(false);
-          }}
-        >
-          <div onClick={(e) => e.stopPropagation()}>
-            <LoginContent />
-          </div>
-        </div>
-      )}
+      {isOpened
+        ? createPortal(
+            <div
+              className="fixed top-0 left-0 z-[999] flex h-screen w-screen items-center justify-center bg-black/20"
+              onClick={() => {
+                setIsOpened(false);
+              }}
+            >
+              <div onClick={(e) => e.stopPropagation()}>
+                <LoginContent />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 };
