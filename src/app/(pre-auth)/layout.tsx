@@ -1,9 +1,12 @@
-import { LoginContent } from '@/src/features/auth/LoginContent';
 import Image from 'next/image';
 
-export default function Login() {
+export default function PreAuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex h-full w-full items-center justify-center bg-sky-50">
+    <div className="h-screen w-full bg-[#F8FAFE]">
       <Image
         className="fixed top-12.5 left-25"
         src="/icons/logo.svg"
@@ -11,7 +14,7 @@ export default function Login() {
         width={134}
         height={54}
       />
-      <LoginContent />
+      {children}
     </div>
   );
 }
