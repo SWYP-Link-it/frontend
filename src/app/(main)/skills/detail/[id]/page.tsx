@@ -4,6 +4,8 @@ import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
 import { Button } from '@/src/components/Button';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
 import { mockSkillList } from '@/src/lib/mocks/data';
+import Link from 'next/link';
+import { RequiredAuth } from '@/src/features/auth/RequiredAuth';
 
 export default async function SkillDetailPage({
   params,
@@ -38,12 +40,16 @@ export default async function SkillDetailPage({
           내 크레딧 | 30
         </span>
         <div className="flex gap-[15px]">
-          <div className="w-[380px]">
-            <Button text={'스킬 요청하기'} mode="active" />
-          </div>
-          <div className="w-[380px]">
-            <Button text={'메세지 보내기'} />
-          </div>
+          <RequiredAuth>
+            <Link className="w-[380px]" href="/skills/request">
+              <Button text={'스킬 요청하기'} mode="active" />
+            </Link>
+          </RequiredAuth>
+          <RequiredAuth>
+            <Link className="w-[380px]" href="/messages">
+              <Button text={'메세지 보내기'} />
+            </Link>
+          </RequiredAuth>
         </div>
       </div>
     </div>
