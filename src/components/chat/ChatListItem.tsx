@@ -4,7 +4,7 @@ import { ChatRoomListItem } from '@/src/types/chat';
 
 export const ChatListItem = ({ data }: { data: ChatRoomListItem }) => {
   return (
-    <Link href={`/chat/${data.roomId}`} className="block">
+    <Link href={`/messages/${data.roomId}`} className="block">
       <div className="m-[10px] flex h-[86px] cursor-pointer items-center rounded-[6px] p-[10px] transition-colors hover:bg-gray-50">
         <img
           className="mr-[12px] h-[40px] w-[40px] shrink-0 rounded-full bg-gray-200 object-cover"
