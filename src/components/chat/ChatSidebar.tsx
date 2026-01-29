@@ -13,7 +13,6 @@ export const ChatSidebar = () => {
   const fetchRooms = useCallback(async () => {
     try {
       const response = await api.get('/chat/rooms');
-
       const roomList = response.data.data || [];
 
       const sortedList = roomList.sort(
@@ -39,26 +38,30 @@ export const ChatSidebar = () => {
 
   const handleCreateTestRoom = async () => {
     try {
-      const targetPartnerId = Number(
-        prompt('대화할 상대방 ID를 입력하세요 (예: 2)', '2'),
-      );
-      if (!targetPartnerId) return;
+      // TODO: 실제 구현 시에는 로그인한 유저 ID(menteeId)와 멘토 상세 페이지에서 넘겨받은 mentorId를 동적으로 사용해야 함
+      const myId = 17;
+      const partnerId = 15;
 
-      const response = await api.post('/chat/rooms', {
-        partnerId: targetPartnerId,
-        type: 'MENTORING',
+      const response = await api.post('/chat/rooms', null, {
+        params: {
+          mentorId: partnerId,
+          menteeId: myId,
+          type: 'MENTORING',
+        },
       });
 
       const newRoomId = response.data.data.roomId;
-      alert(`방 생성 성공! ID: ${newRoomId}`);
+      alert(`성공! 방 ID: ${newRoomId}`);
 
       fetchRooms();
-      router.push(`/chat/${newRoomId}`);
-    } catch (error) {
-      console.error('방 생성 실패:', error);
-      alert('방 생성 중 오류가 발생했습니다.');
+      router.push(`/messages/${newRoomId}`);
+    } catch (error: any) {
+      console.error('방 생성 실패:', error.response?.data);
+      const msg = error.response?.data?.message || '생성 실패';
+      alert(`실패: ${msg}`);
     }
   };
+
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[48px] items-center justify-between px-[20px] pt-[10px]">
@@ -71,7 +74,7 @@ export const ChatSidebar = () => {
           onClick={handleCreateTestRoom}
           className="text-brand-600 rounded bg-blue-100 px-2 py-1 text-xs hover:bg-blue-200"
         >
-          + 방 만들기
+          + 테스트방 생성(ID:1)
         </button>
       </div>
 
