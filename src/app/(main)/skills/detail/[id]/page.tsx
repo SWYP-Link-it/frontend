@@ -1,5 +1,5 @@
 import { DetailTabs } from '@/src/features/skills/detail/DetailTabs';
-import { UserIntroduction } from '@/src/features/skills/detail/UserIntroduction';
+import { UserProfile } from '@/src/features/skills/detail/UserProfile';
 import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
 import { Button } from '@/src/components/Button';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
@@ -18,6 +18,8 @@ export default async function SkillDetailPage({
   const skillId = Number(id);
   const skill = mockSkillList.find((s) => s.id === skillId);
 
+  if (!skill) return null;
+
   const otherSkills = mockSkillList.filter(
     (s) => s.profile.id === skill?.profile.id,
   );
@@ -26,7 +28,7 @@ export default async function SkillDetailPage({
     <>
       <div className="flex flex-1 flex-col">
         <div className="sticky top-[77px] z-50 bg-white px-28">
-          <UserIntroduction />
+          <UserProfile profile={skill.profile} />
           <DetailTabs />
         </div>
         <div className="flex flex-1 gap-5 bg-[#F8FAFE] px-28 pt-12 pb-9">
