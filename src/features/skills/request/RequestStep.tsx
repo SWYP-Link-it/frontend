@@ -5,6 +5,7 @@ import { ko } from 'react-day-picker/locale';
 import { useRequestForm } from './RequestFormProvider';
 import { mockSkillList } from '@/src/lib/mocks/data';
 import Link from 'next/link';
+import { AlertIcon } from '@/src/components/icons/AlertIcon';
 
 type RequestStepProps = {
   step: number;
@@ -14,8 +15,8 @@ type RequestStepProps = {
 export const RequestStep = ({ step, setStep }: RequestStepProps) => {
   const { formData, setFormData } = useRequestForm();
 
-  const availableTimes = ['16:00 ~ 17:00', '17:00 ~ 18:00', '18:00 ~ 19:00'];
-  // const availableTimes: string[] = [];
+  // const availableTimes = ['16:00 ~ 17:00', '17:00 ~ 18:00', '18:00 ~ 19:00'];
+  const availableTimes: string[] = [];
 
   const canProgress = availableTimes && availableTimes.length > 0;
 
@@ -88,7 +89,8 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
             {!availableTimes ||
               (availableTimes.length === 0 && (
                 <div className="flex h-[45px] w-[366px] items-center justify-center gap-[7px] rounded-xl bg-gray-200 text-sm leading-[1.5] font-medium text-gray-400">
-                  <span>i</span>가능한 시간대가 없어요.
+                  <AlertIcon />
+                  가능한 시간대가 없어요.
                 </div>
               ))}
           </div>
@@ -100,11 +102,20 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
         )}
       </div>
       <div className="mt-[74px] w-[380px]">
-        <Button
-          text="다음으로"
-          mode={canProgress ? 'active' : 'inactive'}
-          onClick={() => setStep((step) => step + 1)}
-        />
+        {step === 1 && (
+          <Button
+            text="다음으로"
+            mode="active"
+            onClick={() => setStep((step) => step + 1)}
+          />
+        )}
+        {step === 2 && (
+          <Button
+            text="다음으로"
+            mode={canProgress ? 'active' : 'inactive'}
+            onClick={() => setStep((step) => step + 1)}
+          />
+        )}
       </div>
     </>
   );
