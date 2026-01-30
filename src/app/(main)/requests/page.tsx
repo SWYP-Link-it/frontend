@@ -6,7 +6,34 @@ import { api } from '@/src/lib/api/api';
 import { useAuthStore } from '@/src/stores/authStore';
 import { RequestCard } from '@/src/components/request/RequestCard';
 import { EmptyState } from '@/src/components/request/EmptyState';
-import { SkillRequest, TabType } from '@/src/types/request';
+import {
+  SkillRequest,
+  TabType,
+  ApiRequestItem,
+  RequestStatus,
+} from '@/src/types/request';
+import { Tabbar } from '@/src/components/Tabbar';
+
+// 날짜 포맷팅 유틸 (YYYY-MM-DDT... -> YYYY년 MM월 DD일)
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
+
+// 백엔드 상태값(한글) -> 프론트 상태값(영어) 변환
+const mapStatus = (koreanStatus: string): RequestStatus => {
+  switch (koreanStatus) {
+    case '수락됨':
+      return 'ACCEPTED';
+    case '거절됨':
+      return 'REJECTED';
+    case '대기중':
+      return 'PENDING';
+    default:
+      return 'PENDING'; // 기본값
+  }
+};
 
 const parseJwt = (token: string) => {
   try {
@@ -32,6 +59,19 @@ export default function RequestPage() {
 
   const accessToken = useAuthStore((state) => state.accessToken);
 
+  // 탭바 설정
+  const TAB_ITEMS = ['받은 요청', '보낸 요청'] as const;
+  const tabLabelToId: Record<string, TabType> = {
+    '받은 요청': 'received',
+    '보낸 요청': 'sent',
+  };
+  const currentTabLabel = activeTab === 'received' ? '받은 요청' : '보낸 요청';
+
+  const handleTabClick = (label: string) => {
+    const newTabId = tabLabelToId[label];
+    if (newTabId) setActiveTab(newTabId);
+  };
+
   const getMyId = () => {
     if (!accessToken) return 0;
     const payload = parseJwt(accessToken);
@@ -42,138 +82,59 @@ export default function RequestPage() {
     try {
       setIsLoading(true);
 
-      // TODO: 확인용 MOCK DATA (수정 예정)
-      // 1. 전체 가짜 데이터
-      const MOCK_DATA = [
-        // [받은 요청] 1. 대기중인 요청 (React 멘토링)
-        {
-          id: 1,
-          partnerId: 101, // 채팅용 상대방 ID
-          partnerNickname: '코딩하는고양이',
-          partnerTag: 'React',
-          partnerProfileImageUrl: '', // 없으면 기본이미지 뜸
-          description:
-            '안녕하세요! 리액트 상태관리 라이브러리(Zustand)에 대해 1:1 멘토링을 받고 싶습니다. 실무에서 어떻게 쓰는지 궁금해요!',
-          status: 'PENDING',
-          sessionDate: '2025년 07월 20일',
-          sessionTime: '1시간',
-          credits: 3,
-          createdAt: '2025.07.19',
-          isSentByMe: false, // 내가 받은 것
-        },
-        {
-          id: 2,
-          partnerId: 102,
-          partnerNickname: '디자인깎는노인',
-          partnerTag: 'Figma',
-          partnerProfileImageUrl: '',
-          description:
-            '피그마 오토레이아웃 기능이 너무 어려워서 과외 요청드립니다. 기초부터 알려주세요.',
-          status: 'ACCEPTED',
-          sessionDate: '2025년 07월 22일',
-          sessionTime: '30분',
-          credits: 1,
-          createdAt: '2025.07.18',
-          isSentByMe: false, // 내가 받은 것
-        },
-        {
-          id: 3,
-          partnerId: 103,
-          partnerNickname: '자바의신',
-          partnerTag: 'Java',
-          partnerProfileImageUrl: '',
-          description:
-            '스프링부트 JPA N+1 문제 해결 때문에 머리가 아픕니다. 코드 리뷰 좀 부탁드려도 될까요?',
-          status: 'PENDING',
-          sessionDate: '2025년 07월 25일',
-          sessionTime: '1시간',
-          credits: 5,
-          createdAt: '2025.07.20',
-          isSentByMe: true, // 내가 보낸 것
-        },
-        {
-          id: 4,
-          partnerId: 104,
-          partnerNickname: '풀스택개발자',
-          partnerTag: 'Node.js',
-          partnerProfileImageUrl: '',
-          description: 'NestJS 아키텍처 설계 조언 구합니다.',
-          status: 'REJECTED',
-          sessionDate: '2025년 07월 21일',
-          sessionTime: '30분',
-          credits: 2,
-          createdAt: '2025.07.15',
-          isSentByMe: true, // 내가 보낸 것
-        },
-      ];
+      // 1. 탭에 따라 엔드포인트 결정
+      const endpoint =
+        activeTab === 'received'
+          ? '/exchange/request/received'
+          : '/exchange/request/sent';
 
-      const filteredMockData = MOCK_DATA.filter((item) =>
-        activeTab === 'received' ? !item.isSentByMe : item.isSentByMe,
-      );
-
-      setRequests(filteredMockData as any);
-
-      /* const response = await api.get('/requests', {
-        params: { type: activeTab },
+      // 2. 실제 API 호출
+      const response = await api.get(endpoint, {
+        params: {
+          size: 100, // 일단 넉넉하게 가져옴 (나중에 무한스크롤 적용 시 nextCursor 사용)
+        },
       });
-      const rawData = response.data.data || [];
-      const mappedRequests = rawData.map(...)
+
+      // 3. 데이터 매핑 (Swagger 응답 -> UI 타입)
+      const contentList: ApiRequestItem[] = response.data?.data?.contents || [];
+
+      const mappedRequests: SkillRequest[] = contentList.map((item) => ({
+        id: item.skillExchangeId,
+        partnerId: item.targetUserId,
+        partnerNickname: item.targetNickname,
+        partnerTag: item.skillName, // 스킬 이름 (예: Java)
+        partnerProfileImageUrl: item.targetProfileImageUrl,
+        description: item.message, // 요청 메시지
+        status: mapStatus(item.exchangeStatus), // 상태값 변환
+        sessionDate: formatDate(item.exchangeDateTime), // 날짜 포맷팅
+        sessionTime: `${item.exchangeDuration}분`, // 60 -> "60분"
+        credits: item.creditPrice,
+        createdAt: item.requestedDate,
+        isSentByMe: activeTab === 'sent',
+      }));
+
       setRequests(mappedRequests);
-      */
     } catch (error) {
-      console.error(error);
+      console.error('요청 내역 불러오기 실패:', error);
       setRequests([]);
     } finally {
       setIsLoading(false);
     }
   }, [activeTab]);
 
-  // const fetchRequests = useCallback(async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     const response = await api.get('/requests', {
-  //       params: { type: activeTab },
-  //     });
-
-  //     const rawData = response.data.data || [];
-  //     const mappedRequests = rawData.map((item: any) => ({
-  //       id: item.id,
-  //       partnerId: item.partnerId || item.senderId || 0,
-  //       partnerNickname:
-  //         item.partnerNickname ||
-  //         item.nickname ||
-  //         item.partner?.nickname ||
-  //         '알 수 없음',
-  //       partnerTag:
-  //         item.partnerTag || item.tag || item.partner?.tag || '태그 없음',
-  //       partnerProfileImageUrl:
-  //         item.partnerProfileImageUrl || item.profileImageUrl,
-  //       description: item.description,
-  //       status: item.status,
-  //       sessionDate: item.sessionDate || '날짜 미정',
-  //       sessionTime: item.sessionTime || '시간 미정',
-  //       credits: item.credits || 0,
-  //       createdAt: item.createdAt || '',
-  //       isSentByMe: activeTab === 'sent',
-  //     }));
-
-  //     setRequests(mappedRequests);
-  //   } catch (error) {
-  //     console.error(error);
-  //     setRequests([]);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, [activeTab]);
-
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
 
+  // --- 아래 액션 핸들러들은 백엔드 API 명세에 따라 URL 확인 필요 ---
+  // (일단 기존 로직 유지하되 ID를 skillExchangeId로 사용)
+
   const handleAccept = async (id: number) => {
     if (!confirm('요청을 수락하시겠습니까?')) return;
     try {
-      await api.post(`/requests/${id}/accept`);
+      // TODO: 수락 API 엔드포인트 확인 필요 (예상: /exchange/request/{id}/accept)
+      // 현재는 임시 URL 사용
+      await api.post(`/exchange/request/${id}/accept`);
       alert('수락되었습니다.');
       fetchRequests();
     } catch (error) {
@@ -184,7 +145,7 @@ export default function RequestPage() {
   const handleReject = async (id: number) => {
     if (!confirm('요청을 거절하시겠습니까?')) return;
     try {
-      await api.post(`/requests/${id}/reject`);
+      await api.post(`/exchange/request/${id}/reject`);
       alert('거절되었습니다.');
       fetchRequests();
     } catch (error) {
@@ -195,7 +156,7 @@ export default function RequestPage() {
   const handleCancel = async (id: number) => {
     if (!confirm('요청을 취소하시겠습니까?')) return;
     try {
-      await api.delete(`/requests/${id}`);
+      await api.delete(`/exchange/request/${id}`);
       alert('취소되었습니다.');
       fetchRequests();
     } catch (error) {
@@ -229,9 +190,10 @@ export default function RequestPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* 1. 상단 섹션 (흰색 배경) - 제목과 탭은 여기에 위치 */}
+      {/* 1. 상단 섹션 */}
       <div className="w-full bg-white">
-        <div className="mx-auto w-full max-w-6xl">
+        {/* Header와 동일한 여백 px-[112px] */}
+        <div className="w-full px-[112px]">
           <div className="flex h-[100px] flex-col justify-center">
             <h1 className="mb-[4px] text-[24px] font-semibold text-gray-800">
               요청 관리
@@ -241,35 +203,19 @@ export default function RequestPage() {
             </p>
           </div>
 
-          {/* 탭 버튼: 흰색 배경의 바닥에 붙음 */}
-          <div className="flex h-[56px] border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab('received')}
-              className={`px-[8px] text-[18px] font-semibold transition-all ${
-                activeTab === 'received'
-                  ? 'border-brand-600 border-b-2 text-gray-700'
-                  : 'text-gray-500'
-              }`}
-            >
-              받은 요청
-            </button>
-            <button
-              onClick={() => setActiveTab('sent')}
-              className={`px-[8px] text-[18px] font-semibold transition-all ${
-                activeTab === 'sent'
-                  ? 'border-brand-600 border-b-2 text-gray-700'
-                  : 'text-gray-500'
-              }`}
-            >
-              보낸 요청
-            </button>
+          <div className="mt-4">
+            <Tabbar
+              items={TAB_ITEMS}
+              currentItem={currentTabLabel}
+              onClickItem={handleTabClick}
+            />
           </div>
         </div>
       </div>
 
-      {/* 2. 하단 섹션 (회색 배경) - 카드 리스트는 여기에 위치 */}
+      {/* 2. 하단 섹션 */}
       <div className="w-full flex-1 bg-[#F8FAFC]">
-        <main className="mx-auto w-full max-w-6xl px-4 py-10">
+        <main className="w-full px-[112px] py-10">
           <div className="space-y-6">
             {isLoading ? (
               <div className="flex h-60 items-center justify-center text-gray-400">
