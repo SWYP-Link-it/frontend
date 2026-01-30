@@ -1,12 +1,14 @@
+import Link from 'next/link';
 import { DetailTabs } from '@/src/features/skills/detail/DetailTabs';
 import { UserProfile } from '@/src/features/skills/detail/UserProfile';
 import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
 import { Button } from '@/src/components/Button';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
 import { mockSkillList } from '@/src/lib/mocks/data';
-import Link from 'next/link';
 import { RequiredAuth } from '@/src/features/auth/RequiredAuth';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
+import { RequestIcon } from '@/src/components/icons/RequestIcon';
+import { MessageIcon } from '@/src/components/icons/MessageIcon';
 
 export default async function SkillDetailPage({
   params,
@@ -46,12 +48,19 @@ export default async function SkillDetailPage({
           <div className="flex gap-[15px]">
             <RequiredAuth>
               <Link className="w-[380px]" href="/skills/request">
-                <Button text={'스킬 요청하기'} mode="active" />
+                <Button
+                  text={'스킬 요청하기'}
+                  mode="active"
+                  icon={<RequestIcon size={20} />}
+                />
               </Link>
             </RequiredAuth>
             <RequiredAuth>
               <Link className="w-[380px]" href="/messages">
-                <Button text={'메세지 보내기'} />
+                <Button
+                  text={'메세지 보내기'}
+                  icon={<MessageIcon size={20} />}
+                />
               </Link>
             </RequiredAuth>
           </div>

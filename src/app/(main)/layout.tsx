@@ -1,5 +1,5 @@
 import { Header } from '@/src/components/common/Header';
-import Sidebar from '@/src/components/common/Sidebar';
+import { Sidebar } from '@/src/components/common/Sidebar';
 
 export default function MainLayout({
   children,

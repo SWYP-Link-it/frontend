@@ -1,3 +1,5 @@
+import { ReactElement } from 'react';
+
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** 버튼에 표시될 텍스트 */
   text: string;
@@ -7,9 +9,16 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
    * - 'default': 기본 상태 (클릭 가능)
    */
   mode?: 'inactive' | 'active' | 'default';
+  /** 왼쪽에 표시할 아이콘 */
+  icon?: ReactElement;
 }
 
-export const Button = ({ mode = 'default', text, ...props }: ButtonProps) => {
+export const Button = ({
+  mode = 'default',
+  text,
+  icon,
+  ...props
+}: ButtonProps) => {
   return (
     <button
       {...props}
@@ -20,8 +29,9 @@ export const Button = ({ mode = 'default', text, ...props }: ButtonProps) => {
           : mode === 'active'
             ? 'bg-brand-600 cursor-pointer text-white'
             : 'cursor-pointer bg-gray-200 text-gray-800'
-      } w-full rounded-xl py-[15px] font-semibold`}
+      } flex w-full items-center justify-center gap-[10px] rounded-xl py-[15px] font-semibold`}
     >
+      {icon}
       {text}
     </button>
   );

@@ -1,4 +1,5 @@
 import { Profile } from '@/src/types/types';
+import Image from 'next/image';
 
 type UserProfileProps = {
   profile: Profile;
@@ -9,8 +10,8 @@ export const UserProfile = ({ profile }: UserProfileProps) => {
 
   return (
     <div className="mt-[26px] mb-[30px] flex flex-col gap-3">
-      <div className="flex gap-3">
-        <span className="bg-brand-200 h-8 w-8 rounded-full">프</span>
+      <div className="flex items-center gap-3">
+        <Image src="/icons/avatar.svg" alt={nickname} width={40} height={40} />
         <div className="text-xl leading-[1.5] font-semibold text-gray-800">
           {nickname}
         </div>

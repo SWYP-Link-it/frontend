@@ -1,6 +1,11 @@
 import { Skill } from '@/src/types/types';
 import Image from 'next/image';
 import { ReviewSection } from './ReviewSection';
+import { ReactElement } from 'react';
+import { CursorBoxIcon } from '@/src/components/icons/CursorBoxIcon';
+import { ClockIcon } from '@/src/components/icons/ClockIcon';
+import { ImageIcon } from '@/src/components/icons/ImageIcon';
+import { EditIcon } from '@/src/components/icons/EditIcon';
 
 type SkillDetailProps = {
   skill: Skill;
@@ -54,13 +59,19 @@ export const SkillDetail = ({ skill }: SkillDetailProps) => {
         </div>
       </div>
       <div id="skill-detail-introduction" className="flex flex-col gap-4">
-        <SectionTitle icon="icon" title="스킬 소개" />
+        <SectionTitle
+          icon={<CursorBoxIcon size={18} className="text-gray-800" />}
+          title="스킬 소개"
+        />
         <div className="text-sm leading-[1.6] font-medium text-gray-700">
           {description}
         </div>
       </div>
       <div id="skill-detail-time" className="flex flex-col gap-[18px]">
-        <SectionTitle icon="icon" title="선호 시간대" />
+        <SectionTitle
+          icon={<ClockIcon size={18} className="text-gray-800" />}
+          title="선호 시간대"
+        />
         <div className="flex flex-wrap gap-x-5 gap-y-4">
           {profile.time.map((t) => (
             <div
@@ -73,7 +84,10 @@ export const SkillDetail = ({ skill }: SkillDetailProps) => {
         </div>
       </div>
       <div id="skill-detail-portfolio" className="mt-3 flex flex-col gap-6">
-        <SectionTitle icon="icon" title="포트폴리오 이미지" />
+        <SectionTitle
+          icon={<ImageIcon size={18} className="text-gray-800" />}
+          title="포트폴리오 이미지"
+        />
         <div className="flex gap-5 overflow-x-auto pb-10">
           {portfolioUrls.map((url) => (
             <div key={url} className="border">
@@ -89,17 +103,26 @@ export const SkillDetail = ({ skill }: SkillDetailProps) => {
         </div>
       </div>
       <div id="skill-detail-reviews" className="mt-3 flex flex-col gap-[9px]">
-        <SectionTitle icon="icon" title="이용 후기" />
+        <SectionTitle
+          icon={<EditIcon size={18} className="text-gray-800" />}
+          title="이용 후기"
+        />
         <ReviewSection reviews={reviews} />
       </div>
     </div>
   );
 };
 
-const SectionTitle = ({ icon, title }: { icon: string; title: string }) => {
+const SectionTitle = ({
+  icon,
+  title,
+}: {
+  icon: ReactElement;
+  title: string;
+}) => {
   return (
-    <div className="flex gap-2">
-      <span className="h-[18px] w-[18px]">{icon}</span>
+    <div className="flex items-center gap-2">
+      {icon}
       <div className="text-lg leading-7 font-semibold text-gray-800">
         {title}
       </div>

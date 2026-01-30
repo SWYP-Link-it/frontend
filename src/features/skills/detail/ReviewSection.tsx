@@ -1,4 +1,5 @@
 import { Review } from '@/src/types/types';
+import Image from 'next/image';
 
 type ReviewSectionProps = {
   reviews: Review[];
@@ -39,7 +40,7 @@ export const ReviewSection = ({ reviews }: ReviewSectionProps) => {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-4xl leading-11 font-semibold text-gray-800">
             {averageRating}
-            <span className="text-brand-400 h-5 w-5 text-sm">별</span>
+            <Image src={'/icons/star.svg'} alt="별" width={20} height={20} />
           </div>
           <div className="text-xs leading-[18px] font-normal text-gray-400">
             {reviews.length}개의 리뷰

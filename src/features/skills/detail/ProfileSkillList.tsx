@@ -2,6 +2,8 @@
 
 import { Skill } from '@/src/types/types';
 import Link from 'next/link';
+import Image from 'next/image';
+import { RequestIcon } from '@/src/components/icons/RequestIcon';
 
 type ProfileSkillListProps = {
   currentId: number;
@@ -15,7 +17,8 @@ export const ProfileSkillList = ({
   return (
     <div className="flex cursor-pointer flex-col gap-3 rounded-xl bg-white px-4 py-5">
       <div className="flex items-center leading-[1.5] font-semibold text-gray-500">
-        <span className="h-8 w-8 border">아</span>스킬 모음
+        <RequestIcon size={20} className="text-brand-600 m-[6px]" />
+        스킬 모음
       </div>
       <div className="flex flex-col gap-[11px]">
         {list?.map((skill, idx) => (
