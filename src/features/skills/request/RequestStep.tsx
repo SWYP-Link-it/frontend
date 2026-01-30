@@ -1,7 +1,10 @@
 import { Button } from '@/src/components/Button';
 import { Calendar } from '@/src/components/Calendar';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { ko } from 'react-day-picker/locale';
+import { useRequestForm } from './RequestFormProvider';
+import { mockSkillList } from '@/src/lib/mocks/data';
+import Link from 'next/link';
 
 type RequestStepProps = {
   step: number;
@@ -9,12 +12,19 @@ type RequestStepProps = {
 };
 
 export const RequestStep = ({ step, setStep }: RequestStepProps) => {
-  const [selected, setSelected] = useState<Date | undefined>(undefined);
+  const { formData, setFormData } = useRequestForm();
 
   const availableTimes = ['16:00 ~ 17:00', '17:00 ~ 18:00', '18:00 ~ 19:00'];
   // const availableTimes: string[] = [];
 
   const canProgress = availableTimes && availableTimes.length > 0;
+
+  const skill = mockSkillList.find((skill) => skill.id === formData.skillId);
+
+  if (!skill) return null;
+  const skillList = mockSkillList.filter(
+    (s) => s.profile.id == skill.profile.id,
+  );
 
   return (
     <>
@@ -23,25 +33,27 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
           {GUIDE_LIST[step - 1]}
         </p>
         {step === 1 && (
-          <div className="mt-9 flex gap-[18px]">
-            <div className="flex cursor-pointer flex-col items-center gap-[17px]">
-              <div className="h-25 w-25 rounded-2xl bg-gray-200"></div>
-              <span className="text-sm leading-[1.5] text-gray-700">
-                그래픽디자인
-              </span>
-            </div>
-            <div className="flex cursor-pointer flex-col items-center gap-[17px]">
-              <div className="h-25 w-25 rounded-2xl bg-gray-200"></div>
-              <span className="text-sm leading-[1.5] text-gray-700">
-                인테리어디자인
-              </span>
-            </div>
-            <div className="flex cursor-pointer flex-col items-center gap-[17px]">
-              <div className="bg-brand-200 h-25 w-25 rounded-2xl"></div>
-              <span className="text-brand-600 text-sm leading-[1.5] font-semibold">
-                게임디자인
-              </span>
-            </div>
+          <div className="mt-9 flex flex-wrap justify-center gap-[18px]">
+            {skillList.map((skill) => {
+              const isSelected = formData.skillId === skill.id;
+              return (
+                <Link
+                  key={skill.id}
+                  href={`/skills/request?skillId=${skill.id}`}
+                  replace
+                  className="flex cursor-pointer flex-col items-center gap-[17px]"
+                >
+                  <div
+                    className={`h-25 w-25 rounded-2xl ${isSelected ? 'bg-brand-200' : 'bg-gray-200'}`}
+                  ></div>
+                  <span
+                    className={`text-center text-sm leading-[1.5] ${isSelected ? 'text-brand-600 font-semibold' : 'text-gray-700'}`}
+                  >
+                    {skill.title}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         )}
         {step === 2 && (
@@ -49,8 +61,8 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
             <Calendar
               mode="single"
               locale={ko}
-              selected={selected}
-              onSelect={setSelected}
+              selected={formData.date}
+              onSelect={(date) => setFormData({ date, time: '' })}
               className="h-fit w-77 p-6"
             />
 
@@ -61,6 +73,7 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
                     <div
                       key={t}
                       className="h-8 rounded-xl bg-gray-200 px-3 py-[6px] text-sm leading-[1.5] font-medium text-gray-600"
+                      onClick={() => setFormData({ time: t })}
                     >
                       {t}
                     </div>

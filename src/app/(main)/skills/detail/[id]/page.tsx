@@ -47,7 +47,10 @@ export default async function SkillDetailPage({
           </span>
           <div className="flex gap-[15px]">
             <RequiredAuth>
-              <Link className="w-[380px]" href="/skills/request">
+              <Link
+                className="w-[380px]"
+                href={`/skills/request?skillId=${skill.id}`}
+              >
                 <Button
                   text={'스킬 요청하기'}
                   mode="active"
