@@ -6,8 +6,8 @@ export default function ChatLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-full w-full flex-col items-center">
-      <div className="flex h-full w-full max-w-[1140px] flex-col pb-[28px]">
+    <div className="flex h-full w-full flex-col items-center px-[112px]">
+      <div className="flex h-full w-full flex-col pb-[28px]">
         <div className="flex h-[100px] shrink-0 flex-col justify-center gap-1">
           <h2 className="text-[24px] font-bold text-gray-800">메세지</h2>
           <p className="text-[12px] text-gray-400">
