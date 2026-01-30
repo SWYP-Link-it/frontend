@@ -1,8 +1,4 @@
-'use client';
-
-import { scrollToTop } from '@/src/lib/utils';
 import { Skill } from '@/src/types/types';
-import { useEffect } from 'react';
 import Image from 'next/image';
 import { ReviewSection } from './ReviewSection';
 
@@ -22,10 +18,6 @@ export const SkillDetail = ({ skill }: SkillDetailProps) => {
     portfolioUrls,
     reviews,
   } = skill;
-
-  useEffect(() => {
-    scrollToTop();
-  }, []);
 
   return (
     <div className="flex flex-col gap-12 rounded-2xl bg-white px-9 pt-[54px] pb-20">

@@ -1,5 +1,3 @@
-'use client';
-
 import { CardBanner } from './CardBanner';
 import { SkillCard } from './SkillCard';
 import { Skill } from '@/src/types/types';
