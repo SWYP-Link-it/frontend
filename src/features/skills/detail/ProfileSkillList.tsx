@@ -21,6 +21,7 @@ export const ProfileSkillList = ({
         {list?.map((skill, idx) => (
           <Link
             key={skill.id}
+            title={skill.title}
             href={`/skills/detail/${skill.id}`}
             className={`truncate rounded-xl ${currentId === skill.id ? 'bg-gray-200' : ''} px-5 py-1 text-sm leading-[1.5] font-semibold text-gray-500`}
           >

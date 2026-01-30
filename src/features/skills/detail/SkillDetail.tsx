@@ -108,7 +108,9 @@ const SectionTitle = ({ icon, title }: { icon: string; title: string }) => {
   return (
     <div className="flex gap-2">
       <span className="h-[18px] w-[18px]">{icon}</span>
-      <div className="leading-7 font-semibold text-gray-800">{title}</div>
+      <div className="text-lg leading-7 font-semibold text-gray-800">
+        {title}
+      </div>
     </div>
   );
 };

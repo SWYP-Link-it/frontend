@@ -1,18 +1,17 @@
-import { mockSkillList } from '@/src/lib/mocks/data';
+'use client';
+
 import { CardBanner } from './CardBanner';
 import { SkillCard } from './SkillCard';
+import { Skill } from '@/src/types/types';
 
 type SkillListProps = {
-  category?: string;
+  list?: Skill[];
 };
 
-export const SkillList = ({ category }: SkillListProps) => {
-  // const list: any[] = [];
-  const list = mockSkillList;
-
+export const SkillList = ({ list }: SkillListProps) => {
   return (
     <>
-      {list?.length > 0 && (
+      {list && list?.length > 0 && (
         <div className="grid grid-cols-4 gap-4">
           {list.slice(0, 3).map((skill) => (
             <SkillCard key={skill.id} skill={skill} />

@@ -31,7 +31,7 @@ export default async function SkillDetailPage({
         <div className="w-0 flex-1">
           {skill && <SkillDetail skill={skill} />}
         </div>
-        <div className="w-[173px sticky top-77 h-fit">
+        <div className="sticky top-77 h-fit w-[173px]">
           <ProfileSkillList list={otherSkills} currentId={skillId} />
         </div>
       </div>

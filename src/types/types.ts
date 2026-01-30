@@ -3,7 +3,7 @@ export type Skill = {
   category: string;
   title: string;
   description: string;
-  credit: 1;
+  credit: number;
   rate?: number;
   profile: Profile;
   level: '하' | '중' | '상';
