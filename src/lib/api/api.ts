@@ -33,6 +33,7 @@ api.interceptors.response.use(
       try {
         const reissueResponse = await axios.post(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/refresh`,
+          {},
           {
             withCredentials: true,
           },
