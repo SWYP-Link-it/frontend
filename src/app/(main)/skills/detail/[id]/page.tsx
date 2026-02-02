@@ -49,7 +49,7 @@ export default async function SkillDetailPage({
             <RequiredAuth>
               <Link
                 className="w-[380px]"
-                href={`/skills/request?skillId=${skill.id}`}
+                href={`/skills/request?mentorId=${skill.profile.id}&skillId=${skill.id}`}
               >
                 <Button
                   text={'스킬 요청하기'}

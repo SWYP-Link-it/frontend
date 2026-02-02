@@ -1,21 +1,26 @@
 'use client';
 
 import { ProgressBar } from '@/src/components/ProgressBar';
+import { useFromInfoFromSearchParams } from '@/src/features/skills/request/hooks/useFormInfoFromSearchParams';
 import { RequestFormProvider } from '@/src/features/skills/request/RequestFormProvider';
 import { RequestStep } from '@/src/features/skills/request/RequestStep';
-import { useSearchParams } from 'next/navigation';
+import { mockSkillList } from '@/src/lib/mocks/data';
 import { useState } from 'react';
 
 export default function SkillRequest() {
-  const searchParams = useSearchParams();
+  const { mentorId, skillId } = useFromInfoFromSearchParams();
   const [step, setStep] = useState(1);
 
-  const skillId = searchParams.get('skillId');
+  if (!mentorId) {
+    return <div>경고: 잘못된 경로입니다.</div>;
+  }
 
-  if (!skillId) return null;
+  const otherSkills = mockSkillList.filter(
+    (s) => s.profile.id == Number(mentorId),
+  );
 
   return (
-    <RequestFormProvider key={skillId} skillId={Number(skillId)}>
+    <RequestFormProvider key={skillId} skillList={otherSkills}>
       <div className="flex flex-1 flex-col items-center pt-[91px] pb-22">
         <div className="w-[492px]">
           <ProgressBar step={step} totalSteps={3} />
