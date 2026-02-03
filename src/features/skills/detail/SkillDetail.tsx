@@ -89,15 +89,31 @@ export const SkillDetail = ({
           title="포트폴리오 이미지"
         />
         <div className="flex gap-5 overflow-x-auto pb-10">
-          {imageUrls.map((url) => (
-            <div key={url} className="border">
+          {imageUrls &&
+            imageUrls.length > 0 &&
+            imageUrls.map((url) => (
+              <div key={url} className="border">
+                <Image
+                  src={url}
+                  alt="portfolio 이미지"
+                  width={250}
+                  height={250}
+                  className="shrink-0"
+                />
+              </div>
+            ))}
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="flex h-[250px] w-[250px] shrink-0 flex-col items-center justify-center gap-[5px] rounded-3xl bg-gray-200"
+            >
               <Image
-                src={url}
-                alt="portfolio 이미지"
-                width={250}
-                height={250}
-                className="shrink-0"
+                src={'/icons/camera.svg'}
+                alt={''}
+                width={36}
+                height={36}
               />
+              <span className="text-xs text-gray-400">이미지 촬영 필요</span>
             </div>
           ))}
         </div>
