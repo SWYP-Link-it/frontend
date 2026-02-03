@@ -1,4 +1,4 @@
-import { Review } from '@/src/types/types';
+import { Review } from '@/src/types/skill';
 import Image from 'next/image';
 
 type ReviewSectionProps = {

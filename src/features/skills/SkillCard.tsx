@@ -1,4 +1,4 @@
-import { SkillCardDto } from '@/src/types/types';
+import { SkillCardDto } from '@/src/types/skill';
 import Link from 'next/link';
 
 type SkillCardProps = {

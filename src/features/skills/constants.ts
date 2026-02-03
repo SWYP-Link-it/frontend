@@ -1,17 +1,4 @@
-export const CATEGORIES = [
-  'ALL',
-  'DEVELOPMENT',
-  'DESIGN',
-  'EDITING',
-  'MARKETING',
-  'LANGUAGE',
-  'FINANCE',
-  'SPORTS',
-  'MUSIC',
-  'ETC',
-] as const;
-
-export type Category = (typeof CATEGORIES)[number];
+import { Category } from '@/src/types/skill';
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   ALL: '전체',

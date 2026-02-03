@@ -3,7 +3,7 @@ import { Category } from '@/src/features/skills/constants';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
 import { SkillCategories } from '@/src/features/skills/SkillCategories';
 import { SkillList } from '@/src/features/skills/SkillList';
-import { SkillCardDto } from '@/src/types/types';
+import { SkillCardDto } from '@/src/types/skill';
 
 export default async function Skills({
   searchParams,
@@ -20,7 +20,7 @@ export default async function Skills({
   );
 
   if (!res.ok) {
-    throw new Error('Failed to fetch skills');
+    return null;
   }
 
   const data: SkillCardDto[] = (await res.json()).data;

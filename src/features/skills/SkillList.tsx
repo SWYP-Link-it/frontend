@@ -1,6 +1,6 @@
 import { CardBanner } from './CardBanner';
 import { SkillCard } from './SkillCard';
-import { SkillCardDto } from '@/src/types/types';
+import { SkillCardDto } from '@/src/types/skill';
 
 type SkillListProps = {
   list?: SkillCardDto[];

@@ -1,6 +1,6 @@
 'use client';
 
-import { Skill } from '@/src/types/types';
+import { Skill } from '@/src/types/skill';
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 export type RequestFormData = {
