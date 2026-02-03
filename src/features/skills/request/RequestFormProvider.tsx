@@ -3,7 +3,7 @@
 import { Skill } from '@/src/types/types';
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-export type RequestFormType = {
+export type RequestFormData = {
   date: Date;
   time: string;
   message: string;
@@ -11,8 +11,8 @@ export type RequestFormType = {
 
 type RequestFormContextType = {
   skillList: Skill[];
-  formData: RequestFormType;
-  setFormData: (data: Partial<RequestFormType>) => void;
+  formData: RequestFormData;
+  setFormData: (data: Partial<RequestFormData>) => void;
 };
 
 const INITIAL_FORM_DATA = {
@@ -33,9 +33,9 @@ export const RequestFormProvider = ({
   skillList: Skill[];
 }) => {
   const [formData, setFormDataState] =
-    useState<RequestFormType>(INITIAL_FORM_DATA);
+    useState<RequestFormData>(INITIAL_FORM_DATA);
 
-  const setFormData = (data: Partial<RequestFormType>) => {
+  const setFormData = (data: Partial<RequestFormData>) => {
     setFormDataState((prev) => ({ ...prev, ...data }));
   };
 
