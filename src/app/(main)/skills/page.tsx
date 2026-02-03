@@ -3,7 +3,7 @@ import { Category } from '@/src/features/skills/constants';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
 import { SkillCategories } from '@/src/features/skills/SkillCategories';
 import { SkillList } from '@/src/features/skills/SkillList';
-import { mockSkillList } from '@/src/lib/mocks/data';
+import { SkillCardDto } from '@/src/types/types';
 
 export default async function Skills({
   searchParams,
@@ -13,9 +13,17 @@ export default async function Skills({
   const selectedCategory: Category =
     ((await searchParams).category as Category) || 'ALL';
 
-  const list = mockSkillList.filter((skill) =>
-    selectedCategory === '전체' ? true : skill.category === selectedCategory,
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills${
+      selectedCategory === 'ALL' ? '' : `?category=${selectedCategory}`
+    }`,
   );
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch skills');
+  }
+
+  const data: SkillCardDto[] = (await res.json()).data;
 
   return (
     <>
@@ -38,7 +46,7 @@ export default async function Skills({
           <span className="text-brand-600 mb-6 w-fit rounded-lg bg-[#F4F2FF] px-3 py-[5px] leading-6 font-semibold">
             내 크레딧 | 30
           </span>
-          <SkillList list={list} />
+          <SkillList list={data} />
         </div>
       </div>
       <ScrollToTop deps={[selectedCategory]} />

@@ -1,3 +1,11 @@
+export type SkillCardDto = {
+  skillId: number;
+  profileImageUrl: string;
+  nickname: string;
+  skillTitle: string;
+  skillName: string;
+};
+
 export type Skill = {
   id: number;
   category: string;
