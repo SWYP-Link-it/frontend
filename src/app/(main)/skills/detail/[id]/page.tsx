@@ -50,14 +50,14 @@ export default async function SkillDetailPage({
             />
           </div>
         </div>
-        <div className="sticky bottom-0 flex w-full items-center justify-between bg-white px-28 py-6">
+        <div className="sticky bottom-0 flex w-full items-center justify-between gap-6 bg-white px-28 py-6">
           <span className="text-brand-600 w-fit rounded-lg bg-[#F4F2FF] px-3 py-[5px] leading-6 font-semibold">
             내 크레딧 | 30
           </span>
-          <div className="flex gap-[15px]">
+          <div className="flex flex-1 gap-[15px]">
             <RequiredAuth>
               <Link
-                className="w-[380px]"
+                className="ml-auto w-full max-w-[380px]"
                 href={`/skills/request?mentorId=${skillDetail.profileId}&skillId=${skillId}`}
               >
                 <Button
@@ -68,7 +68,7 @@ export default async function SkillDetailPage({
               </Link>
             </RequiredAuth>
             <RequiredAuth>
-              <Link className="w-[380px]" href="/messages">
+              <Link className="w-full max-w-[380px]" href="/messages">
                 <Button
                   text={'메세지 보내기'}
                   icon={<MessageIcon size={20} />}
