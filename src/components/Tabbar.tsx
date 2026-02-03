@@ -25,11 +25,20 @@ export const Tabbar = <T extends string | number>({
         ))}
       </div>
       <div
-        className="bg-brand-600 h-[2px] w-[90px] rounded-full duration-300 ease-in-out"
         style={{
-          transform: `translateX(${itemIndex * 90}px)`,
+          maxWidth: `${90 * items.length}px`,
         }}
-      ></div>
+      >
+        <div
+          className="bg-brand-600 h-[2px] w-[90px] rounded-full duration-300 ease-in-out"
+          style={{
+            width: `${(1 / items.length) * 100}%`,
+            marginLeft: `${(itemIndex / items.length) * 100}%`,
+            // transform: `translateX(${itemIndex * 90}px)`,
+          }}
+        ></div>
+      </div>
+
       <div className="bg-brand-200 h-[1px] w-full rounded-full"></div>
     </div>
   );
