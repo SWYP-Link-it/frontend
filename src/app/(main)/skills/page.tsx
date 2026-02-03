@@ -1,4 +1,5 @@
 import { ScrollToTop } from '@/src/components/ScrollToTop';
+import { Category } from '@/src/features/skills/constants';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
 import { SkillCategories } from '@/src/features/skills/SkillCategories';
 import { SkillList } from '@/src/features/skills/SkillList';
@@ -9,7 +10,9 @@ export default async function Skills({
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
-  const selectedCategory = (await searchParams).category || '전체';
+  const selectedCategory: Category =
+    ((await searchParams).category as Category) || 'ALL';
+
   const list = mockSkillList.filter((skill) =>
     selectedCategory === '전체' ? true : skill.category === selectedCategory,
   );
