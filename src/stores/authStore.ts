@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api } from '../lib/api/api';
+import axios from 'axios';
 
 interface AuthState {
   accessToken: string | null;
@@ -20,8 +20,14 @@ export const useAuthStore = create<AuthState>()((set) => ({
   },
 
   refresh: () => {
-    api
-      .post('/auth/refresh')
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/refresh`,
+        {},
+        {
+          withCredentials: true,
+        },
+      )
       .then((response) => {
         const newAccessToken = response.data.data.accessToken;
         set({ accessToken: newAccessToken });
