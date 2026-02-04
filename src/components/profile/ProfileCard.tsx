@@ -1,123 +1,59 @@
-import { SkillItem } from './SkillItem';
-
-interface ProfileContentProps {
-  data: {
-    experience: {
-      title: string;
-      icon: string;
-    };
-    skills: Array<{
-      id: number;
-      category: string;
-      tag: string;
-      level: string;
-      description: string;
-    }>;
-    availability: {
-      days: string[];
-      selectedDay: string;
-      slots: string[];
-    };
-    exchangeMethod: {
-      type: 'online' | 'offline';
-      preferredRegion: string;
-      preferredLocation: string;
-    };
-  };
+interface ProfileCardProps {
+  name: string;
+  onEditClick: () => void;
 }
 
-const SectionHeader = ({ title }: { title: string }) => (
-  <div className="mb-4 flex items-center justify-between">
-    <h5 className="font-bold text-gray-900">{title}</h5>
-    <button className="text-xs text-gray-400 hover:text-gray-600">편집</button>
-  </div>
-);
-
-export const ProfileContent = ({ data }: ProfileContentProps) => {
+export const ProfileCard = ({ name, onEditClick }: ProfileCardProps) => {
   return (
-    <div className="space-y-6 pb-20">
-      <section className="rounded-2xl border border-gray-100 p-6">
-        <SectionHeader title="경력과 경험" />
+    <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-gray-100 bg-gray-50 text-xl">
-            {data.experience.icon}
-          </div>
-          <p className="text-sm font-medium text-gray-800">
-            {data.experience.title}
-          </p>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-gray-100 p-6">
-        <SectionHeader title="스킬" />
-        <div className="space-y-4">
-          {data.skills.map((skill) => (
-            <SkillItem key={skill.id} {...skill} />
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-gray-100 p-6">
-        <SectionHeader title="선호 시간대" />
-
-        <div className="mb-6 grid grid-cols-7 overflow-hidden rounded-lg border border-gray-50">
-          {data.availability.days.map((day) => (
-            <button
-              key={day}
-              className={`border-r border-gray-50 py-3 text-sm font-medium transition-colors last:border-r-0 ${
-                day === data.availability.selectedDay
-                  ? 'bg-gray-50 text-gray-900'
-                  : 'text-gray-400 hover:bg-gray-50'
-              }`}
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-blue-100 bg-blue-50">
+            <svg
+              className="h-10 w-10 text-blue-200"
+              fill="currentColor"
+              viewBox="0 0 24 24"
             >
-              {day}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          {data.availability.slots.map((slot, idx) => (
-            <div
-              key={idx}
-              className="rounded-lg border border-gray-100 bg-white px-3 py-2 text-center text-xs font-medium text-gray-800 shadow-sm"
-            >
-              {slot}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-gray-100 p-6">
-        <SectionHeader title="교환 방법" />
-
-        <div className="mb-6 flex rounded-xl bg-gray-50 p-1">
-          <button
-            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${data.exchangeMethod.type === 'online' ? 'bg-white shadow-sm' : 'text-gray-400'}`}
-          >
-            온라인
-          </button>
-          <button
-            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${data.exchangeMethod.type === 'offline' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400'}`}
-          >
-            오프라인
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8">
-          <div>
-            <p className="mb-3 text-sm font-bold text-gray-900">선호 지역</p>
-            <p className="text-sm text-gray-400">
-              {data.exchangeMethod.preferredRegion}
-            </p>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08c-1.29 1.94-3.5 3.22-6 3.22z" />
+            </svg>
           </div>
           <div>
-            <p className="mb-3 text-sm font-bold text-gray-900">선호 위치</p>
-            <p className="text-sm text-gray-400">
-              {data.exchangeMethod.preferredLocation}
-            </p>
+            <h2 className="text-xl font-bold text-gray-900">
+              {name || '사용자'}
+            </h2>
           </div>
         </div>
-      </section>
+        <button
+          onClick={onEditClick}
+          className="rounded-lg bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
+        >
+          프로필 수정하기
+        </button>
+      </div>
+
+      <div className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="flex h-6 w-6 items-center justify-center rounded border border-gray-200 bg-white">
+            <div className="h-2.5 w-2.5 rounded-full bg-blue-400" />
+          </div>
+          <span className="text-sm font-medium text-gray-700">
+            내 크레딧 30
+          </span>
+        </div>
+        <svg
+          className="h-5 w-5 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="9 5l7 7-7 7"
+          />
+        </svg>
+      </div>
     </div>
   );
 };

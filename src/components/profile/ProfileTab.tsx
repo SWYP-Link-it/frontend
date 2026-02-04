@@ -1,34 +1,33 @@
-interface ProfileTabsProps {
-  activeTab: 'profile' | 'credits';
-  onTabChange: (tab: 'profile' | 'credits') => void;
-}
+export const ProfileTab = () => {
+  const tabs = [
+    { label: '내 프로필 보기', active: true },
+    { label: '내 크레딧 보기', active: false },
+  ];
 
-export const ProfileTabs = ({ activeTab, onTabChange }: ProfileTabsProps) => {
   return (
-    <nav className="space-y-1">
-      <button
-        onClick={() => onTabChange('profile')}
-        className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-all ${
-          activeTab === 'profile'
-            ? 'bg-gray-100 text-gray-900'
-            : 'bg-transparent text-gray-500 hover:bg-gray-50'
-        }`}
-      >
-        내 프로필 보기
-      </button>
-      <button
-        onClick={() => onTabChange('credits')}
-        className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition-all ${
-          activeTab === 'credits'
-            ? 'bg-gray-100 text-gray-900'
-            : 'bg-transparent text-gray-500 hover:bg-gray-50'
-        }`}
-      >
-        내 크레딧 보기
-      </button>
-      <button className="w-full rounded-xl px-4 pt-[40px] text-left text-sm font-semibold text-gray-400">
-        로그아웃
-      </button>
-    </nav>
+    <div className="w-full">
+      <nav className="flex flex-col gap-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab.label}
+            className={`w-full rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors ${
+              tab.active
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+        <button
+          onClick={() => {
+            console.log('로그아웃 클릭');
+          }}
+          className="mt-4 w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-gray-400 transition-colors hover:text-gray-600"
+        >
+          로그아웃
+        </button>
+      </nav>
+    </div>
   );
 };
