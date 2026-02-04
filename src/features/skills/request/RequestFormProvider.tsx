@@ -1,6 +1,6 @@
 'use client';
 
-import { Skill } from '@/src/types/skill';
+import { SkillInfo } from '@/src/types/skill';
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 export type RequestFormData = {
@@ -10,7 +10,7 @@ export type RequestFormData = {
 };
 
 type RequestFormContextType = {
-  skillList: Skill[];
+  skillList: SkillInfo[];
   formData: RequestFormData;
   setFormData: (data: Partial<RequestFormData>) => void;
 };
@@ -30,7 +30,7 @@ export const RequestFormProvider = ({
   skillList,
 }: {
   children: ReactNode;
-  skillList: Skill[];
+  skillList: SkillInfo[];
 }) => {
   const [formData, setFormDataState] =
     useState<RequestFormData>(INITIAL_FORM_DATA);

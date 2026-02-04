@@ -93,3 +93,10 @@ export type SkillDetailDto = {
     skillName: string;
   }[];
 };
+
+export type SkillInfo = {
+  skillId: number;
+  skillName: string;
+  exchangeDuration: number;
+  creditPrice: number;
+};

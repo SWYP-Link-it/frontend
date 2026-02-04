@@ -63,45 +63,45 @@ export const handlers = [
   //   return passthrough();
   // }),
 
-  http.get(
-    `${API_URL}/exchange/mentors/:mentorId/available-slots?mentorSkillId=:skillId&date=:formattedDate`,
-    () => {
-      return HttpResponse.json({
-        data: {
-          date: '2026-01-25',
-          slots: [
-            {
-              time: '11:30',
-              available: true,
-            },
-            {
-              time: '12:00',
-              available: true,
-            },
-            {
-              time: '13:00',
-              available: true,
-            },
-          ],
-        },
-      });
-    },
-  ),
+  // http.get(
+  //   `${API_URL}/exchange/mentors/:mentorId/available-slots?mentorSkillId=:skillId&date=:formattedDate`,
+  //   () => {
+  //     return HttpResponse.json({
+  //       data: {
+  //         date: '2026-01-25',
+  //         slots: [
+  //           {
+  //             time: '11:30',
+  //             available: true,
+  //           },
+  //           {
+  //             time: '12:00',
+  //             available: true,
+  //           },
+  //           {
+  //             time: '13:00',
+  //             available: true,
+  //           },
+  //         ],
+  //       },
+  //     });
+  //   },
+  // ),
 
-  http.get(
-    `${API_URL}/exchange/mentors/:mentorId/available-dates?month=:formattedDate`,
-    () => {
-      return HttpResponse.json({
-        data: {
-          month: '2026-02',
-          availableDates: [
-            '2026-02-01',
-            '2026-02-10',
-            '2026-02-13',
-            '2026-02-20',
-          ],
-        },
-      });
-    },
-  ),
+  // http.get(
+  //   `${API_URL}/exchange/mentors/:mentorId/available-dates?month=:formattedDate`,
+  //   () => {
+  //     return HttpResponse.json({
+  //       data: {
+  //         month: '2026-02',
+  //         availableDates: [
+  //           '2026-02-01',
+  //           '2026-02-10',
+  //           '2026-02-13',
+  //           '2026-02-20',
+  //         ],
+  //       },
+  //     });
+  //   },
+  // ),
 ];

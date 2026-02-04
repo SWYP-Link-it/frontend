@@ -20,7 +20,8 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
 
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [availableDates, setAvailableDates] = useState<string[]>();
-  const [availableTimes, setAvailableTimes] = useState<string[]>();
+  const [availableTimes, setAvailableTimes] =
+    useState<{ startTime: string; endTime: string }[]>();
 
   const handleSubmit = (
     mentorId: number,
@@ -47,6 +48,7 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
       })
       .then((response) => {
         console.log(response.data.message);
+        setStep((step) => step + 1);
       })
       .catch((error) => {
         const serverError = error.response?.data;
@@ -82,7 +84,23 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
       )
       .then((response) => {
         const { slots } = response.data.data;
-        setAvailableTimes(slots.map(({ time }: { time: string }) => time));
+        const availableSlots = slots.filter(
+          ({ isAvailable }: { isAvailable: boolean }) => isAvailable,
+        );
+        setAvailableTimes(
+          availableSlots.map(
+            ({
+              startTime,
+              endTime,
+            }: {
+              startTime: string;
+              endTime: string;
+            }) => ({
+              startTime,
+              endTime,
+            }),
+          ),
+        );
       })
       .catch((error) => {
         const serverError = error.response?.data;
@@ -100,11 +118,11 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
         {step === 1 && (
           <div className="mt-9 flex flex-wrap justify-center gap-[18px]">
             {skillList.map((skill) => {
-              const isSelected = skillId === skill.id;
+              const isSelected = skillId === skill.skillId;
               return (
                 <Link
-                  key={skill.id}
-                  href={`/skills/request?mentorId=${skill.profile.id}&skillId=${skill.id}`}
+                  key={skill.skillId}
+                  href={`/skills/request?mentorId=${mentorId}&skillId=${skill.skillId}`}
                   replace
                   className="flex cursor-pointer flex-col items-center gap-[17px]"
                 >
@@ -114,7 +132,7 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
                   <span
                     className={`text-center text-sm leading-[1.5] ${isSelected ? 'text-brand-600 font-semibold' : 'text-gray-700'}`}
                   >
-                    {skill.title}
+                    {skill.skillName}
                   </span>
                 </Link>
               );
@@ -140,14 +158,14 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
 
             {availableTimes && availableTimes?.length > 0 && (
               <>
-                <div className="mt-3 flex flex-wrap gap-6">
-                  {availableTimes.map((time) => (
+                <div className="mt-3 flex flex-wrap justify-center gap-6">
+                  {availableTimes.map(({ startTime, endTime }) => (
                     <div
-                      key={time}
-                      className={`h-8 cursor-pointer rounded-xl px-3 py-[6px] text-sm leading-[1.5] font-medium ${time === formData.time ? 'bg-brand-200 text-brand-600' : 'bg-gray-200 text-gray-600'}`}
-                      onClick={() => setFormData({ time })}
+                      key={startTime}
+                      className={`h-8 cursor-pointer rounded-xl px-3 py-[6px] text-sm leading-[1.5] font-medium ${startTime === formData.time ? 'bg-brand-200 text-brand-600' : 'bg-gray-200 text-gray-600'}`}
+                      onClick={() => setFormData({ time: startTime })}
                     >
-                      {time}
+                      {startTime}~{endTime}
                     </div>
                   ))}
                 </div>
