@@ -20,8 +20,9 @@ export const ChatSection = ({ roomId }: { roomId: string }) => {
 
   return (
     <div className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-[12px] border border-gray-200 bg-gray-50">
+      {/* 백엔드 상세 조회 명세의 partnerNickname을 헤더에 전달 */}
       <ChatHeader
-        nickname={roomInfo?.partnerNickname || '상대방'}
+        nickname={roomInfo?.partnerNickname || '알 수 없는 사용자'}
         profileUrl={roomInfo?.partnerProfileImageUrl}
       />
 
@@ -30,7 +31,8 @@ export const ChatSection = ({ roomId }: { roomId: string }) => {
         partnerProfileUrl={roomInfo?.partnerProfileImageUrl || undefined}
       />
 
-      <ChatInput onSendMessage={sendMessage} />
+      {/* 스킬 요청 시 필요한 mentorId를 roomInfo에서 추출하여 전달 */}
+      <ChatInput onSendMessage={sendMessage} mentorId={roomInfo?.mentorId} />
     </div>
   );
 };
