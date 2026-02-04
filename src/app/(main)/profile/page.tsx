@@ -1,116 +1,139 @@
 'use client';
-import { ProfileContent } from '@/src/components/profile/ProfileContent';
-import { ProfileTabs } from '@/src/components/profile/ProfileTab';
-import { useState } from 'react';
 
-// TODO: API 연동 시 이 데이터를 서버에서 받아온 데이터로 교체
-const MOCK_USER_DATA = {
-  name: '프로덕트디자이너준비러',
-  credits: 30,
-  experience: {
-    title: '빅테크기업 주니어 디자이너 1년차',
-    icon: '🏢',
-  },
-  skills: [
-    {
-      id: 1,
-      category: '디자인 · 크리에이티브',
-      tag: '그래픽 디자인',
-      level: '상',
-      description:
-        '진행한 프로젝트, 직무와 연관된 경험을 자세히 작성해 보세요. 진행한 프로젝트, 직무와 연관된 경험을',
-    },
-    {
-      id: 2,
-      category: '디자인 · 크리에이티브',
-      tag: '그래픽 디자인',
-      level: '상',
-      description:
-        '진행한 프로젝트, 직무와 연관된 경험을 자세히 작성해 보세요. 진행한 프로젝트, 직무와 연관된 경험을',
-    },
-    {
-      id: 3,
-      category: '디자인 · 크리에이티브',
-      tag: '그래픽 디자인',
-      level: '상',
-      description:
-        '진행한 프로젝트, 직무와 연관된 경험을 자세히 작성해 보세요. 진행한 프로젝트, 직무와 연관된 경험을',
-    },
-  ],
-  availability: {
-    days: ['월', '화', '수', '목', '금', '토', '일'],
-    selectedDay: '월',
-    slots: [
-      '21시 30분 ~ 22시 00분',
-      '21시 30분 ~ 22시 00분',
-      '21시 30분 ~ 22시 00분',
-      '21시 30분 ~ 22시 00분',
-    ],
-  },
-  exchangeMethod: {
-    type: 'offline' as 'online' | 'offline',
-    preferredRegion: '경기도 용인시',
-    preferredLocation: '경기도 용인시',
-  },
-};
+import { useEffect, useState } from 'react';
+import { ProfileTab } from '@/src/components/profile/ProfileTab';
+import { ProfileCard } from '@/src/components/profile/ProfileCard';
+import { ProfileContent } from '@/src/components/profile/ProfileContent';
+import { ProfileEditModal } from '@/src/components/edit/ProfileEditModal';
+import { WithdrawalModal } from '@/src/components/edit/WithdrawalModal';
+import { useAuthStore } from '@/src/stores/authStore';
+import { useUserStore } from '@/src/stores/userStore';
+import { api } from '@/src/lib/api/api';
+import { ProfileData } from '@/src/types/profile';
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'credits'>('profile');
-  return (
-    <div className="flex flex-col bg-white px-[112px]">
-      <div className="flex h-[100px] shrink-0 flex-col justify-center gap-1">
-        <h2 className="text-2xl font-bold text-gray-800">메세지</h2>
-        <p className="text-xs text-gray-400">채팅으로 궁금한 걸 묻고 답해요</p>
+  const { accessToken } = useAuthStore();
+  const { userInfo, setUserInfo } = useUserStore();
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (!accessToken) {
+        setIsPageLoading(false);
+        return;
+      }
+      try {
+        setIsPageLoading(true);
+        let currentUserId = userInfo?.userId;
+        if (!currentUserId) {
+          const authRes = await api.get('/auth/me');
+
+          if (authRes.data.success) {
+            const userData = authRes.data.data;
+
+            setUserInfo({
+              userId: userData.id,
+              nickname: userData.nickname,
+              name: userData.name,
+              email: userData.email,
+              profileImageUrl: userData.profileImageUrl,
+            });
+            currentUserId = userData.id;
+          }
+        }
+
+        console.log(currentUserId);
+        if (currentUserId) {
+          try {
+            const profileRes = await api.get(`/profile/${currentUserId}`);
+            console.log(
+              '✅ 서버에서 온 원본 상세 데이터:',
+              profileRes.data.data,
+            );
+            console.log('✅ 그 안의 스킬들:', profileRes.data.data.skills); // 이게 [] 빈 배열이면 서버에 저장이 안 된 겁니다.
+            setProfileData(profileRes.data.data);
+            if (profileRes.data.success) {
+              setProfileData(profileRes.data.data);
+              console.log(profileRes);
+            }
+          } catch (profileError: any) {
+            if (profileError.response?.status === 404) {
+              setProfileData(null);
+            } else {
+              console.error('프로필 상세 조회 중 에러:', profileError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('데이터 로딩 에러:', error);
+      } finally {
+        setIsPageLoading(false);
+      }
+    };
+
+    loadData();
+  }, [accessToken, userInfo?.userId, setUserInfo]);
+
+  const handleWithdrawConfirm = () => {
+    setIsWithdrawModalOpen(false);
+
+    setProfileData(null);
+  };
+
+  if (isPageLoading) {
+    return (
+      <div className="mx-auto flex max-w-6xl justify-center px-6 py-20">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500"></div>
       </div>
-      <div className="flex">
-        <aside className="sticky top-[100px] flex h-[calc(100vh-100px)] w-[270px] flex-col self-start overflow-y-auto">
-          <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+    );
+  }
+
+  return (
+    <div className="bg-white px-[112px]">
+      <div className="flex h-[100px] flex-col justify-center">
+        <h1 className="mb-[4px] text-[24px] font-semibold text-gray-800">
+          마이프로필
+        </h1>
+        <p className="text-[12px] text-gray-400">
+          내 정보와 활동 내역을 확인해요.
+        </p>
+      </div>
+      <div className="flex items-start justify-between">
+        <aside className="sticky top-[100px] mr-[100px] w-64 flex-shrink-0">
+          <ProfileTab />
         </aside>
-
-        <main className="flex-1 bg-white">
-          <div className="w-full pl-[100px]">
-            <h3 className="mb-6 text-lg font-bold text-gray-900">내 프로필</h3>
-
-            {activeTab === 'profile' ? (
-              <>
-                <div className="mt-4 mb-10 flex cursor-pointer items-center justify-between rounded-xl bg-gray-50 p-5 transition-colors hover:bg-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded bg-white text-lg">
-                      💳
-                    </div>
-                    <span className="font-semibold text-gray-800">
-                      내 크레딧 {MOCK_USER_DATA.credits}
-                    </span>
-                  </div>
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-
-                <h3 className="mb-6 text-lg font-bold text-gray-900">
-                  내 프로필
-                </h3>
-
-                <ProfileContent data={MOCK_USER_DATA} />
-              </>
-            ) : (
-              <div className="flex h-[400px] flex-col items-center justify-center text-gray-400">
-                <p>크레딧 내역이 없습니다.</p>
-              </div>
-            )}
+        <main className="flex-1">
+          <div className="">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">내 프로필</h2>
+            </div>
+            <ProfileCard
+              name={profileData?.nickname || userInfo?.nickname || '사용자'}
+              onEditClick={() => setIsEditModalOpen(true)}
+            />
+            <ProfileContent
+              data={profileData}
+              onWithdrawClick={() => setIsWithdrawModalOpen(true)}
+            />
           </div>
         </main>
       </div>
+
+      <ProfileEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        initialName={profileData?.nickname || userInfo?.nickname || ''}
+        onSave={() => setIsEditModalOpen(false)}
+      />
+
+      <WithdrawalModal
+        isOpen={isWithdrawModalOpen}
+        onClose={() => setIsWithdrawModalOpen(false)}
+        onConfirm={handleWithdrawConfirm}
+      />
     </div>
   );
 }
