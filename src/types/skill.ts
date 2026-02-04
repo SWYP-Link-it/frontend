@@ -88,7 +88,7 @@ export type SkillDetailDto = {
     startTime: string;
     endTime: string;
   }[];
-  otherSkills: {
+  skills: {
     skillId: number;
     skillName: string;
   }[];

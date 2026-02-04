@@ -1,9 +1,8 @@
 import { ScrollToTop } from '@/src/components/ScrollToTop';
-import { Category } from '@/src/features/skills/constants';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
 import { SkillCategories } from '@/src/features/skills/SkillCategories';
 import { SkillList } from '@/src/features/skills/SkillList';
-import { SkillCardDto } from '@/src/types/skill';
+import { Category, SkillCardDto } from '@/src/types/skill';
 
 export default async function Skills({
   searchParams,

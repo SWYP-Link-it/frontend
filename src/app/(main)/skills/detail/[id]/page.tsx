@@ -44,10 +44,7 @@ export default async function SkillDetailPage({
             <SkillDetail {...skillDetail} />
           </div>
           <div className="sticky top-77 h-fit w-[173px]">
-            <ProfileSkillList
-              list={skillDetail.otherSkills}
-              currentId={skillId}
-            />
+            <ProfileSkillList list={skillDetail.skills} currentId={skillId} />
           </div>
         </div>
         <div className="sticky bottom-0 flex w-full items-center justify-between gap-6 bg-white px-28 py-6">
