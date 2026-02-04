@@ -54,7 +54,7 @@ export const ProfileContent = ({
           내 스킬
         </h2>
 
-        <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6">
           <SectionHeader
             title="경력과 경험"
             onEdit={() => router.push('/profile/edit')}
@@ -71,7 +71,7 @@ export const ProfileContent = ({
           </div>
         </div>
 
-        <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6">
           <SectionHeader
             title="스킬"
             onEdit={() => router.push('/profile/edit')}
@@ -104,59 +104,72 @@ export const ProfileContent = ({
           )}
         </div>
 
-        <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+        {/* 선호 시간대 섹션 */}
+        <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6">
           <SectionHeader
             title="선호 시간대"
             onEdit={() => router.push('/profile/edit')}
           />
-          <div className="mb-4 flex flex-wrap gap-2">
-            {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
-              <div
-                key={day}
-                className={`flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-medium ${
-                  activeDays.includes(day)
-                    ? 'border-blue-200 bg-blue-50 text-blue-600'
-                    : 'border-gray-100 bg-white text-gray-400'
-                }`}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-          {data?.availableSchedules && data.availableSchedules.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {data.availableSchedules.map((s, idx) => (
+
+          {/* 1. 요일 바 (활성 상태 표시) */}
+          <div className="mb-6 flex w-full items-center gap-1 rounded-xl bg-gray-50/80 p-1.5">
+            {['월', '화', '수', '목', '금', '토', '일'].map((day) => {
+              const isActive = activeDays.includes(day);
+              return (
                 <div
-                  key={idx}
-                  className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-2 text-sm text-gray-600"
+                  key={day}
+                  className={`flex h-10 flex-1 items-center justify-center rounded-lg text-sm font-medium transition-all ${
+                    isActive
+                      ? 'bg-white text-blue-600 shadow-sm ring-1 ring-blue-500/10'
+                      : 'text-gray-400'
+                  }`}
                 >
-                  {s.dayOfWeek} {s.startTime} ~ {s.endTime}
+                  {day}
                 </div>
-              ))}
+              );
+            })}
+          </div>
+
+          {/* 2. 요일별 시간대 칩 (요일별 줄바꿈) */}
+          {data?.availableSchedules && data.availableSchedules.length > 0 ? (
+            <div className="space-y-3">
+              {['월', '화', '수', '목', '금', '토', '일'].map((day) => {
+                const daySchedules = data.availableSchedules
+                  .filter((s) => s.dayOfWeek === day)
+                  .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+                // 해당 요일에 등록된 시간이 없으면 이 줄은 건너뜀
+                if (daySchedules.length === 0) return null;
+
+                return (
+                  <div key={day} className="flex flex-wrap gap-2">
+                    {daySchedules.map((s, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-4 py-2 text-sm text-gray-600"
+                      >
+                        <span className="font-bold text-gray-900">
+                          {s.dayOfWeek}
+                        </span>
+                        <span>
+                          {s.startTime} ~ {s.endTime}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <button
               onClick={() => router.push('/profile/edit')}
               className="flex w-full items-center justify-center rounded-lg border border-dashed border-gray-200 py-3 text-gray-400 transition-colors hover:bg-gray-50"
             >
-              <svg
-                className="mr-1 h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="12 4v16m8-8H4"
-                />
-              </svg>
+              <span className="text-sm">+ 시간대 등록하기</span>
             </button>
           )}
         </div>
-
-        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gray-100 bg-white p-6">
           <SectionHeader
             title="교환 방법"
             onEdit={() => router.push('/profile/edit')}
@@ -201,7 +214,7 @@ export const ProfileContent = ({
         </div>
       </div>
 
-      <div className="space-y-6 border-t border-gray-100 pt-8">
+      <div className="space-y-6 border-t border-gray-100 py-8">
         <h3 className="text-lg font-bold text-gray-900">계정 설정</h3>
         <div className="group flex cursor-pointer items-center justify-between">
           <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900">
