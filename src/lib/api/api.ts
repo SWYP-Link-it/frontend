@@ -6,6 +6,8 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+let refreshPromise: Promise<string> | null = null;
+
 api.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().accessToken;
@@ -22,36 +24,58 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
     const status = error.response?.status;
 
-    if (status === 401) {
-      try {
-        const reissueResponse = await axios.post(
+    if (originalRequest.url?.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
+
+    if (status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // 이미 token refresh 중이면 결과를 기다리고
+      // 토큰을 받아서 해당 요청 재시도
+      if (refreshPromise) {
+        try {
+          const newToken = await refreshPromise;
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return api(originalRequest);
+        } catch (error) {
+          // refresh도 실패하면 clear access token
+          useAuthStore.getState().clearAccessToken();
+          return Promise.reject(error);
+        }
+      }
+
+      // token refresh promise 세팅
+      refreshPromise = axios
+        .post(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/refresh`,
           {},
           {
             withCredentials: true,
           },
-        );
+        )
+        .then((res) => {
+          const newAccessToken = res.data.data.accessToken;
+          useAuthStore.getState().setAccessToken(newAccessToken);
+          return newAccessToken;
+        })
+        .finally(() => {
+          refreshPromise = null;
+        });
 
-        const newAccessToken = reissueResponse.data.accessToken;
-        useAuthStore.getState().setAccessToken(newAccessToken);
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      try {
+        const newToken = await refreshPromise;
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (error) {
-        console.error('토큰 재발급 실패:', error);
+        useAuthStore.getState().clearAccessToken();
+        return Promise.reject(error);
       }
-
-      // TODO: 백엔드에서 refresh token cookie 세팅으로 변경
-      document.cookie = 'refresh_token=; Max-Age=0; path=/;';
-
-      useAuthStore.getState().clearAccessToken();
-      window.location.href = '/login';
     }
 
     return Promise.reject(error);
