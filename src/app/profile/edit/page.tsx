@@ -12,46 +12,12 @@ import { SkillEditItem } from '@/src/components/edit/SkillEditItem';
 import { DaySelector } from '@/src/components/edit/DaySelector';
 import { PreferenceEditItem } from '@/src/components/edit/PreferenceEditItem';
 import { SkillRegisterModal } from '@/src/components/edit/SkillRegisterModal';
-import { TimeSelectModal } from '@/src/components/edit/TimeSelectModal';
-
-/** 매핑 테이블 */
-const REGION_MAP: Record<string, string> = {
-  서울: 'SEOUL',
-  경기도: 'GYEONGGI',
-  강원도: 'GANGWON',
-  충청도: 'CHUNGCHEONG',
-  경상도: 'GYEONGSANG',
-  전라도: 'JEOLLA',
-  제주도: 'JEJU',
-};
-
-const WEEKDAY_MAP: Record<string, string> = {
-  월: 'MON',
-  화: 'TUE',
-  수: 'WED',
-  목: 'THU',
-  금: 'FRI',
-  토: 'SAT',
-  일: 'SUN',
-};
-
-const PROFICIENCY_MAP: Record<string, string> = {
-  상: 'HIGH',
-  중: 'MEDIUM',
-  하: 'LOW',
-};
-
-const SKILL_CATEGORY_MAP: Record<string, string> = {
-  'IT · 개발': 'DEVELOPMENT',
-  '디자인 · 크리에이티브': 'DESIGN',
-  '영상 · 사진 · 편집': 'EDITING',
-  '마케팅 · 콘텐츠': 'MARKETING',
-  외국어: 'LANGUAGE',
-  '재테크 · 경제': 'FINANCE',
-  운동: 'SPORTS',
-  음악: 'MUSIC',
-  기타: 'ETC',
-};
+import {
+  PROFICIENCY_MAP,
+  REGION_MAP,
+  SKILL_CATEGORY_MAP,
+  WEEKDAY_MAP,
+} from '@/src/constants/profile';
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -66,12 +32,10 @@ export default function ProfileEditPage() {
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
   const [editingSkillIndex, setEditingSkillIndex] = useState<number | null>(
     null,
-  ); // [추가] 수정 중인 스킬 인덱스
+  );
 
-  const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
   const [activeDay, setActiveDay] = useState('월');
 
-  /** 1. 페이지 진입 시 데이터 조회 */
   useEffect(() => {
     const fetchProfile = async () => {
       if (!accessToken || !userInfo?.userId) return;
@@ -103,7 +67,6 @@ export default function ProfileEditPage() {
     fetchProfile();
   }, [accessToken, userInfo?.userId, userInfo?.nickname]);
 
-  /** 2. 저장 유효성 검사 */
   const isValid = useMemo(() => {
     if (!localProfile) return false;
     const hasExperience = localProfile.experienceDescription?.trim().length > 0;
@@ -120,27 +83,21 @@ export default function ProfileEditPage() {
     return Boolean(hasExperience && hasSkills && hasSchedules && locationValid);
   }, [localProfile]);
 
-  /** 3. 저장 실행 */
-  /** 3. 저장 실행 */
   const handleSave = async () => {
     if (!localProfile) return;
 
     try {
       const formData = new FormData();
 
-      // 1. 시간 포맷 정리 함수 (초 단위 제거)
       const formatTime = (time: string) => {
         if (!time) return '09:00';
         return time.length > 5 ? time.substring(0, 5) : time;
       };
 
-      // 2. 페이로드 구성
       const payload = {
-        // 닉네임, 경력
         nickname: localProfile.nickname,
         experienceDescription: localProfile.experienceDescription || '',
 
-        // 교환 방식, 지역 (Enum 매핑 안전 장치)
         exchangeType: localProfile.exchangeType || 'ONLINE',
         preferredRegion:
           REGION_MAP[localProfile.preferredRegion] ||
@@ -148,44 +105,42 @@ export default function ProfileEditPage() {
           null,
         detailedLocation: localProfile.detailedLocation?.trim() || null,
 
-        // 스케줄: 기존 ID가 있다면 반드시 포함해서 보내야 함
         availableSchedules: (localProfile.availableSchedules || []).map(
           (s: any) => ({
-            id: s.id || null, // [중요] ID가 있으면 보내고, 없으면 null (신규)
+            id: s.id || null,
             dayOfWeek: WEEKDAY_MAP[s.dayOfWeek] || s.dayOfWeek,
             startTime: formatTime(s.startTime),
             endTime: formatTime(s.endTime),
           }),
         ),
 
-        // 스킬: 마찬가지로 ID 포함
-        skills: (localProfile.skills || []).map((s: any) => ({
-          id: s.id || null, // [중요] 기존 스킬 수정 시 ID 필수
-          skillCategoryType:
-            SKILL_CATEGORY_MAP[s.skillCategoryName] ||
-            s.skillCategoryType ||
-            'ETC', // 매핑 안전장치
-          skillCategoryName: s.skillCategoryName,
-          skillName: s.skillName || '',
-          skillTitle: s.skillTitle || '',
-          skillProficiency:
-            PROFICIENCY_MAP[s.skillProficiency] || s.skillProficiency,
-          skillDescription: s.skillDescription || '',
-          exchangeDuration: Number(s.exchangeDuration) || 60,
-          isVisible: true,
-          imageUrls: Array.isArray(s.imageUrls) ? s.imageUrls : [],
-        })),
-      };
+        skills: (localProfile.skills || []).map((s: any) => {
+          const finalCategoryType = Object.values(SKILL_CATEGORY_MAP).includes(
+            s.skillCategoryType,
+          )
+            ? s.skillCategoryType
+            : SKILL_CATEGORY_MAP[s.skillCategoryName] || 'ETC';
 
-      // [디버깅] 실제 서버로 날아가는 JSON 데이터를 콘솔에서 확인하세요!
-      console.log('Final Payload:', payload);
+          return {
+            id: s.id || null,
+            skillCategoryType: finalCategoryType,
+            skillName: s.skillName || '',
+            skillTitle: s.skillTitle || '',
+            skillProficiency:
+              PROFICIENCY_MAP[s.skillProficiency] || s.skillProficiency,
+            skillDescription: s.skillDescription || '',
+            exchangeDuration: Number(s.exchangeDuration) || 60,
+            isVisible: true,
+            imageUrls: Array.isArray(s.imageUrls) ? s.imageUrls : [],
+          };
+        }),
+      };
 
       formData.append(
         'profile',
         new Blob([JSON.stringify(payload)], { type: 'application/json' }),
       );
 
-      // 이미지 파일 처리
       localProfile.skills.forEach((skill: any, idx: number) => {
         if (skill.imageFiles?.length > 0) {
           skill.imageFiles.forEach((file: File) => {
@@ -194,7 +149,6 @@ export default function ProfileEditPage() {
         }
       });
 
-      // API 호출
       const response = isNewProfile
         ? await api.post('/profile', formData)
         : await api.put('/profile', formData);
@@ -204,15 +158,12 @@ export default function ProfileEditPage() {
         router.push('/profile');
       }
     } catch (err: any) {
-      // 에러 상세 내용을 콘솔에 출력
-      console.error('저장 에러 상세:', err);
-      console.error('서버 응답 데이터:', err.response?.data);
-
       alert(
         `저장 실패: ${err.response?.data?.message || '서버 내부 오류가 발생했습니다(500).'}`,
       );
     }
   };
+
   const updateField = (field: string, value: any) => {
     setLocalProfile((prev: any) => ({ ...prev, [field]: value }));
     setIsDirty(true);
@@ -261,7 +212,6 @@ export default function ProfileEditPage() {
                   key={skill.id || idx}
                   skill={skill}
                   onEdit={() => {
-                    // [추가됨]
                     setEditingSkillIndex(idx);
                     setIsSkillModalOpen(true);
                   }}
@@ -276,7 +226,7 @@ export default function ProfileEditPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setEditingSkillIndex(null); // 신규 등록 모드
+                  setEditingSkillIndex(null);
                   setIsSkillModalOpen(true);
                 }}
                 className="group flex h-20 w-full items-center justify-center rounded-2xl border-2 border-dashed border-gray-100 text-gray-300 transition-all hover:border-blue-100 hover:bg-gray-50 hover:text-blue-300"
@@ -332,43 +282,33 @@ export default function ProfileEditPage() {
 
       <SkillRegisterModal
         isOpen={isSkillModalOpen}
-        // [참고] editingSkillIndex가 있으면 기존 데이터를 모달에 넘겨주는 로직이 있으면 더 좋습니다.
-        // initialData={
-        //   editingSkillIndex !== null
-        //     ? localProfile.skills[editingSkillIndex]
-        //     : null
-        // }
+        initialData={
+          editingSkillIndex !== null
+            ? localProfile.skills[editingSkillIndex]
+            : null
+        }
         onClose={() => {
           setIsSkillModalOpen(false);
           setEditingSkillIndex(null);
         }}
-        onRegister={(skillData) => {
-          const newSkill = {
-            id:
-              editingSkillIndex !== null
-                ? localProfile.skills[editingSkillIndex].id
-                : Date.now(),
-            skillCategoryType: SKILL_CATEGORY_MAP[skillData.category] || 'ETC',
-            skillCategoryName: skillData.category,
+        onRegister={(skillData: any) => {
+          const newSkills = [...(localProfile.skills || [])];
+          const skillEntry = {
+            ...(editingSkillIndex !== null ? newSkills[editingSkillIndex] : {}),
+            skillCategoryType: skillData.category,
             skillName: skillData.name,
-            skillTitle: skillData.title,
             skillProficiency: skillData.proficiency,
+            skillTitle: skillData.title,
             skillDescription: skillData.description,
-            exchangeDuration: 60,
-            isVisible: true,
-            imageUrls:
-              editingSkillIndex !== null
-                ? localProfile.skills[editingSkillIndex].imageUrls
-                : [],
           };
 
           if (editingSkillIndex !== null) {
-            const updatedSkills = [...localProfile.skills];
-            updatedSkills[editingSkillIndex] = newSkill;
-            updateField('skills', updatedSkills);
+            newSkills[editingSkillIndex] = skillEntry;
           } else {
-            updateField('skills', [...(localProfile.skills || []), newSkill]);
+            newSkills.push(skillEntry);
           }
+
+          updateField('skills', newSkills);
           setIsSkillModalOpen(false);
           setEditingSkillIndex(null);
         }}

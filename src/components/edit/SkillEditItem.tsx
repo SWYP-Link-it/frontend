@@ -1,19 +1,7 @@
 'use client';
 
+import { SKILL_CATEGORY_MAP } from '@/src/constants/profile';
 import { UserSkill } from '@/src/types/profile';
-
-// 영문 코드를 한글로 매핑 (백엔드에서 Name을 안 줄 경우 대비)
-const REVERSE_CATEGORY_MAP: Record<string, string> = {
-  DEVELOPMENT: 'IT · 개발',
-  DESIGN: '디자인 · 크리에이티브',
-  EDITING: '영상 · 사진 · 편집',
-  MARKETING: '마케팅 · 콘텐츠',
-  LANGUAGE: '외국어',
-  FINANCE: '재테크 · 경제',
-  SPORTS: '운동',
-  MUSIC: '음악',
-  ETC: '기타',
-};
 
 interface SkillEditItemProps {
   skill: UserSkill;
@@ -26,7 +14,6 @@ export const SkillEditItem = ({
   onEdit,
   onDelete,
 }: SkillEditItemProps) => {
-  // 1. 숙련도 라벨 처리
   const proficiencyLabel =
     skill.skillProficiency === 'HIGH'
       ? '상'
@@ -34,11 +21,10 @@ export const SkillEditItem = ({
         ? '중'
         : '하';
 
-  // 2. 카테고리 이름 처리 (이름이 없으면 영문 코드를 한글로 변환)
   const categoryDisplayName =
-    skill.skillCategoryName ||
-    REVERSE_CATEGORY_MAP[skill.skillCategoryType] ||
-    '기타';
+    Object.keys(SKILL_CATEGORY_MAP).find(
+      (key) => SKILL_CATEGORY_MAP[key] === skill.skillCategoryType,
+    ) || '기타';
 
   return (
     <div className="group relative rounded-xl border border-gray-100 bg-white p-6">
@@ -81,7 +67,6 @@ export const SkillEditItem = ({
         </button>
       </div>
 
-      {/* 수정된 부분: categoryDisplayName 사용 */}
       <h3 className="mb-2 text-sm font-bold text-gray-900">
         {categoryDisplayName}
       </h3>
