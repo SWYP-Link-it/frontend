@@ -1,7 +1,7 @@
 'use client';
 
 import { DependencyList, useEffect } from 'react';
-import { scrollToTop } from '../lib/utils';
+import { scrollToTop } from '../utils/utils';
 
 type ScrollToTopProps = {
   deps: DependencyList;

@@ -1,21 +1,33 @@
 'use client';
 
 import { ProgressBar } from '@/src/components/ProgressBar';
+import { useFromInfoFromSearchParams } from '@/src/features/skills/request/hooks/useFormInfoFromSearchParams';
 import { RequestFormProvider } from '@/src/features/skills/request/RequestFormProvider';
 import { RequestStep } from '@/src/features/skills/request/RequestStep';
-import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+
+import { api } from '@/src/lib/api/api';
+import { SkillInfo } from '@/src/types/skill';
+import { useEffect, useState } from 'react';
 
 export default function SkillRequest() {
-  const searchParams = useSearchParams();
+  const { mentorId, skillId } = useFromInfoFromSearchParams();
   const [step, setStep] = useState(1);
+  const [skills, setSkills] = useState<SkillInfo[]>([]);
 
-  const skillId = searchParams.get('skillId');
+  useEffect(() => {
+    if (!mentorId) return;
 
-  if (!skillId) return null;
+    api.get(`/exchange/mentors/${mentorId}/skills`).then((response) => {
+      setSkills(response.data.data);
+    });
+  }, []);
+
+  if (!mentorId) {
+    return <div>경고: 잘못된 경로입니다.</div>;
+  }
 
   return (
-    <RequestFormProvider key={skillId} skillId={Number(skillId)}>
+    <RequestFormProvider key={skillId} skillList={skills}>
       <div className="flex flex-1 flex-col items-center pt-[91px] pb-22">
         <div className="w-[492px]">
           <ProgressBar step={step} totalSteps={3} />

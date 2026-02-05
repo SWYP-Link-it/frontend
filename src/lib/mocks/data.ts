@@ -1,4 +1,4 @@
-import { Profile, Skill, Review } from '@/src/types/types';
+import { Profile, Skill, Review } from '@/src/types/skill';
 
 const profiles: Profile[] = [
   {
