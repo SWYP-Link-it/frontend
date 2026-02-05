@@ -1,33 +1,32 @@
 export type TabType = 'received' | 'sent';
 
-// UI에서 사용하는 상태값 (영어)
+// Enum 명세 반영: ExchangeStatus
 export type RequestStatus =
   | 'PENDING'
   | 'ACCEPTED'
   | 'REJECTED'
-  | 'pending'
-  | 'accepted'
-  | 'rejected';
+  | 'CANCELED'
+  | 'EXPIRED'
+  | 'COMPLETED'
+  | 'SETTLED';
 
-// 백엔드 API가 주는 원본 데이터 타입 (Swagger 기준)
 export type ApiRequestItem = {
-  skillExchangeId: number; // ID
-  targetUserId: number; // 상대방 ID
-  skillId: number; // 스킬 ID
-  chatRoomId: number | null; // 채팅방 ID (없으면 null일 수 있음)
+  skillExchangeId: number;
+  targetUserId: number;
+  skillId: number;
+  chatRoomId: number | null;
   targetProfileImageUrl: string | null;
   targetNickname: string;
-  skillName: string; // 상대방 스킬 (태그용)
-  exchangeStatus: string; // "대기중", "수락됨" 등 한글로 올 가능성 있음
-  creditPrice: number; // 크레딧
-  message: string; // 요청 내용
-  requestedDate: string; // 요청 날짜 "2024-01-20"
-  exchangeDateTime: string; // 교환 일시 "2024-01-25T12:00:00"
-  exchangeDuration: number; // 진행 시간(분) 60
-  new: boolean;
+  skillName: string;
+  exchangeStatus: string; // "대기중", "수락됨", "취소됨" 등 한글 응답
+  creditPrice: number;
+  message: string;
+  requestedDate: string;
+  exchangeDateTime: string;
+  exchangeDuration: number;
+  isNew: boolean;
 };
 
-// 프론트엔드 UI 컴포넌트용 타입 (기존 유지)
 export type SkillRequest = {
   id: number;
   partnerId: number;

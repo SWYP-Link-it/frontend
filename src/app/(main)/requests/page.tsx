@@ -14,24 +14,27 @@ import {
 } from '@/src/types/request';
 import { Tabbar } from '@/src/components/Tabbar';
 
-// 날짜 포맷팅 유틸 (YYYY-MM-DDT... -> YYYY년 MM월 DD일)
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
-// 백엔드 상태값(한글) -> 프론트 상태값(영어) 변환
+// Enum 명세 반영 매핑 함수
 const mapStatus = (koreanStatus: string): RequestStatus => {
   switch (koreanStatus) {
     case '수락됨':
       return 'ACCEPTED';
     case '거절됨':
       return 'REJECTED';
+    case '취소됨':
+      return 'CANCELED';
+    case '만료됨':
+      return 'EXPIRED';
     case '대기중':
       return 'PENDING';
     default:
-      return 'PENDING'; // 기본값
+      return 'PENDING';
   }
 };
 
@@ -56,10 +59,8 @@ export default function RequestPage() {
   const [activeTab, setActiveTab] = useState<TabType>('received');
   const [requests, setRequests] = useState<SkillRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
   const accessToken = useAuthStore((state) => state.accessToken);
 
-  // 탭바 설정
   const TAB_ITEMS = ['받은 요청', '보낸 요청'] as const;
   const tabLabelToId: Record<string, TabType> = {
     '받은 요청': 'received',
@@ -75,39 +76,29 @@ export default function RequestPage() {
   const getMyId = () => {
     if (!accessToken) return 0;
     const payload = parseJwt(accessToken);
-    return payload?.userId || payload?.sub || payload?.id || 0;
+    return payload?.userId || payload?.sub || 0;
   };
 
   const fetchRequests = useCallback(async () => {
     try {
       setIsLoading(true);
-
-      // 1. 탭에 따라 엔드포인트 결정
       const endpoint =
         activeTab === 'received'
           ? '/exchange/request/received'
           : '/exchange/request/sent';
+      const response = await api.get(endpoint, { params: { size: 50 } });
 
-      // 2. 실제 API 호출
-      const response = await api.get(endpoint, {
-        params: {
-          size: 100, // 일단 넉넉하게 가져옴 (나중에 무한스크롤 적용 시 nextCursor 사용)
-        },
-      });
-
-      // 3. 데이터 매핑 (Swagger 응답 -> UI 타입)
       const contentList: ApiRequestItem[] = response.data?.data?.contents || [];
-
       const mappedRequests: SkillRequest[] = contentList.map((item) => ({
         id: item.skillExchangeId,
         partnerId: item.targetUserId,
         partnerNickname: item.targetNickname,
-        partnerTag: item.skillName, // 스킬 이름 (예: Java)
+        partnerTag: item.skillName,
         partnerProfileImageUrl: item.targetProfileImageUrl,
-        description: item.message, // 요청 메시지
-        status: mapStatus(item.exchangeStatus), // 상태값 변환
-        sessionDate: formatDate(item.exchangeDateTime), // 날짜 포맷팅
-        sessionTime: `${item.exchangeDuration}분`, // 60 -> "60분"
+        description: item.message,
+        status: mapStatus(item.exchangeStatus),
+        sessionDate: formatDate(item.exchangeDateTime),
+        sessionTime: `${item.exchangeDuration}분`,
         credits: item.creditPrice,
         createdAt: item.requestedDate,
         isSentByMe: activeTab === 'sent',
@@ -115,7 +106,7 @@ export default function RequestPage() {
 
       setRequests(mappedRequests);
     } catch (error) {
-      console.error('요청 내역 불러오기 실패:', error);
+      console.error('불러오기 실패:', error);
       setRequests([]);
     } finally {
       setIsLoading(false);
@@ -126,19 +117,14 @@ export default function RequestPage() {
     fetchRequests();
   }, [fetchRequests]);
 
-  // --- 아래 액션 핸들러들은 백엔드 API 명세에 따라 URL 확인 필요 ---
-  // (일단 기존 로직 유지하되 ID를 skillExchangeId로 사용)
-
   const handleAccept = async (id: number) => {
     if (!confirm('요청을 수락하시겠습니까?')) return;
     try {
-      // TODO: 수락 API 엔드포인트 확인 필요 (예상: /exchange/request/{id}/accept)
-      // 현재는 임시 URL 사용
       await api.post(`/exchange/request/${id}/accept`);
       alert('수락되었습니다.');
       fetchRequests();
     } catch (error) {
-      alert('오류가 발생했습니다.');
+      alert('수락 처리에 실패했습니다.');
     }
   };
 
@@ -149,27 +135,25 @@ export default function RequestPage() {
       alert('거절되었습니다.');
       fetchRequests();
     } catch (error) {
-      alert('오류가 발생했습니다.');
+      alert('거절 처리에 실패했습니다.');
     }
   };
 
   const handleCancel = async (id: number) => {
     if (!confirm('요청을 취소하시겠습니까?')) return;
     try {
-      await api.delete(`/exchange/request/${id}`);
+      // 명세서에 따라 POST /cancel 사용
+      await api.post(`/exchange/request/${id}/cancel`);
       alert('취소되었습니다.');
       fetchRequests();
     } catch (error) {
-      alert('오류가 발생했습니다.');
+      alert('취소 처리에 실패했습니다.');
     }
   };
 
   const handleInquiry = async (partnerId: number) => {
     const myId = Number(getMyId());
-    if (!myId) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
+    if (!myId) return alert('로그인이 필요합니다.');
 
     try {
       const response = await api.post('/chat/rooms', null, {
@@ -179,31 +163,23 @@ export default function RequestPage() {
           type: 'MENTORING',
         },
       });
-
-      const newRoomId = response.data.data.roomId;
-      router.push(`/messages/${newRoomId}`);
-    } catch (error: any) {
-      const msg = error.response?.data?.message || '채팅 연결 실패';
-      alert(msg);
+      router.push(`/messages/${response.data.data.roomId}`);
+    } catch (error) {
+      alert('채팅방 연결에 실패했습니다.');
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* 1. 상단 섹션 */}
-      <div className="w-full bg-white">
-        {/* Header와 동일한 여백 px-[112px] */}
-        <div className="w-full px-[112px]">
+    <div className="flex min-h-screen flex-col bg-[#F8FAFC]">
+      <div className="w-full border-b border-gray-100 bg-white">
+        <div className="mx-auto max-w-[1200px] px-6">
           <div className="flex h-[100px] flex-col justify-center">
-            <h1 className="mb-[4px] text-[24px] font-semibold text-gray-800">
-              요청 관리
-            </h1>
-            <p className="text-[12px] text-gray-400">
-              받은 요청과 보낸 요청을 관리하세요
+            <h1 className="text-[24px] font-bold text-gray-900">요청 관리</h1>
+            <p className="text-sm text-gray-500">
+              파트너와 주고받은 스킬 교환 요청을 확인하세요.
             </p>
           </div>
-
-          <div className="mt-4">
+          <div className="mt-2">
             <Tabbar
               items={TAB_ITEMS}
               currentItem={currentTabLabel}
@@ -213,37 +189,34 @@ export default function RequestPage() {
         </div>
       </div>
 
-      {/* 2. 하단 섹션 */}
-      <div className="w-full flex-1 bg-[#F8FAFC]">
-        <main className="w-full px-[112px] py-10">
-          <div className="space-y-6">
-            {isLoading ? (
-              <div className="flex h-60 items-center justify-center text-gray-400">
-                로딩 중...
-              </div>
-            ) : requests.length > 0 ? (
-              requests.map((request) => (
-                <RequestCard
-                  key={request.id}
-                  request={request}
-                  onAccept={handleAccept}
-                  onReject={handleReject}
-                  onCancel={handleCancel}
-                  onInquiry={handleInquiry}
-                />
-              ))
-            ) : (
-              <EmptyState
-                message={
-                  activeTab === 'received'
-                    ? '아직 받은 요청이 없어요.'
-                    : '아직 보낸 요청이 없어요.'
-                }
+      <main className="mx-auto w-full max-w-[1200px] flex-1 px-6 py-10">
+        <div className="space-y-6">
+          {isLoading ? (
+            <div className="flex h-60 items-center justify-center font-medium text-gray-400">
+              데이터를 불러오는 중입니다...
+            </div>
+          ) : requests.length > 0 ? (
+            requests.map((request) => (
+              <RequestCard
+                key={request.id}
+                request={request}
+                onAccept={handleAccept}
+                onReject={handleReject}
+                onCancel={handleCancel}
+                onInquiry={handleInquiry}
               />
-            )}
-          </div>
-        </main>
-      </div>
+            ))
+          ) : (
+            <EmptyState
+              message={
+                activeTab === 'received'
+                  ? '받은 요청이 없습니다.'
+                  : '보낸 요청이 없습니다.'
+              }
+            />
+          )}
+        </div>
+      </main>
     </div>
   );
 }
