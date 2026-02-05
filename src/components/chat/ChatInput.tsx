@@ -1,102 +1,83 @@
 'use client';
 
-import Image from 'next/image';
 import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface ChatInputProps {
   onSendMessage: (content: string) => Promise<void>;
+  mentorId?: number; // 가라가 아닌 실제 데이터 사용
 }
 
-export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
+export const ChatInput = ({ onSendMessage, mentorId }: ChatInputProps) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
 
   const handleResizeHeight = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; // 높이 초기화
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // 내용만큼 늘리기
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
-
     try {
       await onSendMessage(message);
-
       setMessage('');
-
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-      }
+      if (textareaRef.current) textareaRef.current.style.height = 'auto';
     } catch (error) {
-      console.error('전송 중 에러 발생:', error);
+      console.error('전송 실패:', error);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.nativeEvent.isComposing) return; // 한글 조합 중 중복 전송 방지
-
+    if (e.nativeEvent.isComposing) return;
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); // 줄바꿈 방지
+      e.preventDefault();
       handleSendMessage();
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
-    handleResizeHeight();
-  };
-
   return (
-    <div className="flex-col items-center gap-4 border-t border-gray-100 bg-white px-[20px] py-[24px]">
-      <div className="mb-[32px] w-full rounded-lg bg-gray-200 p-[1px] focus-within:bg-gradient-to-r focus-within:from-[#ADB6FD] focus-within:via-[#8EDBFF] focus-within:to-[#A4C2F8]">
+    <div className="flex shrink-0 flex-col border-t border-gray-100 bg-white p-[20px]">
+      <div className="focus-within:border-brand-500 mb-[12px] flex min-h-[44px] w-full items-end rounded-[12px] border border-gray-200 bg-white px-[16px] py-[10px]">
         <textarea
           ref={textareaRef}
-          value={message}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          placeholder="메세지를 입력하세요"
           rows={1}
-          className="block max-h-[150px] w-full resize-none overflow-y-auto rounded-[7px] bg-gray-50 px-4 py-3 text-[14px] focus:outline-none"
-          style={{ minHeight: '46px' }}
+          placeholder="메시지를 입력하세요..."
+          className="max-h-[120px] w-full resize-none bg-transparent text-[15px] leading-[1.5] text-gray-900 outline-none"
+          value={message}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            handleResizeHeight();
+          }}
+          onKeyDown={handleKeyDown}
         />
-      </div>
-
-      <div className="flex justify-between text-[14px]">
-        <div className="flex">
-          <div className="mr-[8px] flex h-[36px] cursor-pointer items-center justify-center rounded-[100px] border border-gray-200 px-[16px] font-semibold text-gray-500 hover:bg-gray-50">
-            <Image
-              className="mr-[3px]"
-              src="/icons/icon_image_btn.svg"
-              alt="첨부파일버튼"
-              height={20}
-              width={20}
-            />
-            이미지 추가
-          </div>
-
-          <div className="h-[36px] cursor-pointer rounded-[100px] bg-gradient-to-r from-[#ADB6FD] via-[#8EDBFF] to-[#A4C2F8] p-[1px]">
-            <div className="bg-brand-50 flex h-full w-full items-center justify-center rounded-[100px] px-[16px] text-gray-500 transition-colors hover:bg-white">
-              <Image
-                className="mr-[3px]"
-                src="/icons/icon_skill_btn.svg"
-                alt="스킬요청버튼"
-                height={20}
-                width={20}
-              />
-              <span className="text-brand-600 font-semibold">
-                스킬 요청 보내기
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div
+        <button
           onClick={handleSendMessage}
-          className="bg-brand-600 hover:bg-brand-700 flex h-[36px] cursor-pointer items-center justify-center rounded-[8px] px-[16px] font-bold text-white"
+          className={`ml-[12px] font-bold ${message.trim() ? 'text-brand-600' : 'text-gray-300'}`}
         >
           전송
+        </button>
+      </div>
+
+      <div className="flex justify-between">
+        <div className="flex gap-2">
+          <div className="flex h-[36px] cursor-pointer items-center rounded-[100px] border px-[16px] text-gray-500">
+            이미지 추가
+          </div>
+          <div
+            onClick={
+              () =>
+                mentorId && router.push(`/skills/request?skillId=${mentorId}`) // mentorId를 skillId로 전달
+            }
+            className="h-[36px] cursor-pointer rounded-[100px] bg-gradient-to-r from-[#ADB6FD] to-[#A4C2F8] p-[1px]"
+          >
+            <div className="bg-brand-50 text-brand-600 flex h-full items-center rounded-[100px] px-[16px] font-semibold">
+              스킬 요청 보내기
+            </div>
+          </div>
         </div>
       </div>
     </div>
