@@ -1,14 +1,10 @@
-import Link from 'next/link';
 import { DetailTabs } from '@/src/features/skills/detail/DetailTabs';
 import { UserProfile } from '@/src/features/skills/detail/UserProfile';
 import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
-import { Button } from '@/src/components/Button';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
-import { RequiredAuth } from '@/src/features/auth/RequiredAuth';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
-import { RequestIcon } from '@/src/components/icons/RequestIcon';
-import { MessageIcon } from '@/src/components/icons/MessageIcon';
 import { SkillDetailDto } from '@/src/types/skill';
+import { RequestFooter } from '@/src/features/skills/request/RequestFooter';
 
 export default async function SkillDetailPage({
   params,
@@ -47,33 +43,7 @@ export default async function SkillDetailPage({
             <ProfileSkillList list={skillDetail.skills} currentId={skillId} />
           </div>
         </div>
-        <div className="sticky bottom-0 flex w-full items-center justify-between gap-6 bg-white px-28 py-6">
-          <span className="text-brand-600 w-fit rounded-lg bg-[#F4F2FF] px-3 py-[5px] leading-6 font-semibold">
-            내 크레딧 | 30
-          </span>
-          <div className="flex flex-1 gap-[15px]">
-            <RequiredAuth>
-              <Link
-                className="ml-auto w-full max-w-[380px]"
-                href={`/skills/request?mentorId=${skillDetail.profileId}&skillId=${skillId}`}
-              >
-                <Button
-                  text={'스킬 요청하기'}
-                  mode="active"
-                  icon={<RequestIcon size={20} />}
-                />
-              </Link>
-            </RequiredAuth>
-            <RequiredAuth>
-              <Link className="w-full max-w-[380px]" href="/messages">
-                <Button
-                  text={'메세지 보내기'}
-                  icon={<MessageIcon size={20} />}
-                />
-              </Link>
-            </RequiredAuth>
-          </div>
-        </div>
+        <RequestFooter mentorId={skillDetail.profileId} skillId={skillId} />
       </div>
       <ScrollToTop deps={[id]} />
     </>
