@@ -24,3 +24,10 @@ export const formatMessageDate = (dateString: string): string => {
   // 3. 그 외: "2024.01.16"
   return date.format('YYYY.MM.DD');
 };
+
+export const formatDate = (
+  dateString: string | Date,
+  template?: string | undefined,
+): string => {
+  return dayjs(dateString).format(template);
+};

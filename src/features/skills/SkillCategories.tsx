@@ -2,22 +2,10 @@
 
 import { Tabbar } from '@/src/components/Tabbar';
 import { useRouter } from 'next/navigation';
-
-const categories = [
-  '전체',
-  '개발',
-  '디자인',
-  '편집',
-  '마케팅',
-  '외국어',
-  '재테크',
-  '운동',
-  '음악',
-  '기타',
-] as const;
+import { Category, CATEGORY_LABELS } from './constants';
 
 type SkillCategoriesProps = {
-  category: string;
+  category: Category;
 };
 export const SkillCategories = ({ category }: SkillCategoriesProps) => {
   const router = useRouter();
@@ -30,7 +18,10 @@ export const SkillCategories = ({ category }: SkillCategoriesProps) => {
 
   return (
     <Tabbar
-      items={categories}
+      items={Object.entries(CATEGORY_LABELS).map(([category, label]) => ({
+        key: category,
+        label,
+      }))}
       currentItem={category}
       onClickItem={handleCategoryClick}
     />

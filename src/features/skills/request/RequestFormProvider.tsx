@@ -1,25 +1,25 @@
 'use client';
 
+import { SkillInfo } from '@/src/types/skill';
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-export type RequestFormType = {
-  skillId: number;
+export type RequestFormData = {
   date: Date;
   time: string;
   message: string;
 };
 
 type RequestFormContextType = {
-  formData: RequestFormType;
-  setFormData: (data: Partial<RequestFormType>) => void;
+  skillList: SkillInfo[];
+  formData: RequestFormData;
+  setFormData: (data: Partial<RequestFormData>) => void;
 };
 
-const createFormData = (skillId: number) => ({
-  skillId,
+const INITIAL_FORM_DATA = {
   date: new Date(),
   time: '',
   message: '',
-});
+};
 
 const RequestFormContext = createContext<RequestFormContextType | undefined>(
   undefined,
@@ -27,22 +27,22 @@ const RequestFormContext = createContext<RequestFormContextType | undefined>(
 
 export const RequestFormProvider = ({
   children,
-  skillId,
+  skillList,
 }: {
   children: ReactNode;
-  skillId: number;
+  skillList: SkillInfo[];
 }) => {
-  const [formData, setFormDataState] = useState<RequestFormType>(
-    createFormData(skillId),
-  );
+  const [formData, setFormDataState] =
+    useState<RequestFormData>(INITIAL_FORM_DATA);
 
-  const setFormData = (data: Partial<RequestFormType>) => {
+  const setFormData = (data: Partial<RequestFormData>) => {
     setFormDataState((prev) => ({ ...prev, ...data }));
   };
 
   return (
     <RequestFormContext.Provider
       value={{
+        skillList,
         formData,
         setFormData,
       }}

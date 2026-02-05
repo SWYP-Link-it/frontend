@@ -68,8 +68,9 @@ export const ChatInput = ({ onSendMessage, mentorId }: ChatInputProps) => {
             이미지 추가
           </div>
           <div
-            onClick={() =>
-              mentorId && router.push(`/skills/request?mentorId=${mentorId}`)
+            onClick={
+              () =>
+                mentorId && router.push(`/skills/request?skillId=${mentorId}`) // mentorId를 skillId로 전달
             }
             className="h-[36px] cursor-pointer rounded-[100px] bg-gradient-to-r from-[#ADB6FD] to-[#A4C2F8] p-[1px]"
           >

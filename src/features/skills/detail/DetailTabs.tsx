@@ -3,14 +3,20 @@
 import { Tabbar } from '@/src/components/Tabbar';
 import { useState } from 'react';
 
-const tabs = ['스킬 정보', '소개', '시간', '포트폴리오', '후기'] as const;
+const tabs = [
+  'overview',
+  'introduction',
+  'time',
+  'portfolio',
+  'reviews',
+] as const;
 
-export const TAB_ELEMENT = {
-  '스킬 정보': 'overview',
-  소개: 'introduction',
-  시간: 'time',
-  포트폴리오: 'portfolio',
-  후기: 'reviews',
+export const TAB_LABELS = {
+  overview: '스킬 정보',
+  introduction: '소개',
+  time: '시간',
+  portfolio: '포트폴리오',
+  reviews: '후기',
 };
 
 export const DetailTabs = () => {
@@ -20,9 +26,7 @@ export const DetailTabs = () => {
     console.log('Clicked tab:', tab);
     setCurrentTab(tab as (typeof tabs)[number]);
 
-    const element = document.getElementById(
-      `skill-detail-${TAB_ELEMENT[tab as keyof typeof TAB_ELEMENT]}`,
-    );
+    const element = document.getElementById(`skill-detail-${tab}`);
     if (element) {
       window.scrollTo({
         top: element.getBoundingClientRect().top + window.scrollY - 120,
@@ -34,7 +38,10 @@ export const DetailTabs = () => {
 
   return (
     <Tabbar
-      items={tabs}
+      items={Object.entries(TAB_LABELS).map(([tab, label]) => ({
+        key: tab,
+        label,
+      }))}
       currentItem={currentTab}
       onClickItem={handleTabClick}
     />
