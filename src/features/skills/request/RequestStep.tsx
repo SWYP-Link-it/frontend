@@ -84,11 +84,8 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
       )
       .then((response) => {
         const { slots } = response.data.data;
-        const availableSlots = slots.filter(
-          ({ isAvailable }: { isAvailable: boolean }) => isAvailable,
-        );
         setAvailableTimes(
-          availableSlots.map(
+          slots.map(
             ({
               startTime,
               endTime,
