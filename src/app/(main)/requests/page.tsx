@@ -14,6 +14,7 @@ import {
 } from '@/src/types/request';
 import { Tabbar } from '@/src/components/Tabbar';
 
+// 날짜 포맷팅 유틸 (YYYY-MM-DDT... -> YYYY년 MM월 DD일)
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -61,16 +62,15 @@ export default function RequestPage() {
   const [isLoading, setIsLoading] = useState(true);
   const accessToken = useAuthStore((state) => state.accessToken);
 
-  const TAB_ITEMS = ['받은 요청', '보낸 요청'] as const;
-  const tabLabelToId: Record<string, TabType> = {
-    '받은 요청': 'received',
-    '보낸 요청': 'sent',
-  };
-  const currentTabLabel = activeTab === 'received' ? '받은 요청' : '보낸 요청';
+  // Tabbar 컴포넌트의 제네릭 구조에 맞게 수정된 아이템 리스트
+  const TAB_ITEMS: { key: TabType; label: string }[] = [
+    { key: 'received', label: '받은 요청' },
+    { key: 'sent', label: '보낸 요청' },
+  ];
 
-  const handleTabClick = (label: string) => {
-    const newTabId = tabLabelToId[label];
-    if (newTabId) setActiveTab(newTabId);
+  // 클릭 시 전달받는 key가 바로 TabType('received' | 'sent')이므로 로직이 단순해집니다.
+  const handleTabClick = (key: TabType) => {
+    setActiveTab(key);
   };
 
   const getMyId = () => {
@@ -182,7 +182,7 @@ export default function RequestPage() {
           <div className="mt-2">
             <Tabbar
               items={TAB_ITEMS}
-              currentItem={currentTabLabel}
+              currentItem={activeTab}
               onClickItem={handleTabClick}
             />
           </div>
