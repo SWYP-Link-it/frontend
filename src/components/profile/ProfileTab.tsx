@@ -1,4 +1,8 @@
+import { useAuthStore } from '@/src/stores/authStore';
+
 export const ProfileTab = () => {
+  const logout = useAuthStore((state) => state.logout);
+
   const tabs = [
     { label: '내 프로필 보기', active: true },
     { label: '내 크레딧 보기', active: false },
@@ -21,7 +25,9 @@ export const ProfileTab = () => {
         ))}
         <button
           onClick={() => {
-            console.log('로그아웃 클릭');
+            if (confirm('로그아웃 하시겠습니까?')) {
+              logout();
+            }
           }}
           className="mt-4 w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-gray-400 transition-colors hover:text-gray-600"
         >

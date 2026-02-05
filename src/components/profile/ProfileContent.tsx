@@ -1,23 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SkillItem } from './SkillItem';
 import { ProfileData } from '@/src/types/profile';
+import { useAuthStore } from '@/src/stores/authStore';
+import { WithdrawalModal } from '../edit/WithdrawalModal';
+import { REGION_MAP } from '@/src/constants/profile';
 
 interface ProfileContentProps {
   data: ProfileData | null;
-  onWithdrawClick: () => void;
+  onWithdrawClick?: () => void;
 }
 
-const REGION_MAP: Record<string, string> = {
-  SEOUL: '서울',
-  GYEONGGI: '경기도',
-  GANGWON: '강원도',
-  CHUNGCHEONG: '충청도',
-  GYEONGSANG: '경상도',
-  JEOLLA: '전라도',
-  JEJU: '제주도',
-};
 const SectionHeader = ({
   title,
   showEdit = true,
@@ -39,13 +34,27 @@ const SectionHeader = ({
     )}
   </div>
 );
+
 export const ProfileContent = ({
   data,
   onWithdrawClick,
 }: ProfileContentProps) => {
   const router = useRouter();
 
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+
+  const withdraw = useAuthStore((state) => state.withdraw);
+
   const activeDays = data?.availableSchedules?.map((s) => s.dayOfWeek) || [];
+
+  const handleWithdrawConfirm = async () => {
+    try {
+      await withdraw();
+      setIsWithdrawModalOpen(false);
+    } catch (error) {
+      console.error('탈퇴 처리 중 오류 발생:', error);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -97,21 +106,19 @@ export const ProfileContent = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="12 4v16m8-8H4"
+                  d="M12 4v16m8-8H4"
                 />
               </svg>
             </button>
           )}
         </div>
 
-        {/* 선호 시간대 섹션 */}
         <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6">
           <SectionHeader
             title="선호 시간대"
             onEdit={() => router.push('/profile/edit')}
           />
 
-          {/* 1. 요일 바 (활성 상태 표시) */}
           <div className="mb-6 flex w-full items-center gap-1 rounded-xl bg-gray-50/80 p-1.5">
             {['월', '화', '수', '목', '금', '토', '일'].map((day) => {
               const isActive = activeDays.includes(day);
@@ -130,7 +137,6 @@ export const ProfileContent = ({
             })}
           </div>
 
-          {/* 2. 요일별 시간대 칩 (요일별 줄바꿈) */}
           {data?.availableSchedules && data.availableSchedules.length > 0 ? (
             <div className="space-y-3">
               {['월', '화', '수', '목', '금', '토', '일'].map((day) => {
@@ -138,7 +144,6 @@ export const ProfileContent = ({
                   .filter((s) => s.dayOfWeek === day)
                   .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-                // 해당 요일에 등록된 시간이 없으면 이 줄은 건너뜀
                 if (daySchedules.length === 0) return null;
 
                 return (
@@ -169,6 +174,7 @@ export const ProfileContent = ({
             </button>
           )}
         </div>
+
         <div className="rounded-xl border border-gray-100 bg-white p-6">
           <SectionHeader
             title="교환 방법"
@@ -201,13 +207,13 @@ export const ProfileContent = ({
               <div className="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-600">
                 {data?.preferredRegion
                   ? REGION_MAP[data.preferredRegion] || data.preferredRegion
-                  : '경기도'}
+                  : '지역 정보 없음'}
               </div>
             </div>
             <div>
               <p className="mb-2 text-xs font-bold text-gray-900">세부 위치</p>
               <div className="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-600">
-                {data?.detailedLocation || '용인시'}
+                {data?.detailedLocation || '위치 정보 없음'}
               </div>
             </div>
           </div>
@@ -230,17 +236,26 @@ export const ProfileContent = ({
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="9 5l7 7-7 7"
+              d="M9 5l7 7-7 7"
             />
           </svg>
         </div>
+
+        {/* 서비스 탈퇴 버튼: 클릭 시 모달 열기 */}
         <button
-          onClick={onWithdrawClick}
+          onClick={() => setIsWithdrawModalOpen(true)}
           className="text-sm font-medium text-gray-300 hover:text-red-400"
         >
           서비스 탈퇴
         </button>
       </div>
+
+      {/* 회원 탈퇴 전용 모달 */}
+      <WithdrawalModal
+        isOpen={isWithdrawModalOpen}
+        onClose={() => setIsWithdrawModalOpen(false)}
+        onConfirm={handleWithdrawConfirm}
+      />
     </div>
   );
 };

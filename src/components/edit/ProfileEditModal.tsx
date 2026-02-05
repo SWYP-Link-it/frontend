@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BaseModal } from '../BaseModal';
 import { Input } from '../Input';
+import { api } from '@/src/lib/api/api';
 
 interface ProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialName: string;
-  onSave: (newName: string) => void;
+  onSave: () => void;
 }
 
 export const ProfileEditModal = ({
@@ -18,6 +19,46 @@ export const ProfileEditModal = ({
   onSave,
 }: ProfileEditModalProps) => {
   const [name, setName] = useState(initialName);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setName(initialName);
+  }, [initialName, isOpen]);
+
+  const handleNicknameChange = async () => {
+    if (!name.trim()) {
+      alert('닉네임을 입력해주세요.');
+      return;
+    }
+
+    if (name === initialName) {
+      onClose();
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await api.patch('/user/nickname', {
+        nickname: name,
+      });
+
+      if (response.data.success) {
+        alert('닉네임이 성공적으로 변경되었습니다.');
+        onSave();
+      }
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      if (errorData?.code === 'U002') {
+        alert('이미 존재하는 닉네임입니다.');
+      } else if (errorData?.code === 'U003') {
+        alert('기존 닉네임과 동일합니다.');
+      } else {
+        alert(errorData?.message || '닉네임 변경에 실패했습니다.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-[520px]">
@@ -65,15 +106,17 @@ export const ProfileEditModal = ({
         <div className="flex w-full gap-4">
           <button
             onClick={onClose}
-            className="flex-1 rounded-[15px] border border-gray-200 py-[18px] text-xl font-bold text-gray-400 transition-colors hover:bg-gray-50"
+            disabled={isLoading}
+            className="flex-1 rounded-[15px] border border-gray-200 py-[18px] text-xl font-bold text-gray-400 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             취소
           </button>
           <button
-            onClick={() => onSave(name)}
-            className="flex-1 rounded-[15px] bg-[#62A1FF] py-[18px] text-xl font-bold text-white shadow-lg shadow-blue-100 transition-colors hover:bg-blue-500"
+            onClick={handleNicknameChange}
+            disabled={isLoading}
+            className="flex-1 rounded-[15px] bg-[#62A1FF] py-[18px] text-xl font-bold text-white shadow-lg shadow-blue-100 transition-colors hover:bg-blue-500 disabled:opacity-50"
           >
-            수정하기
+            {isLoading ? '처리 중...' : '수정하기'}
           </button>
         </div>
       </div>
