@@ -9,7 +9,7 @@ export const ChatListItem = ({ data }: { data: ChatRoomListItem }) => {
       <div className="m-[10px] flex h-[86px] cursor-pointer items-center rounded-[6px] p-[10px] transition-colors hover:bg-gray-50">
         <div className="relative mr-[12px] h-[40px] w-[40px] shrink-0 overflow-hidden rounded-full bg-gray-200">
           <Image
-            src={data.partnerProfileImageUrl || '/icons/icon_default_user.svg'}
+            src={'/icons/avatar.svg'}
             alt="프로필"
             fill
             className="object-cover"
