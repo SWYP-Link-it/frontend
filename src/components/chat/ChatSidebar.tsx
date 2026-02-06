@@ -1,44 +1,54 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { ChatListItem } from './ChatListItem';
 import { ChatRoomListItem } from '@/src/types/chat';
 import { api } from '@/src/lib/api/api';
+import { MessageIcon } from '../icons/MessageIcon';
 
 export const ChatSidebar = () => {
   const [rooms, setRooms] = useState<ChatRoomListItem[]>([]);
 
-  const fetchRooms = useCallback(async () => {
-    try {
-      const response = await api.get('/chat/rooms');
-      const roomList = response.data.data || [];
-      const sortedList = roomList.sort(
-        (a: ChatRoomListItem, b: ChatRoomListItem) => {
-          const timeA = a.lastMessageAtEpochMs || 0;
-          const timeB = b.lastMessageAtEpochMs || 0;
-          return timeB - timeA;
-        },
-      );
-      setRooms(sortedList);
-    } catch (error) {
-      console.error('채팅방 목록 로딩 실패:', error);
-    }
-  }, []);
-
   useEffect(() => {
-    // 비동기 작업임을 명시하기 위해 별도 실행
-    const initialize = async () => {
-      await fetchRooms();
+    const fetchRooms = async () => {
+      try {
+        const response = await api.get('/chat/rooms');
+        const roomList = response.data.data || [];
+        const sortedList = roomList.sort(
+          (a: ChatRoomListItem, b: ChatRoomListItem) => {
+            const timeA = a.lastMessageAtEpochMs || 0;
+            const timeB = b.lastMessageAtEpochMs || 0;
+            return timeB - timeA;
+          },
+        );
+        setRooms(sortedList);
+      } catch (error) {
+        console.error('채팅방 목록 로딩 실패:', error);
+      }
     };
-    initialize();
-  }, [fetchRooms]);
+
+    // 최초 실행
+    fetchRooms();
+
+    const handleChatUpdate = () => {
+      fetchRooms();
+    };
+
+    window.addEventListener('chat-update', handleChatUpdate);
+
+    return () => {
+      window.removeEventListener('chat-update', handleChatUpdate);
+    };
+  }, []); // 외부 의존성이 없으므로 빈 배열로 설정합니다.
 
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[48px] items-center justify-between px-[20px] pt-[10px]">
         <div className="flex items-center">
           <span className="text-[16px] font-bold text-gray-800">대화 목록</span>
-          <span className="ml-1 text-gray-300">● {rooms.length}</span>
+          <span className="ml-1 text-gray-300">
+            <MessageIcon />
+          </span>
         </div>
       </div>
       {rooms.length > 0 ? (
