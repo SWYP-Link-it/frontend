@@ -39,28 +39,32 @@ export const RequestFooter = ({ mentorId, skillId }: RequestFooterProps) => {
       alert('채팅방을 여는 중 오류가 발생했습니다.');
     }
   };
+
+  const isMySkill = mentorId === myId;
+
   return (
     <div className="sticky bottom-0 flex w-full items-center justify-between gap-6 bg-white px-28 py-6">
       <span className="text-brand-600 w-fit rounded-lg bg-[#F4F2FF] px-3 py-[5px] leading-6 font-semibold">
         내 크레딧 | 30
       </span>
       <div className="flex flex-1 gap-[15px]">
-        <RequiredAuth>
-          <Link
-            className="ml-auto w-full max-w-[380px]"
-            href={`/skills/request?mentorId=${mentorId}&skillId=${skillId}`}
-          >
-            <Button
-              text={'스킬 요청하기'}
-              mode="active"
-              icon={<RequestIcon size={20} />}
-            />
-          </Link>
-        </RequiredAuth>
+        <Button
+          text={'스킬 요청하기'}
+          mode={isMySkill ? 'inactive' : 'active'}
+          icon={<RequestIcon size={20} />}
+          disabled={isMySkill}
+          className="ml-auto w-full max-w-[380px]"
+          onClick={() =>
+            router.push(
+              `/skills/request?mentorId=${mentorId}&skillId=${skillId}`,
+            )
+          }
+        />
         <RequiredAuth>
           <div className="w-full max-w-[380px]">
             <Button
               text={'메세지 보내기'}
+              mode={isMySkill ? 'inactive' : 'default'}
               icon={<MessageIcon size={20} />}
               onClick={() => handleContact()}
             />
