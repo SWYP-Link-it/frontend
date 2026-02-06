@@ -11,11 +11,11 @@ export const ChatSection = ({ roomId }: { roomId: string }) => {
     Number(roomId),
   );
 
-  useEffect(() => {
-    if (roomInfo) {
-      console.log('룸 정보 전체보기:', roomInfo); // 여기서 skillId 혹은 exchangeSkillId 등을 찾아보세요!
-    }
-  }, [roomInfo]);
+  // useEffect(() => {
+  //   if (roomInfo) {
+  //     console.log('룸 정보 전체보기:', roomInfo);
+  //   }
+  // }, [roomInfo]);
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-white">
