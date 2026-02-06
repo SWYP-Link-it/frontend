@@ -1,9 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BaseModal } from '../BaseModal';
-import { Input } from '../Input';
-import { SKILL_CATEGORY_MAP } from '@/src/constants/profile';
+import {
+  SKILL_CATEGORY_MAP,
+  PROFICIENCY_OPTIONS,
+} from '@/src/constants/profile';
+
+interface SkillData {
+  skillCategoryType?: string;
+  category?: string;
+  skillName?: string;
+  name?: string;
+  skillProficiency?: string;
+  proficiency?: string;
+  skillTitle?: string;
+  title?: string;
+  skillDescription?: string;
+  description?: string;
+  imageUrls?: string[];
+  [key: string]: any;
+}
 
 interface SkillFormData {
   category: string;
@@ -11,13 +28,15 @@ interface SkillFormData {
   proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
   title: string;
   description: string;
+  existingImages: string[];
+  newFiles: File[];
 }
 
 interface SkillRegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRegister: (skill: any) => void;
-  initialData?: any;
+  initialData?: SkillData;
 }
 
 export const SkillRegisterModal = ({
@@ -26,29 +45,23 @@ export const SkillRegisterModal = ({
   onRegister,
   initialData,
 }: SkillRegisterModalProps) => {
-  // initialData로부터 폼의 초기 상태를 직접 계산하는 함수
-  // 이 방식은 useEffect 내부에서 setState를 호출하는 것보다 React의 렌더링 사이클에 안전합니다.
-  const getInitialForm = (): SkillFormData => {
+  const getDefaultValues = useCallback((): SkillFormData => {
     if (initialData) {
       const rawCategory =
-        initialData.skillCategoryType ||
-        initialData.category ||
-        initialData.skillCategoryName ||
-        '';
-
-      const categoryEntries = Object.entries(SKILL_CATEGORY_MAP);
-      const foundEntry = categoryEntries.find(
-        ([kor, eng]) => eng === rawCategory || kor === rawCategory,
-      );
+        initialData.skillCategoryType || initialData.category || '';
+      const categoryValue = SKILL_CATEGORY_MAP[rawCategory] || rawCategory;
 
       return {
-        category: foundEntry ? (foundEntry[1] as string) : 'ETC',
-        name: initialData.skillName || '',
-        proficiency:
-          (initialData.skillProficiency as 'LOW' | 'MEDIUM' | 'HIGH') ||
-          'MEDIUM',
-        title: initialData.skillTitle || '',
-        description: initialData.skillDescription || '',
+        category: categoryValue || '',
+        name: initialData.skillName || initialData.name || '',
+        proficiency: (initialData.skillProficiency ||
+          initialData.proficiency ||
+          'MEDIUM') as 'LOW' | 'MEDIUM' | 'HIGH',
+        title: initialData.skillTitle || initialData.title || '',
+        description:
+          initialData.skillDescription || initialData.description || '',
+        existingImages: initialData.imageUrls || [],
+        newFiles: [],
       };
     }
     return {
@@ -57,80 +70,174 @@ export const SkillRegisterModal = ({
       proficiency: 'MEDIUM',
       title: '',
       description: '',
+      existingImages: [],
+      newFiles: [],
     };
+  }, [initialData]);
+
+  // 초기값 설정 시 함수 호출
+  const [form, setForm] = useState<SkillFormData>(() => getDefaultValues());
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isProficiencyOpen, setIsProficiencyOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        setForm(getDefaultValues());
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    let urls: string[] = [];
+
+    const timer = setTimeout(() => {
+      if (form.newFiles.length === 0) {
+        setPreviews([]);
+        return;
+      }
+      urls = form.newFiles.map((file) => URL.createObjectURL(file));
+      setPreviews(urls);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [form.newFiles]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      const currentTotal = form.existingImages.length + form.newFiles.length;
+      if (currentTotal + selectedFiles.length > 5) {
+        alert('이미지는 최대 5장까지 등록 가능합니다.');
+        return;
+      }
+      setForm((prev) => ({
+        ...prev,
+        newFiles: [...prev.newFiles, ...selectedFiles],
+      }));
+    }
   };
 
-  // 1. useState의 지연 초기화(Lazy initialization) 기능을 사용하여
-  // 컴포넌트가 처음 마운트될 때 딱 한 번 초기값을 계산합니다.
-  const [form, setForm] = useState<SkillFormData>(() => getInitialForm());
+  const removeExistingImage = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      existingImages: prev.existingImages.filter((_, i) => i !== index),
+    }));
+  };
 
-  // 2. 만약 부모 컴포넌트에서 initialData가 바뀔 때 폼을 강제로 동기화해야 한다면,
-  // 부모 쪽에서 <SkillRegisterModal key={initialData?.id || 'new'} /> 처럼 key를 주는 것이 베스트입니다.
-  // 그렇게 하면 이 컴포넌트가 새로 마운트되면서 useState가 다시 초기화됩니다.
+  const removeNewFile = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      newFiles: prev.newFiles.filter((_, i) => i !== index),
+    }));
+  };
+
+  const isFormValid = Boolean(
+    form.category && form.name && form.title && form.title.length <= 39,
+  );
+
+  const handleSubmit = () => {
+    onRegister({
+      category: form.category,
+      name: form.name,
+      proficiency: form.proficiency,
+      title: form.title,
+      description: form.description,
+      existingImages: form.existingImages,
+      newFiles: form.newFiles,
+    });
+  };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-2xl">
       <div className="p-10">
-        <h2 className="mb-8 text-xl font-bold text-gray-900">
-          {initialData ? '스킬 수정' : '스킬 등록'}
-        </h2>
+        <h2 className="mb-8 text-[24px] font-bold text-gray-900">스킬</h2>
 
-        <div className="custom-scrollbar max-h-[70vh] space-y-8 overflow-y-auto pr-2">
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-bold text-gray-900">
+        <div className="custom-scrollbar max-h-[70vh] space-y-10 overflow-y-auto pr-2">
+          {/* 카테고리 섹션 */}
+          <div className="flex flex-col gap-4">
+            <label className="text-[16px] font-bold text-gray-900">
               스킬 카테고리
             </label>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(SKILL_CATEGORY_MAP).map(([korLabel, engEnum]) => {
-                const isSelected = form.category === engEnum;
-
-                return (
-                  <button
-                    key={engEnum}
-                    type="button"
-                    onClick={() => setForm({ ...form, category: engEnum })}
-                    className={`rounded-lg border px-4 py-2 text-sm transition-all duration-200 ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-50 font-bold text-blue-600 ring-2 ring-blue-500/20'
-                        : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
-                    }`}
-                  >
-                    {korLabel}
-                  </button>
-                );
-              })}
+            <div
+              onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+              className={`w-full cursor-pointer rounded-[12px] border p-4 transition-all ${
+                isCategoryOpen ? 'border-blue-400' : 'border-gray-200'
+              } ${form.category ? 'text-gray-800' : 'text-gray-400'}`}
+            >
+              {Object.keys(SKILL_CATEGORY_MAP).find(
+                (key) => SKILL_CATEGORY_MAP[key] === form.category,
+              ) || '어떤 분야의 스킬인지 알려주세요.'}
             </div>
+
+            {isCategoryOpen && (
+              <div className="flex flex-wrap gap-2 rounded-[12px] border border-gray-100 bg-white p-4 shadow-sm">
+                {Object.entries(SKILL_CATEGORY_MAP).map(
+                  ([korLabel, engEnum]) => (
+                    <button
+                      key={engEnum}
+                      type="button"
+                      onClick={() => {
+                        setForm((prev) => ({ ...prev, category: engEnum }));
+                        setIsCategoryOpen(false);
+                      }}
+                      className={`rounded-lg border px-4 py-2 text-[14px] transition-all ${
+                        form.category === engEnum
+                          ? 'border-blue-500 bg-blue-50 font-bold text-blue-600'
+                          : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      {korLabel}
+                    </button>
+                  ),
+                )}
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="스킬명"
-              placeholder="예: React, Figma"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
+          <div className="grid grid-cols-2 gap-6">
             <div className="flex flex-col gap-3">
-              <label className="text-xl leading-[30px] font-medium text-gray-900">
+              <label className="text-[16px] font-bold text-gray-900">
+                스킬명
+              </label>
+              <input
+                placeholder="구체적인 스킬명을 입력해주세요."
+                value={form.name}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, name: e.target.value }))
+                }
+                className="w-full rounded-[12px] border border-gray-200 p-4 text-[16px] outline-none focus:border-blue-400"
+              />
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <label className="text-[16px] font-bold text-gray-900">
                 숙련도
               </label>
               <div className="relative">
-                <select
-                  value={form.proficiency}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      proficiency: e.target.value as 'LOW' | 'MEDIUM' | 'HIGH',
-                    })
-                  }
-                  className="w-full appearance-none rounded-[15px] border-2 border-gray-300 bg-white p-[14px] text-xl transition-all outline-none focus:border-blue-400"
+                <button
+                  type="button"
+                  onClick={() => setIsProficiencyOpen(!isProficiencyOpen)}
+                  className="flex w-full items-center justify-between rounded-[12px] border border-gray-200 p-4 text-[16px] outline-none focus:border-blue-400"
                 >
-                  <option value="LOW">초급</option>
-                  <option value="MEDIUM">중급</option>
-                  <option value="HIGH">고급</option>
-                </select>
-                <div className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-400">
+                  <span
+                    className={
+                      form.proficiency ? 'text-gray-800' : 'text-gray-400'
+                    }
+                  >
+                    {PROFICIENCY_OPTIONS.find(
+                      (opt) => opt.value === form.proficiency,
+                    )?.label || '선택'}
+                  </span>
                   <svg
-                    className="h-5 w-5"
+                    className={`h-5 w-5 transition-transform ${
+                      isProficiencyOpen ? 'rotate-180' : ''
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -142,46 +249,148 @@ export const SkillRegisterModal = ({
                       d="M19 9l-7 7-7-7"
                     />
                   </svg>
-                </div>
+                </button>
+                {isProficiencyOpen && (
+                  <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-gray-100 bg-white shadow-xl">
+                    {PROFICIENCY_OPTIONS.map((opt) => (
+                      <div
+                        key={opt.value}
+                        onClick={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            proficiency: opt.value as any,
+                          }));
+                          setIsProficiencyOpen(false);
+                        }}
+                        className="flex cursor-pointer items-center justify-between border-b border-gray-50 p-4 last:border-none hover:bg-blue-50"
+                      >
+                        <div>
+                          <div className="font-bold text-gray-900">
+                            {opt.label}
+                          </div>
+                          <div className="text-[12px] text-gray-500">
+                            {opt.description}
+                          </div>
+                        </div>
+                        {form.proficiency === opt.value && (
+                          <svg
+                            className="h-5 w-5 text-blue-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          <Input
-            label="스킬 제목"
-            placeholder="사람들이 보게 될 게시글의 제목을 입력해주세요."
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-          />
+          <div className="flex flex-col gap-3">
+            <label className="text-[16px] font-bold text-gray-900">
+              스킬 제목
+            </label>
+            <input
+              placeholder="게시글 제목을 입력해주세요."
+              value={form.title}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, title: e.target.value }))
+              }
+              className={`w-full rounded-[12px] border p-4 text-[16px] outline-none ${
+                form.title.length > 39
+                  ? 'border-red-400'
+                  : 'border-gray-200 focus:border-blue-400'
+              }`}
+            />
+          </div>
 
           <div className="flex flex-col gap-3">
-            <label className="text-xl leading-[30px] font-medium text-gray-900">
+            <label className="text-[16px] font-bold text-gray-900">
               스킬 소개
             </label>
             <textarea
-              placeholder="어떤 내용을 알려줄 수 있는지 간단히 적어주세요."
+              placeholder="스킬을 소개해주세요."
               value={form.description}
               onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
+                setForm((prev) => ({ ...prev, description: e.target.value }))
               }
-              className="min-h-[120px] w-full resize-none rounded-[15px] border-2 border-gray-100 bg-white p-4 text-xl transition-all outline-none focus:border-blue-400"
+              className="min-h-[120px] w-full resize-none rounded-[12px] border border-gray-200 p-4 text-[16px] outline-none focus:border-blue-400"
             />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <label className="text-[16px] font-bold text-gray-900">
+              포트폴리오
+            </label>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex h-[120px] w-[120px] cursor-pointer flex-col items-center justify-center rounded-[12px] border-2 border-dashed border-gray-200 bg-gray-50 text-gray-400">
+                <span className="text-[14px]">
+                  {form.existingImages.length + form.newFiles.length}/5
+                </span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+              {form.existingImages.map((url, i) => (
+                <div
+                  key={`existing-${i}`}
+                  className="relative h-[120px] w-[120px]"
+                >
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-full w-full rounded-xl object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeExistingImage(i)}
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600"
+                  >
+                    <span className="text-[12px] leading-none">✕</span>
+                  </button>
+                </div>
+              ))}
+              {previews.map((url, i) => (
+                <div key={`new-${i}`} className="relative h-[120px] w-[120px]">
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-full w-full rounded-xl object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeNewFile(i)}
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-white shadow-md transition-colors hover:bg-black"
+                  >
+                    <span className="text-[12px] leading-none">✕</span>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         <button
           type="button"
-          onClick={() => {
-            onRegister({
-              ...form,
-              skillCategoryType: form.category,
-            });
-          }}
-          disabled={!form.name || !form.title || !form.category}
-          className={`mt-8 w-full rounded-xl py-4 font-bold shadow-lg transition-all ${
-            form.name && form.title && form.category
-              ? 'bg-blue-500 text-white shadow-blue-100 hover:bg-blue-600'
-              : 'cursor-not-allowed bg-gray-100 text-gray-300 shadow-none'
+          onClick={handleSubmit}
+          disabled={!isFormValid}
+          className={`mt-10 w-full rounded-[12px] py-5 text-[18px] font-bold transition-all ${
+            isFormValid
+              ? 'bg-blue-500 text-white hover:bg-blue-600'
+              : 'bg-gray-100 text-gray-300'
           }`}
         >
           {initialData ? '수정 완료' : '스킬 등록'}
