@@ -6,31 +6,7 @@ import {
   SKILL_CATEGORY_MAP,
   PROFICIENCY_OPTIONS,
 } from '@/src/constants/profile';
-
-interface SkillData {
-  skillCategoryType?: string;
-  category?: string;
-  skillName?: string;
-  name?: string;
-  skillProficiency?: string;
-  proficiency?: string;
-  skillTitle?: string;
-  title?: string;
-  skillDescription?: string;
-  description?: string;
-  imageUrls?: string[];
-  [key: string]: any;
-}
-
-interface SkillFormData {
-  category: string;
-  name: string;
-  proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
-  title: string;
-  description: string;
-  existingImages: string[];
-  newFiles: File[];
-}
+import { SkillData, SkillFormData } from '@/src/types/profile';
 
 interface SkillRegisterModalProps {
   isOpen: boolean;
@@ -61,7 +37,7 @@ export const SkillRegisterModal = ({
         description:
           initialData.skillDescription || initialData.description || '',
         existingImages: initialData.imageUrls || [],
-        newFiles: [],
+        newFiles: initialData.imageFiles || [],
       };
     }
     return {
@@ -75,7 +51,6 @@ export const SkillRegisterModal = ({
     };
   }, [initialData]);
 
-  // 초기값 설정 시 함수 호출
   const [form, setForm] = useState<SkillFormData>(() => getDefaultValues());
   const [previews, setPreviews] = useState<string[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
