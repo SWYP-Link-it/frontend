@@ -5,47 +5,26 @@ import { RequestIcon } from '@/src/components/icons/RequestIcon';
 import { MessageIcon } from '@/src/components/icons/MessageIcon';
 import { RequiredAuth } from '@/src/features/auth/RequiredAuth';
 import { Button } from '@/src/components/Button';
-import { useAuthStore } from '@/src/stores/authStore';
 import { api } from '@/src/lib/api/api';
 import { useRouter } from 'next/navigation';
+import { useUserInfoStore } from '@/src/stores/userInfoStore';
 
 type RequestFooterProps = {
   mentorId: number;
   skillId: number;
 };
 
-const parseJwt = (token: string) => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join(''),
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    return null;
-  }
-};
-
 export const RequestFooter = ({ mentorId, skillId }: RequestFooterProps) => {
   const router = useRouter();
-  const accessToken = useAuthStore((state) => state.accessToken);
 
-  const getMyId = () => {
-    if (!accessToken) return 0;
-    const payload = parseJwt(accessToken);
-    return payload?.userId || payload?.sub || payload?.id || 0;
-  };
+  const myId = useUserInfoStore((state) => state.userId);
 
   const handleContact = async () => {
     try {
       const response = await api.post('/chat/rooms', null, {
         params: {
           mentorId: mentorId,
-          menteeId: getMyId(),
+          menteeId: myId,
         },
       });
 
