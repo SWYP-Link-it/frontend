@@ -5,6 +5,11 @@ import { ReactElement } from 'react';
 import { CursorBoxIcon } from '@/src/components/icons/CursorBoxIcon';
 import { ClockIcon } from '@/src/components/icons/ClockIcon';
 import { ImageIcon } from '@/src/components/icons/ImageIcon';
+import {
+  REGION_LABELS,
+  EXCHANGE_TYPE_LABELS,
+  PROFICIENCY_LABELS,
+} from '@/src/constants/profile';
 
 export const SkillDetail = ({
   mainSkill,
@@ -30,7 +35,7 @@ export const SkillDetail = ({
             {skillTitle}
           </div>
           <div className="leading-[1.5] font-semibold text-gray-500">
-            숙련도 - {skillProficiency}
+            숙련도 - {PROFICIENCY_LABELS[skillProficiency]}
           </div>
         </div>
         <div className="bg-brand-200 h-25 w-25 rounded-2xl">그래픽 이미지</div>
@@ -47,11 +52,11 @@ export const SkillDetail = ({
           </div>
           <div className="py-2">
             <span className="mr-4 font-normal text-gray-500">선호 방식</span>
-            {exchangeType}
+            {EXCHANGE_TYPE_LABELS[exchangeType]}
           </div>
           <div className="py-2">
             <span className="mr-4 font-normal text-gray-500">선호 지역</span>
-            {preferredRegion}
+            {REGION_LABELS[preferredRegion]}
           </div>
         </div>
       </div>
