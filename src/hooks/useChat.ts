@@ -3,14 +3,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage, ChatRoomDetail } from '@/src/types/chat';
 import { api } from '@/src/lib/api/api';
-// 보내주신 파일 경로에 맞춰 import (파일명이 socket.ts인지 확인 필요)
 import {
   connectSocket,
   enterRoom,
   subscribeToRoom,
   exitRoom,
   disconnectSocket,
-  sendMessage as sendSocketMessage, // 이름 중복 방지를 위해 별칭 사용
+  sendMessage as sendSocketMessage,
   ChatPayload,
 } from '@/src/utils/socket';
 import { useAuthStore } from '../stores/authStore';
@@ -23,14 +22,22 @@ export const useChat = (roomId: number) => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const subscriptionRef = useRef<any>(null);
 
-  // 내 ID 추출 함수
   const getMyId = useCallback(() => {
     if (!accessToken) return 0;
     const payload = parseJwt(accessToken);
     return payload?.userId || payload?.sub || payload?.id || 0;
   }, [accessToken]);
 
-  // 초기 데이터 로딩
+  const markAsRead = useCallback(async () => {
+    if (!roomId) return;
+    try {
+      await api.post(`/chat/rooms/${roomId}/read`);
+      window.dispatchEvent(new Event('chat-update'));
+    } catch (error) {
+      console.error('읽음 처리 실패:', error);
+    }
+  }, [roomId]);
+
   const fetchInitialData = useCallback(async () => {
     if (!roomId) return;
     try {
@@ -45,19 +52,19 @@ export const useChat = (roomId: number) => {
       }
       if (messagesRes.data.success) {
         const myId = Number(getMyId());
-        // 기존 메시지들에 isMine 속성 부여
         const fixedMessages = messagesRes.data.data.map((msg: any) => ({
           ...msg,
           isMine: msg.senderId === myId,
         }));
         setMessages(fixedMessages);
+        await markAsRead();
       }
     } catch (error) {
       console.error('채팅 데이터 로딩 실패:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [roomId, getMyId]);
+  }, [roomId, getMyId, markAsRead]);
 
   useEffect(() => {
     if (!accessToken || !roomId) return;
@@ -67,7 +74,6 @@ export const useChat = (roomId: number) => {
         await connectSocket(accessToken);
         enterRoom(roomId);
 
-        // 실시간 메시지 구독
         subscriptionRef.current = subscribeToRoom(
           roomId,
           (payload: ChatPayload) => {
@@ -83,6 +89,12 @@ export const useChat = (roomId: number) => {
                 isMine: payload.senderId === myId,
               };
               setMessages((prev) => [...prev, newMessage]);
+
+              if (payload.senderId !== myId) {
+                markAsRead();
+              }
+
+              window.dispatchEvent(new Event('chat-update'));
             }
           },
         );
@@ -100,17 +112,13 @@ export const useChat = (roomId: number) => {
       exitRoom(roomId);
       disconnectSocket();
     };
-  }, [roomId, accessToken, fetchInitialData, getMyId]);
+  }, [roomId, accessToken, fetchInitialData, getMyId, markAsRead]);
 
-  // 메시지 전송 (소켓 이용)
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
     try {
-      // 소켓을 통해 전송 (백엔드에서 저장 후 구독자들에게 브로드캐스팅됨)
       sendSocketMessage(roomId, content);
-
-      // 만약 백엔드에서 전송 API를 따로 호출해야 한다면 아래 주석 해제
-      // await api.post(`/chat/rooms/${roomId}/messages`, { content });
+      window.dispatchEvent(new Event('chat-update'));
     } catch (error) {
       console.error('메시지 전송 실패:', error);
     }

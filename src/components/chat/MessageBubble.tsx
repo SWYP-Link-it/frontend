@@ -25,7 +25,7 @@ export const MessageBubble = ({
             <div className="relative h-[40px] w-[40px] overflow-hidden rounded-full border border-gray-200 bg-gray-100">
               {profileUrl ? (
                 <Image
-                  src={profileUrl}
+                  src={'/icons/avatar.svg'}
                   alt="profile"
                   fill
                   className="object-cover"
@@ -46,17 +46,17 @@ export const MessageBubble = ({
         className={`flex max-w-[70%] items-end gap-[4px] ${isMine ? 'flex-row-reverse' : 'flex-row'}`}
       >
         <div
-          className={`rounded-[18px] px-[16px] py-[10px] text-[15px] leading-[1.5] break-all ${
+          className={`rounded-[18px] px-[16px] py-[10px] text-sm leading-[1.5] break-all ${
             isMine
               ? 'bg-brand-600 rounded-tr-none text-white'
-              : 'rounded-tl-none bg-gray-100 text-gray-900'
+              : 'bg-brand-100 rounded-tl-none text-gray-900'
           } `}
         >
           {content}
         </div>
 
         {showTime && (
-          <span className="mb-[2px] shrink-0 text-[11px] text-gray-400">
+          <span className="mb-[2px] shrink-0 text-xs text-gray-400">
             {timestamp}
           </span>
         )}
