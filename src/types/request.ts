@@ -1,14 +1,33 @@
 export type TabType = 'received' | 'sent';
 
+// Enum 명세 반영: ExchangeStatus
 export type RequestStatus =
   | 'PENDING'
   | 'ACCEPTED'
   | 'REJECTED'
-  | 'pending'
-  | 'accepted'
-  | 'rejected';
+  | 'CANCELED'
+  | 'EXPIRED'
+  | 'COMPLETED'
+  | 'SETTLED';
 
-export interface SkillRequest {
+export type ApiRequestItem = {
+  skillExchangeId: number;
+  targetUserId: number;
+  skillId: number;
+  chatRoomId: number | null;
+  targetProfileImageUrl: string | null;
+  targetNickname: string;
+  skillName: string;
+  exchangeStatus: string; // "대기중", "수락됨", "취소됨" 등 한글 응답
+  creditPrice: number;
+  message: string;
+  requestedDate: string;
+  exchangeDateTime: string;
+  exchangeDuration: number;
+  isNew: boolean;
+};
+
+export type SkillRequest = {
   id: number;
   partnerId: number;
   partnerNickname: string;
@@ -21,4 +40,4 @@ export interface SkillRequest {
   credits: number;
   createdAt: string;
   isSentByMe: boolean;
-}
+};

@@ -1,5 +1,3 @@
-// 📂 src/types/chat.ts
-
 export type ApiResponse<T> = {
   success: boolean;
   code: string | null;
@@ -7,18 +5,17 @@ export type ApiResponse<T> = {
   data: T;
 };
 
-// GET /chat/rooms/{roomId}
 export type ChatRoomDetail = {
   roomId: number;
   mentorId: number;
   menteeId: number;
-  status: 'ACTIVE' | 'INACTIVE';
+  status: 'ACTIVE' | 'CLOSED';
   partnerId: number;
   partnerNickname: string;
-  partnerProfileImageUrl: string;
-  lastMessageId: number;
-  lastMessageContent: string;
-  lastMessageAtEpochMs: number;
+  partnerProfileImageUrl: string | null;
+  lastMessageId: number | null;
+  lastMessageContent: string | null;
+  lastMessageAtEpochMs: number | null;
   unreadCount: number;
   unreadMentorCount: number;
   unreadMenteeCount: number;
@@ -26,7 +23,6 @@ export type ChatRoomDetail = {
   modifiedAtEpochMs: number;
 };
 
-// GET /chat/rooms/{roomId}/messages
 export type ChatMessage = {
   messageId: number;
   roomId: number;
@@ -39,11 +35,16 @@ export type ChatMessage = {
 
 export interface ChatRoomListItem {
   roomId: number;
-  roomName: string;
+  mentorId: number;
+  menteeId: number;
+  status: string;
   partnerId: number;
   partnerNickname: string;
   partnerProfileImageUrl: string | null;
-  lastMessage: string | null;
+  lastMessageId: number | null;
+  lastMessageContent: string | null;
   lastMessageAtEpochMs: number | null;
   unreadCount: number;
+  createdAtEpochMs: number;
+  modifiedAtEpochMs: number;
 }
