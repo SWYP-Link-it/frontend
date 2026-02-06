@@ -2,13 +2,46 @@
 
 import Image from 'next/image';
 import { SearchIcon } from '../icons/SearchIcon';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { api } from '@/src/lib/api/api';
+
+type PopularSkill = {
+  skillId: number;
+  nickname: string;
+  skillTitle: string;
+};
+
+type PopularKeyword = {
+  rank: number;
+  keyword: string;
+};
 
 export const Header = () => {
+  const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
+  const [popularSkills, setPopularSkills] = useState<PopularSkill[]>([]);
+  const [popularKeywords, setPopularKeywords] = useState<PopularKeyword[]>([]);
+
+  const search = (searchKeyword: string) => {
+    router.push(`/skills `);
+  };
+
+  useEffect(() => {
+    if (!isSearchModalOpen) return;
+
+    api
+      .get('/search/keywords/popular')
+      .then((response) => setPopularKeywords(response.data.data));
+
+    api
+      .get('/search/skills/popular')
+      .then((response) => setPopularSkills(response.data.data));
+  }, [isSearchModalOpen]);
 
   return (
     <>
@@ -59,10 +92,10 @@ export const Header = () => {
                       </span>
                     </div>
                     <div className="flex flex-col gap-4 text-lg font-medium text-gray-700">
-                      {popularKeyword.map((keyword, idx) => (
-                        <div key={idx} className="cursor-pointer">
+                      {popularKeywords.map(({ rank, keyword }) => (
+                        <div key={rank} className="cursor-pointer">
                           <span className="text-brand-600 mr-6 font-semibold">
-                            {idx + 1}
+                            {rank}
                           </span>
                           {keyword}
                         </div>
@@ -75,15 +108,17 @@ export const Header = () => {
                       <span className="text-base text-gray-600">더보기</span>
                     </div>
                     <div className="flex gap-4 overflow-x-auto">
-                      {popularPosts.map((post, idx) => (
-                        <div
-                          key={idx + 1}
-                          className="flex w-65 shrink-0 flex-col gap-3 rounded-lg bg-[#F5F6FA] px-6 py-4 font-semibold"
-                        >
-                          <span className="text-gray-400">{post.nickname}</span>
-                          <p className="text-gray-700">{post.content}</p>
-                        </div>
-                      ))}
+                      {popularSkills.map(
+                        ({ skillId, skillTitle, nickname }) => (
+                          <div
+                            key={skillId}
+                            className="flex w-65 shrink-0 flex-col gap-3 rounded-lg bg-[#F5F6FA] px-6 py-4 font-semibold"
+                          >
+                            <span className="text-gray-400">{nickname}</span>
+                            <p className="text-gray-700">{skillTitle}</p>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
                 </div>
@@ -95,30 +130,3 @@ export const Header = () => {
     </>
   );
 };
-
-const popularKeyword = [
-  '리액트',
-  '그래픽디자인',
-  '자바(Spring)',
-  '프로덕트 디자인',
-  'C4D',
-];
-
-const popularPosts = [
-  {
-    nickname: '블루팬더',
-    content: '수준높은 강의 보여드립니다.',
-  },
-  {
-    nickname: '블루팬더2',
-    content: '수준높은 강의 보여드립니다.',
-  },
-  {
-    nickname: '블루팬더2',
-    content: '수준높은 강의 보여드립니다.',
-  },
-  {
-    nickname: '블루팬더2',
-    content: '수준높은 강의 보여드립니다.',
-  },
-];
