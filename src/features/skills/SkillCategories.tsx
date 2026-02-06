@@ -2,7 +2,8 @@
 
 import { Tabbar } from '@/src/components/Tabbar';
 import { useRouter } from 'next/navigation';
-import { Category, CATEGORY_LABELS } from './constants';
+import { Category } from '@/src/types/skill';
+import { CATEGORY_LABELS } from '@/src/constants/skill';
 
 type SkillCategoriesProps = {
   category: Category;
