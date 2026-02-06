@@ -11,5 +11,6 @@
     "javascriptreact",
     "typescript",
     "typescriptreact"
-  ]
+  ],
+  "prettier.configPath": ".prettierrc.json"
 }
