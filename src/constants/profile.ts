@@ -37,12 +37,6 @@ export const SKILL_CATEGORY_MAP: Record<string, string> = {
   기타: 'ETC',
 };
 
-export const PROFICIENCY_LEVELS = [
-  { label: '상', desc: '네이티브 수준이에요', value: '상' },
-  { label: '중', desc: '능숙하게 활용 가능해요', value: '중' },
-  { label: '하', desc: '기초적인 수준이에요', value: '하' },
-] as const;
-
 export const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
 export const TIME_SECTIONS = [
   {
@@ -112,5 +106,22 @@ export const TIME_SECTIONS = [
       '23:00',
       '23:30',
     ],
+  },
+];
+export const PROFICIENCY_OPTIONS = [
+  {
+    value: 'HIGH',
+    label: '상',
+    description: '실무 경험이 있으며, 노하우를 공유할 수 있어요.',
+  },
+  {
+    value: 'MEDIUM',
+    label: '중',
+    description: '기본 기능을 이해하고, 간단한 작업이 가능해요.',
+  },
+  {
+    value: 'LOW',
+    label: '하',
+    description: '기초 개념을 알고 있고, 배우면서 사용 중이에요.',
   },
 ];

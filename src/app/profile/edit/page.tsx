@@ -15,7 +15,6 @@ import { SkillRegisterModal } from '@/src/components/edit/SkillRegisterModal';
 import {
   PROFICIENCY_MAP,
   REGION_MAP,
-  SKILL_CATEGORY_MAP,
   WEEKDAY_MAP,
 } from '@/src/constants/profile';
 
@@ -88,23 +87,18 @@ export default function ProfileEditPage() {
 
     try {
       const formData = new FormData();
-
-      const formatTime = (time: string) => {
-        if (!time) return '09:00';
-        return time.length > 5 ? time.substring(0, 5) : time;
-      };
+      const formatTime = (time: string) =>
+        !time ? '09:00' : time.length > 5 ? time.substring(0, 5) : time;
 
       const payload = {
         nickname: localProfile.nickname,
         experienceDescription: localProfile.experienceDescription || '',
-
         exchangeType: localProfile.exchangeType || 'ONLINE',
         preferredRegion:
           REGION_MAP[localProfile.preferredRegion] ||
           localProfile.preferredRegion ||
           null,
         detailedLocation: localProfile.detailedLocation?.trim() || null,
-
         availableSchedules: (localProfile.availableSchedules || []).map(
           (s: any) => ({
             id: s.id || null,
@@ -113,27 +107,18 @@ export default function ProfileEditPage() {
             endTime: formatTime(s.endTime),
           }),
         ),
-
-        skills: (localProfile.skills || []).map((s: any) => {
-          const finalCategoryType = Object.values(SKILL_CATEGORY_MAP).includes(
-            s.skillCategoryType,
-          )
-            ? s.skillCategoryType
-            : SKILL_CATEGORY_MAP[s.skillCategoryName] || 'ETC';
-
-          return {
-            id: s.id || null,
-            skillCategoryType: finalCategoryType,
-            skillName: s.skillName || '',
-            skillTitle: s.skillTitle || '',
-            skillProficiency:
-              PROFICIENCY_MAP[s.skillProficiency] || s.skillProficiency,
-            skillDescription: s.skillDescription || '',
-            exchangeDuration: Number(s.exchangeDuration) || 60,
-            isVisible: true,
-            imageUrls: Array.isArray(s.imageUrls) ? s.imageUrls : [],
-          };
-        }),
+        skills: (localProfile.skills || []).map((s: any) => ({
+          id: s.id || null,
+          skillCategoryType: s.skillCategoryType,
+          skillName: s.skillName || '',
+          skillTitle: s.skillTitle || '',
+          skillProficiency:
+            PROFICIENCY_MAP[s.skillProficiency] || s.skillProficiency,
+          skillDescription: s.skillDescription || '',
+          exchangeDuration: 60,
+          isVisible: true,
+          imageUrls: Array.isArray(s.imageUrls) ? s.imageUrls : [],
+        })),
       };
 
       formData.append(
@@ -152,15 +137,12 @@ export default function ProfileEditPage() {
       const response = isNewProfile
         ? await api.post('/profile', formData)
         : await api.put('/profile', formData);
-
       if (response.data.success) {
         alert('저장되었습니다.');
         router.push('/profile');
       }
     } catch (err: any) {
-      alert(
-        `저장 실패: ${err.response?.data?.message || '서버 내부 오류가 발생했습니다(500).'}`,
-      );
+      alert(`저장 실패: ${err.response?.data?.message || '서버 오류'}`);
     }
   };
 
@@ -183,13 +165,12 @@ export default function ProfileEditPage() {
   ) as string[];
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] pb-32">
+    <div className="bg-brand-50 min-h-screen pb-32">
       <ProfileEditHeader
         onSave={handleSave}
         isDirty={isDirty}
         isValid={isValid}
       />
-
       <main className="mx-auto max-w-4xl px-6 py-12">
         <div className="rounded-[40px] border border-gray-50 bg-white p-12 shadow-xl shadow-gray-100/50">
           <ProfileEditSection
@@ -243,18 +224,16 @@ export default function ProfileEditPage() {
                 activeDay={activeDay}
                 onActiveDayChange={setActiveDay}
                 onChange={(days) => {
-                  const newSchedules = days.map((day) => {
-                    const existing = localProfile.availableSchedules?.find(
-                      (s: any) => s.dayOfWeek === day,
-                    );
-                    return (
-                      existing || {
+                  const newSchedules = days.map(
+                    (day) =>
+                      localProfile.availableSchedules?.find(
+                        (s: any) => s.dayOfWeek === day,
+                      ) || {
                         dayOfWeek: day,
                         startTime: '09:00',
                         endTime: '18:00',
-                      }
-                    );
-                  });
+                      },
+                  );
                   updateField('availableSchedules', newSchedules);
                 }}
               />
@@ -293,6 +272,7 @@ export default function ProfileEditPage() {
         }}
         onRegister={(skillData: any) => {
           const newSkills = [...(localProfile.skills || [])];
+
           const skillEntry = {
             ...(editingSkillIndex !== null ? newSkills[editingSkillIndex] : {}),
             skillCategoryType: skillData.category,
@@ -300,6 +280,8 @@ export default function ProfileEditPage() {
             skillProficiency: skillData.proficiency,
             skillTitle: skillData.title,
             skillDescription: skillData.description,
+            imageUrls: skillData.existingImages || [],
+            imageFiles: skillData.newFiles || [],
           };
 
           if (editingSkillIndex !== null) {
