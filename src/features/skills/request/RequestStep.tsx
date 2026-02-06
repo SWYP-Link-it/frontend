@@ -60,6 +60,7 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
   const hasSlots = availableTimes && availableTimes.length > 0;
 
   useEffect(() => {
+    if (!mentorId || !currentMonth) return;
     const formattedMonth = formatDate(currentMonth, 'YYYY-MM');
     api
       .get(
@@ -77,6 +78,7 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
   }, [currentMonth, mentorId]);
 
   useEffect(() => {
+    if (!mentorId || !skillId || !formData.date) return;
     const formattedDate = formatDate(formData.date, 'YYYY-MM-DD');
     api
       .get(
