@@ -8,7 +8,7 @@ const tabs = [
   'introduction',
   'time',
   'portfolio',
-  'reviews',
+  // 'reviews',
 ] as const;
 
 export const TAB_LABELS = {
@@ -16,14 +16,13 @@ export const TAB_LABELS = {
   introduction: '소개',
   time: '시간',
   portfolio: '포트폴리오',
-  reviews: '후기',
+  // reviews: '후기',
 };
 
-export const DetailTabs = () => {
+export const DetailSectionTab = () => {
   const [currentTab, setCurrentTab] = useState<(typeof tabs)[number]>(tabs[0]);
 
   const handleTabClick = (tab: string) => {
-    console.log('Clicked tab:', tab);
     setCurrentTab(tab as (typeof tabs)[number]);
 
     const element = document.getElementById(`skill-detail-${tab}`);
