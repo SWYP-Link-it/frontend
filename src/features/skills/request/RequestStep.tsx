@@ -5,9 +5,11 @@ import { ko } from 'react-day-picker/locale';
 import { RequestFormData, useRequestForm } from './RequestFormProvider';
 import Link from 'next/link';
 import { AlertIcon } from '@/src/components/icons/AlertIcon';
-import { useFromInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
+import { useFormInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
 import { api } from '@/src/lib/api/api';
 import { formatDate } from '@/src/utils/date';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 type RequestStepProps = {
   step: number;
@@ -15,7 +17,8 @@ type RequestStepProps = {
 };
 
 export const RequestStep = ({ step, setStep }: RequestStepProps) => {
-  const { mentorId, skillId } = useFromInfoFromSearchParams();
+  const router = useRouter();
+  const { mentorId, skillId } = useFormInfoFromSearchParams();
   const { skillList, formData, setFormData } = useRequestForm();
 
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -46,14 +49,13 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
         requestedDate: formatDate(formData.date, 'YYYY-MM-DD'),
         startTime: formData.time,
       })
-      .then((response) => {
-        console.log(response.data.message);
-        setStep((step) => step + 1);
+      .then(() => {
+        toast.success('신청이 완료되었습니다!');
+        router.push('/skills');
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast(serverError.message);
       });
   };
 
@@ -72,8 +74,7 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast.error(serverError.message);
       });
   }, [currentMonth, mentorId]);
 
@@ -103,8 +104,7 @@ export const RequestStep = ({ step, setStep }: RequestStepProps) => {
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast.error(serverError.message);
       });
   }, [formData.date, mentorId, skillId]);
 

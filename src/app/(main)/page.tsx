@@ -2,6 +2,7 @@
 
 import { api } from '@/src/lib/api/api';
 import { useIsLoggedIn } from '@/src/stores/selectors';
+import { toast } from 'sonner';
 
 export default function Home() {
   const isLoggedIn = useIsLoggedIn();
@@ -10,12 +11,12 @@ export default function Home() {
       {isLoggedIn ? 'Logged in' : 'Not logged in'}
       <button
         onClick={() => {
-          api.get('/chat/rooms').then((response) => {
-            console.log('성공:', response.data);
-          });
+          toast.error(
+            '테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트',
+          );
         }}
       >
-        테스트 요청
+        테스트 버튼
       </button>
     </div>
   );
