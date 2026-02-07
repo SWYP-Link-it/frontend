@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { RequestIcon } from '@/src/components/icons/RequestIcon';
 import { MessageIcon } from '@/src/components/icons/MessageIcon';
 import { RequiredAuth } from '@/src/features/auth/RequiredAuth';
@@ -8,6 +7,7 @@ import { Button } from '@/src/components/Button';
 import { api } from '@/src/lib/api/api';
 import { useRouter } from 'next/navigation';
 import { useUserInfoStore } from '@/src/stores/userInfoStore';
+import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
 
 type RequestFooterProps = {
   mentorId: number;
@@ -17,10 +17,14 @@ type RequestFooterProps = {
 export const RequestFooter = ({ mentorId, skillId }: RequestFooterProps) => {
   const router = useRouter();
 
-  const myId = useUserInfoStore((state) => state.userId);
+  const myId = useUserInfoStore((state) => state.userInfo?.userId);
 
   const handleContact = async () => {
     try {
+      if (!myId) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
       const response = await api.post('/chat/rooms', null, {
         params: {
           mentorId: mentorId,
@@ -43,10 +47,8 @@ export const RequestFooter = ({ mentorId, skillId }: RequestFooterProps) => {
   const isMySkill = mentorId === myId;
 
   return (
-    <div className="sticky bottom-0 flex w-full items-center justify-between gap-6 bg-white px-28 py-6">
-      <span className="text-brand-600 w-fit rounded-lg bg-[#F4F2FF] px-3 py-[5px] leading-6 font-semibold">
-        내 크레딧 | 30
-      </span>
+    <div className="sticky bottom-0 flex w-full items-center justify-between gap-12 bg-white px-28 py-6">
+      <MyCreditBadge />
       <div className="flex flex-1 gap-[15px]">
         <RequiredAuth>
           <div className="ml-auto w-full max-w-[380px]">

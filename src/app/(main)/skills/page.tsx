@@ -1,8 +1,9 @@
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
-import { CategoryTab } from '@/src/features/skills/CategoryTab';
 import { SkillList } from '@/src/features/skills/SkillList';
 import { Category, SkillCardDto } from '@/src/types/skill';
+import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
+import { CategoryTab } from '@/src/features/skills/CategoryTab';
 
 export default async function Skills({
   searchParams,
@@ -48,9 +49,7 @@ export default async function Skills({
           <div className="my-7">
             <CreditInfoBanner />
           </div>
-          <span className="text-brand-600 mb-6 w-fit rounded-lg bg-[#F4F2FF] px-3 py-[5px] leading-6 font-semibold">
-            내 크레딧 | 30
-          </span>
+          <MyCreditBadge className="mb-6" />
           <SkillList list={data} />
         </div>
       </div>

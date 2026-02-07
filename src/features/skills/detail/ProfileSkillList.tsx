@@ -26,6 +26,7 @@ export const ProfileSkillList = ({
           <Link
             key={skillId}
             title={skillName}
+            replace
             href={`/skills/detail/${skillId}`}
             className={`truncate rounded-xl ${currentId === skillId ? 'bg-gray-200' : ''} px-5 py-1 text-sm leading-[1.5] font-semibold text-gray-500`}
           >
