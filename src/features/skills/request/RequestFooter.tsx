@@ -47,34 +47,36 @@ export const RequestFooter = ({ mentorId, skillId }: RequestFooterProps) => {
   const isMySkill = mentorId === myId;
 
   return (
-    <div className="sticky bottom-0 flex w-full items-center justify-between gap-12 bg-white px-28 py-6">
-      <MyCreditBadge />
-      <div className="flex flex-1 gap-[15px]">
-        <RequiredAuth>
-          <div className="ml-auto w-full max-w-[380px]">
-            <Button
-              text={'스킬 요청하기'}
-              mode={isMySkill ? 'inactive' : 'active'}
-              icon={<RequestIcon size={20} />}
-              disabled={isMySkill}
-              onClick={() =>
-                router.push(
-                  `/skills/request?mentorId=${mentorId}&skillId=${skillId}`,
-                )
-              }
-            />
-          </div>
-        </RequiredAuth>
-        <RequiredAuth>
-          <div className="w-full max-w-[380px]">
-            <Button
-              text={'메세지 보내기'}
-              mode={isMySkill ? 'inactive' : 'default'}
-              icon={<MessageIcon size={20} />}
-              onClick={() => handleContact()}
-            />
-          </div>
-        </RequiredAuth>
+    <div className="sticky bottom-0 w-full bg-white py-6">
+      <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 items-center gap-12">
+        <MyCreditBadge />
+        <div className="flex flex-1 gap-[15px]">
+          <RequiredAuth>
+            <div className="ml-auto w-full max-w-[380px]">
+              <Button
+                text={'스킬 요청하기'}
+                mode={isMySkill ? 'inactive' : 'active'}
+                icon={<RequestIcon size={20} />}
+                disabled={isMySkill}
+                onClick={() =>
+                  router.push(
+                    `/skills/request?mentorId=${mentorId}&skillId=${skillId}`,
+                  )
+                }
+              />
+            </div>
+          </RequiredAuth>
+          <RequiredAuth>
+            <div className="w-full max-w-[380px]">
+              <Button
+                text={'메세지 보내기'}
+                mode={isMySkill ? 'inactive' : 'default'}
+                icon={<MessageIcon size={20} />}
+                onClick={() => handleContact()}
+              />
+            </div>
+          </RequiredAuth>
+        </div>
       </div>
     </div>
   );

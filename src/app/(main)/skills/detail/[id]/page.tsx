@@ -27,7 +27,7 @@ export default async function SkillDetailPage({
 
   return (
     <>
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col bg-[#F8FAFE]">
         <div className="sticky top-18 z-50 bg-white px-28">
           <div className="mx-auto max-w-284">
             <UserProfile
@@ -37,7 +37,7 @@ export default async function SkillDetailPage({
             <DetailSectionTab />
           </div>
         </div>
-        <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-1 gap-5 bg-[#F8FAFE] pt-12 pb-9">
+        <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-1 gap-5 pt-12 pb-9">
           <div className="w-0 flex-1">
             <SkillDetail {...skillDetail} />
           </div>
