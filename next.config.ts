@@ -1,7 +1,15 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'link-it-bucket.kr.object.ncloudstorage.com',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
