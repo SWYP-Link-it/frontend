@@ -125,3 +125,25 @@ export const PROFICIENCY_OPTIONS = [
     description: '기초 개념을 알고 있고, 배우면서 사용 중이에요.',
   },
 ];
+
+export const EXCHANGE_TYPE_LABELS: Record<string, string> = {
+  ONLINE: '온라인 가능',
+  OFFLINE: '오프라인 가능',
+  BOTH: '온라인 + 오프라인 가능',
+};
+
+export const REGION_LABELS: Record<string, string> = {
+  SEOUL: '서울',
+  GYEONGGI: '경기도',
+  GANGWON: '강원도',
+  CHUNGCHEONG: '충청도',
+  GYEONGSANG: '경상도',
+  JEOLLA: '전라도',
+  JEJU: '제주도',
+};
+
+export const PROFICIENCY_LABELS: Record<string, string> = {
+  HIGH: '상',
+  MEDIUM: '중',
+  LOW: '하',
+};

@@ -46,17 +46,18 @@ export default function Signup() {
         {`링킷에서 사용할 프로필을\n등록해주세요.`}
       </div>
       <div className="border-brand-600 h-[200px] w-[300px] border">avatar</div>
-      <div className="w-full">
-        <Input
-          label="닉네임"
-          placeholder="사용할 이름을 입력해주세요."
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          errorMessage={errorMessage}
-          onKeyDown={handleKeyDown}
-          maxLength={10}
-        />
-      </div>
+
+      <Input
+        className="w-full"
+        size="lg"
+        label="닉네임"
+        placeholder="사용할 이름을 입력해주세요."
+        value={nickname}
+        onChange={(e) => setNickname(e.target.value)}
+        errorMessage={errorMessage}
+        onKeyDown={handleKeyDown}
+        maxLength={10}
+      />
       <div className="w-[380px]">
         <Button
           text="회원가입"
