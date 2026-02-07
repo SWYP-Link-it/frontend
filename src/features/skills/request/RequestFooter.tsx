@@ -48,18 +48,21 @@ export const RequestFooter = ({ mentorId, skillId }: RequestFooterProps) => {
         내 크레딧 | 30
       </span>
       <div className="flex flex-1 gap-[15px]">
-        <Button
-          text={'스킬 요청하기'}
-          mode={isMySkill ? 'inactive' : 'active'}
-          icon={<RequestIcon size={20} />}
-          disabled={isMySkill}
-          className="ml-auto w-full max-w-[380px]"
-          onClick={() =>
-            router.push(
-              `/skills/request?mentorId=${mentorId}&skillId=${skillId}`,
-            )
-          }
-        />
+        <RequiredAuth>
+          <div className="ml-auto w-full max-w-[380px]">
+            <Button
+              text={'스킬 요청하기'}
+              mode={isMySkill ? 'inactive' : 'active'}
+              icon={<RequestIcon size={20} />}
+              disabled={isMySkill}
+              onClick={() =>
+                router.push(
+                  `/skills/request?mentorId=${mentorId}&skillId=${skillId}`,
+                )
+              }
+            />
+          </div>
+        </RequiredAuth>
         <RequiredAuth>
           <div className="w-full max-w-[380px]">
             <Button
