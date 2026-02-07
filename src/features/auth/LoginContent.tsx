@@ -4,7 +4,12 @@ import Image from 'next/image';
 
 export const LoginContent = () => {
   const handleLogin = (provider: 'naver' | 'kakao') => {
-    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/oauth2/authorization/${provider}`;
+    const returnUrl =
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000/'
+        : 'https://app.desklab.kr/';
+
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/oauth2/authorization/${provider}?returnUrl=${encodeURIComponent(returnUrl)};`;
   };
 
   return (
