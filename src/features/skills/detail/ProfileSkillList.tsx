@@ -16,7 +16,7 @@ export const ProfileSkillList = ({
   list,
 }: ProfileSkillListProps) => {
   return (
-    <div className="flex cursor-pointer flex-col gap-3 rounded-xl bg-white px-4 py-5">
+    <aside className="flex cursor-pointer flex-col gap-3 rounded-xl bg-white px-4 py-5">
       <div className="flex items-center leading-[1.5] font-semibold text-gray-500">
         <RequestIcon size={20} className="text-brand-600 m-[6px]" />
         스킬 모음
@@ -34,6 +34,6 @@ export const ProfileSkillList = ({
           </Link>
         ))}
       </div>
-    </div>
+    </aside>
   );
 };

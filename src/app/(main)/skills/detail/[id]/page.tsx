@@ -41,7 +41,7 @@ export default async function SkillDetailPage({
           <div className="w-0 flex-1">
             <SkillDetail {...skillDetail} />
           </div>
-          <div className="sticky top-78 h-fit w-[173px]">
+          <div className="sticky top-75 h-fit w-[173px]">
             <ProfileSkillList list={skillDetail.skills} currentId={skillId} />
           </div>
         </div>

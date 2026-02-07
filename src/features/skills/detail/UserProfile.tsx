@@ -7,7 +7,7 @@ type UserProfileProps = {
 
 export const UserProfile = ({ nickname, timesTaught }: UserProfileProps) => {
   return (
-    <div className="mt-[26px] mb-[30px] flex flex-col gap-3">
+    <div className="mt-[22px] mb-[24px] flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <Image src="/icons/avatar.svg" alt={nickname} width={40} height={40} />
         <div className="text-xl leading-[1.5] font-semibold text-gray-800">
