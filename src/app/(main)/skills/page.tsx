@@ -1,21 +1,26 @@
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
-import { SkillCategories } from '@/src/features/skills/SkillCategories';
+import { CategoryTab } from '@/src/features/skills/CategoryTab';
 import { SkillList } from '@/src/features/skills/SkillList';
 import { Category, SkillCardDto } from '@/src/types/skill';
 
 export default async function Skills({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; searchKeyword?: string }>;
 }) {
   const selectedCategory: Category =
     ((await searchParams).category as Category) || 'ALL';
 
+  const searchKeyword = (await searchParams).searchKeyword;
+
+  const params = new URLSearchParams();
+
+  if (selectedCategory !== 'ALL') params.append('category', selectedCategory);
+  if (searchKeyword) params.append('searchKeyword', searchKeyword);
+
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills${
-      selectedCategory === 'ALL' ? '' : `?category=${selectedCategory}`
-    }`,
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills?${params.toString()}`,
   );
 
   if (!res.ok) {
@@ -23,6 +28,7 @@ export default async function Skills({
   }
 
   const data: SkillCardDto[] = (await res.json()).data;
+  console.log(data);
 
   return (
     <>
@@ -36,7 +42,7 @@ export default async function Skills({
               게시글을 확인하고 진짜 실력자에게 스킬을 배워보세요!
             </span>
           </div>
-          <SkillCategories category={selectedCategory} />
+          <CategoryTab category={selectedCategory} />
         </div>
         <div className="flex flex-1 flex-col px-28 pb-[126px]">
           <div className="my-7">

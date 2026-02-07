@@ -1,26 +1,28 @@
 'use client';
 
 import { Tabbar } from '@/src/components/Tabbar';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Category } from '@/src/types/skill';
 import { CATEGORY_LABELS } from '@/src/constants/skill';
 
 type SkillCategoriesProps = {
   category: Category;
 };
-export const SkillCategories = ({ category }: SkillCategoriesProps) => {
+export const CategoryTab = ({ category }: SkillCategoriesProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleCategoryClick = (category: string) => {
-    const params = new URLSearchParams();
-    params.set('category', category);
+  const handleCategoryClick = (newCategory: Category) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (newCategory === 'ALL') params.delete('category');
+    else params.set('category', newCategory);
     router.replace(`?${params.toString()}`, { scroll: true });
   };
 
   return (
     <Tabbar
       items={Object.entries(CATEGORY_LABELS).map(([category, label]) => ({
-        key: category,
+        key: category as Category,
         label,
       }))}
       currentItem={category}
