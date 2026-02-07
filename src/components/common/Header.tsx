@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import { useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/src/lib/api/api';
+import { toast } from 'sonner';
 
 type PopularSkill = {
   skillId: number;
@@ -97,7 +98,7 @@ export const Header = () => {
                           searchInputRef.current?.value ?? '';
 
                         if (!searchKeyword) {
-                          alert('검색어를 입력해주세요.');
+                          toast('검색어를 입력해주세요.');
                           return;
                         }
 

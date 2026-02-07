@@ -5,21 +5,28 @@ import { ProgressBar } from '@/src/components/ProgressBar';
 import { api } from '@/src/lib/api/api';
 import { SkillInfo } from '@/src/types/skill';
 import { useEffect, useState } from 'react';
-import { useFromInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
+import { useFormInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
 import { RequestFormProvider } from './RequestFormProvider';
 import { RequestStep } from './RequestStep';
+import { toast } from 'sonner';
 
 export default function SkillRequestClient() {
-  const { mentorId, skillId } = useFromInfoFromSearchParams();
+  const { mentorId, skillId } = useFormInfoFromSearchParams();
   const [step, setStep] = useState(1);
   const [skills, setSkills] = useState<SkillInfo[]>([]);
 
   useEffect(() => {
     if (!mentorId) return;
 
-    api.get(`/exchange/mentors/${mentorId}/skills`).then((response) => {
-      setSkills(response.data.data);
-    });
+    api
+      .get(`/exchange/mentors/${mentorId}/skills`)
+      .then((response) => {
+        setSkills(response.data.data);
+      })
+      .catch((error) => {
+        const serverError = error.response?.data;
+        toast.error(serverError.message);
+      });
   }, []);
 
   if (!mentorId) {
