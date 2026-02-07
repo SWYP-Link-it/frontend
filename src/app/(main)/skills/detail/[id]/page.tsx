@@ -1,4 +1,4 @@
-import { DetailTabs } from '@/src/features/skills/detail/DetailTabs';
+import { DetailSectionTab } from '@/src/features/skills/detail/DetailSectionTab';
 import { UserProfile } from '@/src/features/skills/detail/UserProfile';
 import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
@@ -33,7 +33,7 @@ export default async function SkillDetailPage({
             nickname={skillDetail.nickname}
             timesTaught={skillDetail.timesTaught}
           />
-          <DetailTabs />
+          <DetailSectionTab />
         </div>
         <div className="flex flex-1 gap-5 bg-[#F8FAFE] px-28 pt-12 pb-9">
           <div className="w-0 flex-1">
