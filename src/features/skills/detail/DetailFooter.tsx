@@ -9,12 +9,12 @@ import { useRouter } from 'next/navigation';
 import { useUserInfoStore } from '@/src/stores/userInfoStore';
 import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
 
-type RequestFooterProps = {
+type DetailFooterProps = {
   mentorId: number;
   skillId: number;
 };
 
-export const RequestFooter = ({ mentorId, skillId }: RequestFooterProps) => {
+export const DetailFooter = ({ mentorId, skillId }: DetailFooterProps) => {
   const router = useRouter();
 
   const myId = useUserInfoStore((state) => state.userInfo?.userId);

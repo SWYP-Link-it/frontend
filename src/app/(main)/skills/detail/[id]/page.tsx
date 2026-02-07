@@ -4,7 +4,7 @@ import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { SkillDetailDto } from '@/src/types/skill';
-import { RequestFooter } from '@/src/features/skills/request/RequestFooter';
+import { DetailFooter } from '@/src/features/skills/detail/DetailFooter';
 
 export default async function SkillDetailPage({
   params,
@@ -45,7 +45,7 @@ export default async function SkillDetailPage({
             <ProfileSkillList list={skillDetail.skills} currentId={skillId} />
           </div>
         </div>
-        <RequestFooter mentorId={skillDetail.profileId} skillId={skillId} />
+        <DetailFooter mentorId={skillDetail.profileId} skillId={skillId} />
       </div>
       <ScrollToTop deps={[id]} />
     </>
