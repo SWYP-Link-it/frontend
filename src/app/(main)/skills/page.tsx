@@ -29,23 +29,24 @@ export default async function Skills({
   }
 
   const data: SkillCardDto[] = (await res.json()).data;
-  console.log(data);
 
   return (
     <>
-      <div className="flex flex-1 flex-col">
-        <div className="sticky top-[77px] z-50 bg-white px-28">
-          <div className="my-6 flex flex-col gap-[2px]">
-            <h1 className="text-2xl leading-[1.5] font-semibold text-gray-800">
-              스킬 게시판
-            </h1>
-            <span className="leading-[1.5] font-medium text-gray-400">
-              게시글을 확인하고 진짜 실력자에게 스킬을 배워보세요!
-            </span>
+      <div className="flex h-full flex-col">
+        <div className="sticky top-18 z-50 bg-white px-28">
+          <div className="mx-auto max-w-284">
+            <div className="my-6 flex flex-col gap-[2px]">
+              <h1 className="text-2xl leading-[1.5] font-semibold text-gray-800">
+                스킬 게시판
+              </h1>
+              <span className="leading-[1.5] font-medium text-gray-400">
+                게시글을 확인하고 진짜 실력자에게 스킬을 배워보세요!
+              </span>
+            </div>
+            <CategoryTab category={selectedCategory} />
           </div>
-          <CategoryTab category={selectedCategory} />
         </div>
-        <div className="flex flex-1 flex-col px-28 pb-[126px]">
+        <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-1 flex-col pb-[126px]">
           <div className="my-7">
             <CreditInfoBanner />
           </div>

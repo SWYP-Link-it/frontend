@@ -51,20 +51,22 @@ export const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex h-[77px] w-full items-center justify-between bg-white px-[112px] py-5">
-        {/* TODO: 로고 바뀌면 재조정 */}
-        <Image src="/icons/logo.svg" alt="logo" width={67} height={26} />
-        <button
-          onClick={() => setIsSearchModalOpen(true)}
-          className="border-brand-600 flex h-[37px] w-[342px] cursor-pointer items-center gap-[7px] rounded-lg border p-[10px]"
-        >
-          <SearchIcon className="text-gray-600" size={14} />
-          <div
-            className={`text-sm font-medium text-gray-700 outline-none ${searchKeyword ? '' : 'opacity-65'}`}
+      <header className="sticky top-0 z-50 flex min-h-18 w-full items-center justify-center bg-white">
+        <div className="mx-28 flex w-284 items-center justify-between">
+          {/* TODO: 로고 바뀌면 재조정 */}
+          <Image src="/icons/logo.svg" alt="logo" width={67} height={26} />
+          <button
+            onClick={() => setIsSearchModalOpen(true)}
+            className="border-brand-600 flex h-[37px] w-[342px] cursor-pointer items-center gap-[7px] rounded-lg border p-[10px]"
           >
-            {searchKeyword || '찾는 스킬을 입력해주세요.'}
-          </div>
-        </button>
+            <SearchIcon className="text-gray-600" size={14} />
+            <div
+              className={`text-sm font-medium text-gray-700 outline-none ${searchKeyword ? '' : 'opacity-65'}`}
+            >
+              {searchKeyword || '찾는 스킬을 입력해주세요.'}
+            </div>
+          </button>
+        </div>
       </header>
       {isSearchModalOpen
         ? createPortal(

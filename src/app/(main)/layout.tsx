@@ -9,10 +9,10 @@ export default function MainLayout({
   return (
     <div className="bg-brand-50 flex h-screen w-full">
       <Sidebar />
-      <main className="flex flex-1 flex-col overflow-y-auto">
+      <div className="flex flex-1 flex-col overflow-y-auto">
         <Header />
-        {children}
-      </main>
+        <main className="flex-1">{children}</main>
+      </div>
     </div>
   );
 }
