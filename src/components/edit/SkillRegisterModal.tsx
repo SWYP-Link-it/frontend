@@ -6,13 +6,38 @@ import {
   SKILL_CATEGORY_MAP,
   PROFICIENCY_OPTIONS,
 } from '@/src/constants/profile';
-import { SkillData, SkillFormData } from '@/src/types/profile';
+
+interface SkillData {
+  skillCategoryType?: string;
+  category?: string;
+  skillName?: string;
+  name?: string;
+  skillProficiency?: string;
+  proficiency?: string;
+  skillTitle?: string;
+  title?: string;
+  skillDescription?: string;
+  description?: string;
+  imageUrls?: string[];
+  imageFiles?: File[];
+  [key: string]: any;
+}
+
+interface SkillFormData {
+  category: string;
+  name: string;
+  proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
+  title: string;
+  description: string;
+  existingImages: string[];
+  newFiles: File[];
+}
 
 interface SkillRegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRegister: (skill: any) => void;
-  initialData?: SkillData;
+  initialData?: SkillData | null;
 }
 
 export const SkillRegisterModal = ({
@@ -21,6 +46,7 @@ export const SkillRegisterModal = ({
   onRegister,
   initialData,
 }: SkillRegisterModalProps) => {
+  // 기본값 설정 함수 - initialData 유무에 따라 완벽하게 분리
   const getDefaultValues = useCallback((): SkillFormData => {
     if (initialData) {
       const rawCategory =
@@ -36,8 +62,12 @@ export const SkillRegisterModal = ({
         title: initialData.skillTitle || initialData.title || '',
         description:
           initialData.skillDescription || initialData.description || '',
-        existingImages: initialData.imageUrls || [],
-        newFiles: initialData.imageFiles || [],
+        existingImages: Array.isArray(initialData.imageUrls)
+          ? [...initialData.imageUrls]
+          : [],
+        newFiles: Array.isArray(initialData.imageFiles)
+          ? [...initialData.imageFiles]
+          : [],
       };
     }
     return {
@@ -51,36 +81,27 @@ export const SkillRegisterModal = ({
     };
   }, [initialData]);
 
-  const [form, setForm] = useState<SkillFormData>(() => getDefaultValues());
+  const [form, setForm] = useState<SkillFormData>(getDefaultValues);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isProficiencyOpen, setIsProficiencyOpen] = useState(false);
 
+  // 모달이 열릴 때마다 폼을 초기화 (수정 시 데이터 로드 포함)
   useEffect(() => {
     if (isOpen) {
-      const timer = setTimeout(() => {
-        setForm(getDefaultValues());
-      }, 0);
-      return () => clearTimeout(timer);
+      setForm(getDefaultValues());
     }
-  }, [isOpen]);
+  }, [isOpen, getDefaultValues]);
 
+  // 미리보기 URL 생성 및 정리
   useEffect(() => {
-    let urls: string[] = [];
-
-    const timer = setTimeout(() => {
-      if (form.newFiles.length === 0) {
-        setPreviews([]);
-        return;
-      }
-      urls = form.newFiles.map((file) => URL.createObjectURL(file));
-      setPreviews(urls);
-    }, 0);
-
-    return () => {
-      clearTimeout(timer);
-      urls.forEach((url) => URL.revokeObjectURL(url));
-    };
+    if (!form.newFiles || form.newFiles.length === 0) {
+      setPreviews([]);
+      return;
+    }
+    const urls = form.newFiles.map((file) => URL.createObjectURL(file));
+    setPreviews(urls);
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [form.newFiles]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +117,8 @@ export const SkillRegisterModal = ({
         newFiles: [...prev.newFiles, ...selectedFiles],
       }));
     }
+    // 동일 파일 재선택을 위해 인풋 초기화
+    e.target.value = '';
   };
 
   const removeExistingImage = (index: number) => {
@@ -126,6 +149,8 @@ export const SkillRegisterModal = ({
       existingImages: form.existingImages,
       newFiles: form.newFiles,
     });
+    // 등록 후 폼 초기화 (덮어쓰기 방지)
+    setForm(getDefaultValues());
   };
 
   return (
@@ -134,7 +159,7 @@ export const SkillRegisterModal = ({
         <h2 className="mb-8 text-[24px] font-bold text-gray-900">스킬</h2>
 
         <div className="custom-scrollbar max-h-[70vh] space-y-10 overflow-y-auto pr-2">
-          {/* 카테고리 섹션 */}
+          {/* 카테고리 선택 */}
           <div className="flex flex-col gap-4">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 카테고리
@@ -175,6 +200,7 @@ export const SkillRegisterModal = ({
             )}
           </div>
 
+          {/* 스킬명 & 숙련도 */}
           <div className="grid grid-cols-2 gap-6">
             <div className="flex flex-col gap-3">
               <label className="text-[16px] font-bold text-gray-900">
@@ -210,9 +236,7 @@ export const SkillRegisterModal = ({
                     )?.label || '선택'}
                   </span>
                   <svg
-                    className={`h-5 w-5 transition-transform ${
-                      isProficiencyOpen ? 'rotate-180' : ''
-                    }`}
+                    className={`h-5 w-5 transition-transform ${isProficiencyOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -270,6 +294,7 @@ export const SkillRegisterModal = ({
             </div>
           </div>
 
+          {/* 제목 섹션 */}
           <div className="flex flex-col gap-3">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 제목
@@ -288,6 +313,7 @@ export const SkillRegisterModal = ({
             />
           </div>
 
+          {/* 소개 섹션 */}
           <div className="flex flex-col gap-3">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 소개
@@ -302,6 +328,7 @@ export const SkillRegisterModal = ({
             />
           </div>
 
+          {/* 포트폴리오(이미지) 섹션 */}
           <div className="flex flex-col gap-3">
             <label className="text-[16px] font-bold text-gray-900">
               포트폴리오
@@ -332,7 +359,7 @@ export const SkillRegisterModal = ({
                   <button
                     type="button"
                     onClick={() => removeExistingImage(i)}
-                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600"
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-600"
                   >
                     <span className="text-[12px] leading-none">✕</span>
                   </button>
@@ -348,7 +375,7 @@ export const SkillRegisterModal = ({
                   <button
                     type="button"
                     onClick={() => removeNewFile(i)}
-                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-white shadow-md transition-colors hover:bg-black"
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-white shadow-md hover:bg-black"
                   >
                     <span className="text-[12px] leading-none">✕</span>
                   </button>
