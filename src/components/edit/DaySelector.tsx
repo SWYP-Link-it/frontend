@@ -18,7 +18,7 @@ export const DaySelector = ({
   };
 
   return (
-    <div className="mb-6 flex w-full gap-1.5 rounded-2xl bg-gray-50/80 p-1.5">
+    <div className="m-0 flex w-full gap-1.5 rounded-2xl bg-gray-50/80 p-1.5">
       {days.map((day) => {
         const isSelected = selectedDays.includes(day);
         const isActive = activeDay === day;

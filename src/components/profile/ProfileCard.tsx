@@ -42,7 +42,7 @@ export const ProfileCard = ({
             <div className="h-2.5 w-2.5 rounded-full bg-blue-400" />
           </div>
           <span className="text-sm font-medium text-gray-700">
-            내 크레딧 {credit}
+            내 크레딧 {credit.toLocaleString()}
           </span>
         </div>
         <svg
@@ -55,7 +55,7 @@ export const ProfileCard = ({
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="9 5l7 7-7 7"
+            d="M9 5l7 7-7 7"
           />
         </svg>
       </div>

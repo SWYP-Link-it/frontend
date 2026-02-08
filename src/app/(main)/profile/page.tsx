@@ -19,12 +19,15 @@ export default function ProfilePage() {
     (state) => state.userInfo?.creditBalance,
   );
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [creditBalance, setCreditBalance] = useState<number>(0);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!accessToken) {
+      setProfileData(null);
+      setCreditBalance(0);
       setIsPageLoading(false);
       return;
     }
@@ -56,13 +59,20 @@ export default function ProfilePage() {
         } catch (profileError: any) {
           if (profileError.response?.status === 404) {
             setProfileData(null);
-          } else {
-            console.error('프로필 상세 조회 중 에러:', profileError);
           }
+        }
+
+        try {
+          const creditRes = await api.get('/credits/balance');
+          if (creditRes.data.success) {
+            setCreditBalance(creditRes.data.data.creditBalance);
+          }
+        } catch (creditError) {
+          console.error('Failed to fetch credits');
         }
       }
     } catch (error) {
-      console.error('데이터 로딩 에러:', error);
+      console.error('Data loading error:', error);
     } finally {
       setIsPageLoading(false);
     }
@@ -74,6 +84,8 @@ export default function ProfilePage() {
 
   const handleWithdrawConfirm = async () => {
     setIsWithdrawModalOpen(false);
+    const { withdraw } = useAuthStore.getState();
+    await withdraw();
   };
 
   const handleEditSave = () => {
@@ -112,7 +124,7 @@ export default function ProfilePage() {
 
           <ProfileCard
             name={profileData?.nickname || userInfo?.nickname || '사용자'}
-            credit={creditBalance ?? 0}
+            credit={creditBalance}
             onEditClick={() => setIsEditModalOpen(true)}
           />
 
@@ -123,7 +135,6 @@ export default function ProfilePage() {
         </main>
       </div>
 
-      {/* 닉네임 수정 모달 */}
       <ProfileEditModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -131,7 +142,6 @@ export default function ProfilePage() {
         onSave={handleEditSave}
       />
 
-      {/* 회원 탈퇴 모달 */}
       <WithdrawalModal
         isOpen={isWithdrawModalOpen}
         onClose={() => setIsWithdrawModalOpen(false)}
