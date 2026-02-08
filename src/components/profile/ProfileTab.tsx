@@ -5,7 +5,7 @@ export const ProfileTab = () => {
 
   const tabs = [
     { label: '내 프로필 보기', active: true },
-    { label: '내 크레딧 보기', active: false },
+    // { label: '내 크레딧 보기', active: false },
   ];
 
   return (
