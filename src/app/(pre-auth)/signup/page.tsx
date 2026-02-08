@@ -7,6 +7,7 @@ import { useAuthStore } from '@/src/stores/authStore';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 export default function Signup() {
   const router = useRouter();
@@ -52,8 +53,7 @@ export default function Signup() {
       <div className="text-center text-3xl leading-[1.4] font-bold whitespace-pre-wrap">
         {`링킷에서 사용할 프로필을\n등록해주세요.`}
       </div>
-      <div className="border-brand-600 h-[200px] w-[300px] border">avatar</div>
-
+      <Image src={'/icons/avatar.svg'} alt="profile" width={196} height={196} />
       <Input
         className="w-full"
         size="lg"
