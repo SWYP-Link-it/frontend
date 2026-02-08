@@ -7,6 +7,12 @@ export function middleware(request: NextRequest) {
   const protectedPaths = ['/profile'];
   const authPages = ['/login'];
 
+  const { pathname } = request.nextUrl;
+
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/skills', request.url));
+  }
+
   // if (
   //   isLoggedIn &&
   //   authPages.some((path) => request.nextUrl.pathname.startsWith(path))
@@ -25,5 +31,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/profile', '/login'],
+  matcher: ['/profile', '/login', '/'],
 };

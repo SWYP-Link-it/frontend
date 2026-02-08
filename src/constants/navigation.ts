@@ -5,7 +5,7 @@ import { SkillIcon } from '../components/icons/SkillIcon';
 import { UserIcon } from '../components/icons/UserIcon';
 
 const BASE_MENU_ITEMS = [
-  { name: '홈', path: '/', requiredAuth: false, icon: HomeIcon },
+  // { name: '홈', path: '/', requiredAuth: false, icon: HomeIcon },
   {
     name: '게시판',
     path: '/skills',
