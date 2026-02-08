@@ -20,7 +20,7 @@ export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
       </div>
       <Image
         src={IMAGE[step - 1]}
-        alt="profile"
+        alt={`Step ${step}`}
         width={495}
         height={344}
         className="mt-8"

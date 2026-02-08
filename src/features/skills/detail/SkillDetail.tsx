@@ -31,7 +31,9 @@ export const SkillDetail = ({
     <div className="flex flex-col gap-12 rounded-2xl bg-white px-9 pt-[54px] pb-20">
       <div id="skill-detail-overview" className="flex justify-between">
         <div className="flex flex-col">
-          <div className="mb-3">{skillName}</div>
+          <div className="mb-3 w-fit rounded-md bg-[#E9F0FF] px-[10px] py-1 text-xs font-semibold text-[#3477FF]">
+            {skillName}
+          </div>
           <div className="mb-1 text-xl leading-[30px] font-bold text-gray-900">
             {skillTitle}
           </div>
