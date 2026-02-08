@@ -88,6 +88,8 @@ export default function SkillRequestClient() {
       });
   };
 
+  const isFormCompleted = Boolean(formData.date && formData.time);
+
   useEffect(() => {
     if (!mentorId) return;
 
@@ -278,7 +280,7 @@ export default function SkillRequestClient() {
           />
           <Button
             text="작성 완료"
-            mode={'active'}
+            mode={isFormCompleted ? 'active' : 'inactive'}
             onClick={() => handleSubmit(mentorId, skillId, formData)}
           />
         </div>
