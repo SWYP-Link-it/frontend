@@ -107,7 +107,7 @@ export const Header = () => {
                           searchInputRef.current?.value ?? '';
 
                         if (!searchKeyword) {
-                          toast('검색어를 입력해주세요.');
+                          toast.warning('검색어를 입력해주세요.');
                           return;
                         }
 

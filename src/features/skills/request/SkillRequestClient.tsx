@@ -86,7 +86,7 @@ export default function SkillRequestClient() {
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        toast(serverError.message);
+        toast.error(serverError.message);
       });
   };
 
