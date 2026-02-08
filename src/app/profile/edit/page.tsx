@@ -17,6 +17,7 @@ import {
   REGION_MAP,
   WEEKDAY_MAP,
 } from '@/src/constants/profile';
+import Image from 'next/image';
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -26,24 +27,27 @@ export default function ProfileEditPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isNewProfile, setIsNewProfile] = useState(false);
   const [localProfile, setLocalProfile] = useState<any>(null);
-
   const [isDirty, setIsDirty] = useState(false);
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
   const [editingSkillIndex, setEditingSkillIndex] = useState<number | null>(
     null,
   );
-
   const [activeDay, setActiveDay] = useState('월');
 
   useEffect(() => {
     const fetchProfile = async () => {
       if (!accessToken || !userInfo?.userId) return;
-
       try {
         setIsLoading(true);
-        const res = await api.get(`/profile/${userInfo.userId}`);
+        const res = await api.get(`/profile/${userInfo.userId}/edit`);
         if (res.data.success && res.data.data) {
-          setLocalProfile(res.data.data);
+          const profileData = res.data.data;
+          const skillsWithImages = (profileData.skills || []).map((s: any) => ({
+            ...s,
+            imageUrls: s.imageUrls || [],
+            imageFiles: [],
+          }));
+          setLocalProfile({ ...profileData, skills: skillsWithImages });
           setIsNewProfile(false);
         }
       } catch (err: any) {
@@ -64,22 +68,14 @@ export default function ProfileEditPage() {
       }
     };
     fetchProfile();
-  }, [accessToken, userInfo?.userId, userInfo?.nickname]);
+  }, [accessToken, userInfo?.userId]);
 
   const isValid = useMemo(() => {
     if (!localProfile) return false;
-    const hasExperience = localProfile.experienceDescription?.trim().length > 0;
-    const hasSkills = localProfile.skills?.length > 0;
-    const hasSchedules = localProfile.availableSchedules?.length > 0;
-    const isOffline = ['OFFLINE', 'BOTH'].includes(localProfile.exchangeType);
-
-    let locationValid = true;
-    if (isOffline) {
-      locationValid = Boolean(
-        localProfile.preferredRegion && localProfile.detailedLocation?.trim(),
-      );
-    }
-    return Boolean(hasExperience && hasSkills && hasSchedules && locationValid);
+    return Boolean(
+      localProfile.experienceDescription?.trim().length > 0 &&
+      localProfile.skills?.length > 0,
+    );
   }, [localProfile]);
 
   const handleSave = async () => {
@@ -107,7 +103,7 @@ export default function ProfileEditPage() {
             endTime: formatTime(s.endTime),
           }),
         ),
-        skills: (localProfile.skills || []).map((s: any) => ({
+        skills: localProfile.skills.map((s: any) => ({
           id: s.id || null,
           skillCategoryType: s.skillCategoryType,
           skillName: s.skillName || '',
@@ -117,7 +113,7 @@ export default function ProfileEditPage() {
           skillDescription: s.skillDescription || '',
           exchangeDuration: 60,
           isVisible: true,
-          imageUrls: Array.isArray(s.imageUrls) ? s.imageUrls : [],
+          imageUrls: s.imageUrls || [],
         })),
       };
 
@@ -127,7 +123,7 @@ export default function ProfileEditPage() {
       );
 
       localProfile.skills.forEach((skill: any, idx: number) => {
-        if (skill.imageFiles?.length > 0) {
+        if (skill.imageFiles && skill.imageFiles.length > 0) {
           skill.imageFiles.forEach((file: File) => {
             formData.append(`skill-${idx}-images`, file);
           });
@@ -137,6 +133,7 @@ export default function ProfileEditPage() {
       const response = isNewProfile
         ? await api.post('/profile', formData)
         : await api.put('/profile', formData);
+
       if (response.data.success) {
         alert('저장되었습니다.');
         router.push('/profile');
@@ -152,11 +149,7 @@ export default function ProfileEditPage() {
   };
 
   if (isLoading || !localProfile)
-    return (
-      <div className="py-20 text-center text-gray-500">
-        정보를 불러오는 중입니다...
-      </div>
-    );
+    return <div className="py-20 text-center">로딩 중...</div>;
 
   const selectedDayNames = Array.from(
     new Set(
@@ -172,25 +165,29 @@ export default function ProfileEditPage() {
         isValid={isValid}
       />
       <main className="mx-auto max-w-4xl px-6 py-12">
-        <div className="rounded-[40px] border border-gray-50 bg-white p-12 shadow-xl shadow-gray-100/50">
-          <ProfileEditSection
-            title="경력과 경험"
-            description="전문성을 나타낼 수 있는 본인의 경력이나 프로젝트 경험을 상세히 적어주세요."
-          >
+        <div className="rounded-[40px] border border-gray-50 bg-white p-12 shadow-xl">
+          <div className="relative mb-8 h-full w-full">
+            <Image
+              src="/icons/profile_banner.svg"
+              alt="프로필 배너"
+              width={0}
+              height={0}
+              sizes="100vw"
+              className="h-auto w-full"
+            />
+          </div>
+          <ProfileEditSection title="경력과 경험">
             <ExperienceEditItem
               value={localProfile.experienceDescription || ''}
               onChange={(val) => updateField('experienceDescription', val)}
             />
           </ProfileEditSection>
 
-          <ProfileEditSection
-            title="스킬"
-            description="본인이 가진 스킬을 등록하고 숙련도를 선택해 주세요."
-          >
+          <ProfileEditSection title="스킬">
             <div className="grid grid-cols-1 gap-4">
               {localProfile.skills?.map((skill: any, idx: number) => (
                 <SkillEditItem
-                  key={skill.id || idx}
+                  key={idx}
                   skill={skill}
                   onEdit={() => {
                     setEditingSkillIndex(idx);
@@ -210,51 +207,49 @@ export default function ProfileEditPage() {
                   setEditingSkillIndex(null);
                   setIsSkillModalOpen(true);
                 }}
-                className="group flex h-20 w-full items-center justify-center rounded-2xl border-2 border-dashed border-gray-100 text-gray-300 transition-all hover:border-blue-100 hover:bg-gray-50 hover:text-blue-300"
+                className="h-20 w-full rounded-2xl border-2 border-dashed border-gray-100 font-bold text-gray-300"
               >
-                <span className="font-bold">+ 스킬 추가하기</span>
+                + 스킬 추가하기
               </button>
             </div>
           </ProfileEditSection>
 
           <ProfileEditSection title="선호 시간대">
-            <div className="space-y-6">
-              <DaySelector
-                selectedDays={selectedDayNames}
-                activeDay={activeDay}
-                onActiveDayChange={setActiveDay}
-                onChange={(days) => {
-                  const newSchedules = days.map(
-                    (day) =>
-                      localProfile.availableSchedules?.find(
-                        (s: any) => s.dayOfWeek === day,
-                      ) || {
-                        dayOfWeek: day,
-                        startTime: '09:00',
-                        endTime: '18:00',
-                      },
-                  );
-                  updateField('availableSchedules', newSchedules);
-                }}
-              />
-              <PreferenceEditItem
-                activeDay={activeDay}
-                times={localProfile.availableSchedules || []}
-                exchangeType={localProfile.exchangeType}
-                location={{
-                  region: localProfile.preferredRegion || '',
-                  detail: localProfile.detailedLocation || '',
-                }}
-                onTimesChange={(newSchedules) =>
-                  updateField('availableSchedules', newSchedules)
-                }
-                onExchangeChange={(type) => updateField('exchangeType', type)}
-                onLocationChange={(loc) => {
-                  updateField('preferredRegion', loc.region);
-                  updateField('detailedLocation', loc.detail);
-                }}
-              />
-            </div>
+            <DaySelector
+              selectedDays={selectedDayNames}
+              activeDay={activeDay}
+              onActiveDayChange={setActiveDay}
+              onChange={(days) => {
+                const newSchedules = days.map(
+                  (day) =>
+                    localProfile.availableSchedules?.find(
+                      (s: any) => s.dayOfWeek === day,
+                    ) || {
+                      dayOfWeek: day,
+                      startTime: '09:00',
+                      endTime: '18:00',
+                    },
+                );
+                updateField('availableSchedules', newSchedules);
+              }}
+            />
+            <PreferenceEditItem
+              activeDay={activeDay}
+              times={localProfile.availableSchedules || []}
+              exchangeType={localProfile.exchangeType}
+              location={{
+                region: localProfile.preferredRegion || '',
+                detail: localProfile.detailedLocation || '',
+              }}
+              onTimesChange={(newSchedules) =>
+                updateField('availableSchedules', newSchedules)
+              }
+              onExchangeChange={(type) => updateField('exchangeType', type)}
+              onLocationChange={(loc) => {
+                updateField('preferredRegion', loc.region);
+                updateField('detailedLocation', loc.detail);
+              }}
+            />
           </ProfileEditSection>
         </div>
       </main>
@@ -271,28 +266,33 @@ export default function ProfileEditPage() {
           setEditingSkillIndex(null);
         }}
         onRegister={(skillData: any) => {
-          const newSkills = [...(localProfile.skills || [])];
+          setLocalProfile((prev: any) => {
+            const currentSkills = [...(prev.skills || [])];
+            const updatedEntry = {
+              ...(editingSkillIndex !== null
+                ? currentSkills[editingSkillIndex]
+                : {}),
+              skillCategoryType: skillData.category,
+              skillName: skillData.name,
+              skillProficiency: skillData.proficiency,
+              skillTitle: skillData.title,
+              skillDescription: skillData.description,
+              imageUrls: skillData.existingImages || [],
+              imageFiles: skillData.newFiles || [],
+            };
 
-          const skillEntry = {
-            ...(editingSkillIndex !== null ? newSkills[editingSkillIndex] : {}),
-            skillCategoryType: skillData.category,
-            skillName: skillData.name,
-            skillProficiency: skillData.proficiency,
-            skillTitle: skillData.title,
-            skillDescription: skillData.description,
-            imageUrls: skillData.existingImages || [],
-            imageFiles: skillData.newFiles || [],
-          };
+            const nextSkills =
+              editingSkillIndex !== null
+                ? currentSkills.map((s, i) =>
+                    i === editingSkillIndex ? updatedEntry : s,
+                  )
+                : [...currentSkills, updatedEntry];
 
-          if (editingSkillIndex !== null) {
-            newSkills[editingSkillIndex] = skillEntry;
-          } else {
-            newSkills.push(skillEntry);
-          }
-
-          updateField('skills', newSkills);
+            return { ...prev, skills: nextSkills };
+          });
           setIsSkillModalOpen(false);
           setEditingSkillIndex(null);
+          setIsDirty(true);
         }}
       />
     </div>
