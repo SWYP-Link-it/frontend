@@ -50,12 +50,12 @@ export default function SkillRequestClient() {
     formData: RequestFormData,
   ) => {
     if (!formData.date) {
-      console.error('날짜를 선택해 주세요');
+      toast.error('날짜를 선택해 주세요');
       return;
     }
 
     if (!formData.time) {
-      console.error('시간을 선택해 주세요');
+      toast.error('시간을 선택해 주세요');
       return;
     }
 
@@ -67,15 +67,13 @@ export default function SkillRequestClient() {
         requestedDate: formatDate(formData.date, 'YYYY-MM-DD'),
         startTime: formData.time,
       })
-      .then((response) => {
-        console.log(response.data.message);
-        alert('신청을 완료했습니다!');
+      .then(() => {
+        toast.success('신청이 완료되었습니다!');
         router.push('/skills');
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast(serverError.message);
       });
   };
 
@@ -106,8 +104,7 @@ export default function SkillRequestClient() {
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast.error(serverError.message);
       });
   }, [currentMonth, mentorId]);
 
@@ -137,8 +134,7 @@ export default function SkillRequestClient() {
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast.error(serverError.message);
       });
   }, [formData.date, mentorId, skillId]);
 
