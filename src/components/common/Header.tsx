@@ -5,7 +5,7 @@ import { SearchIcon } from '../icons/SearchIcon';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/src/lib/api/api';
 import { toast } from 'sonner';
 
@@ -23,6 +23,7 @@ type PopularKeyword = {
 export const Header = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -40,6 +41,11 @@ export const Header = () => {
   };
 
   const searchKeyword = searchParams.get('searchKeyword') ?? '';
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (isSearchModalOpen) setIsSearchModalOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!isSearchModalOpen) return;
