@@ -99,7 +99,7 @@ export const SkillDetail = ({
             imageUrls.map((url) => (
               <div
                 key={url}
-                className="relative h-[250px] w-[250px] shrink-0 overflow-hidden rounded-3xl border"
+                className="relative h-[250px] w-[250px] shrink-0 overflow-hidden rounded-3xl"
               >
                 <Image
                   src={url}
