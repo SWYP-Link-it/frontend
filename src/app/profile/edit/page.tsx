@@ -24,8 +24,7 @@ export default function ProfileEditPage() {
   const router = useRouter();
   const { accessToken } = useAuthStore();
   const { userInfo } = useUserStore();
-  const { setUserInfo: setUserCreditInfo, userInfo: userCreditInfo } =
-    useUserInfoStore();
+  const { setUserInfo: setUserCreditInfo } = useUserInfoStore();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isNewProfile, setIsNewProfile] = useState(false);
