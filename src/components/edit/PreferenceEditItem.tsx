@@ -26,10 +26,30 @@ export const PreferenceEditItem = ({
 }: PreferenceEditItemProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 현재 선택된 요일의 시간대를 가져와서 시작 시간 순으로 정렬
-  const currentDayTimes = times
-    .filter((t) => t.dayOfWeek === activeDay)
-    .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const getMergedDisplayTimes = () => {
+    const dayTimes = times
+      .filter((t) => t.dayOfWeek === activeDay)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+    if (dayTimes.length === 0) return [];
+
+    const merged = [];
+    let current = { ...dayTimes[0] };
+
+    for (let i = 1; i < dayTimes.length; i++) {
+      const next = dayTimes[i];
+      if (current.endTime.substring(0, 5) === next.startTime.substring(0, 5)) {
+        current.endTime = next.endTime;
+      } else {
+        merged.push(current);
+        current = { ...next };
+      }
+    }
+    merged.push(current);
+    return merged;
+  };
+
+  const currentDayTimes = getMergedDisplayTimes();
 
   const formatTimeRange = (start: string, end: string) => {
     const s = start.substring(0, 5);
@@ -46,28 +66,24 @@ export const PreferenceEditItem = ({
     let nextIsOffline = isOfflineSelected;
     if (type === 'ONLINE') nextIsOnline = !isOnlineSelected;
     else nextIsOffline = !isOfflineSelected;
-
     let nextType: ExchangeType = 'NONE';
     if (nextIsOnline && nextIsOffline) nextType = 'BOTH';
     else if (nextIsOnline) nextType = 'ONLINE';
     else if (nextIsOffline) nextType = 'OFFLINE';
+    if (!nextIsOffline) onLocationChange({ region: '', detail: '' });
     onExchangeChange(nextType);
   };
 
   return (
     <div className="space-y-8">
       <div>
-        <label className="mb-3 block text-sm font-bold text-gray-900">
-          가능 시간대 ({activeDay}요일)
-        </label>
-        <div className="flex min-h-[90px] w-full items-start justify-between rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="flex min-h-[90px] w-full items-start justify-between bg-white py-6">
           {currentDayTimes.length > 0 ? (
-            <div className="mr-4 grid flex-1 grid-cols-2 gap-3 md:grid-cols-3">
-              {/* 텍스트가 길어지므로 그리드 수를 줄임 */}
+            <div className="mr-4 grid grid-cols-2 justify-between gap-3 md:grid-cols-3">
               {currentDayTimes.map((slot, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-blue-50 bg-blue-50/30 px-2 py-3 text-center text-[13px] font-bold text-blue-600 shadow-sm"
+                  className="rounded-[8px] border border-blue-100 bg-blue-50/50 px-4 py-2 text-center text-sm font-medium text-blue-600"
                 >
                   {formatTimeRange(slot.startTime, slot.endTime)}
                 </div>
@@ -77,9 +93,9 @@ export const PreferenceEditItem = ({
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="flex h-12 w-full items-center justify-center text-gray-300 italic"
+              className="h-[48px] w-full rounded-[12px] border border-gray-200 text-xl text-gray-300"
             >
-              시간대를 등록해주세요 +
+              +
             </button>
           )}
           {currentDayTimes.length > 0 && (
@@ -105,11 +121,9 @@ export const PreferenceEditItem = ({
           )}
         </div>
       </div>
-
-      {/* 진행 방식 및 지역 선택 (기존과 동일) */}
       <div className="space-y-4">
-        <label className="block text-sm font-bold text-gray-900">
-          진행 방식
+        <label className="block text-lg font-bold text-gray-900">
+          교환 정보
         </label>
         <div className="grid grid-cols-2 gap-4">
           <button
@@ -128,7 +142,6 @@ export const PreferenceEditItem = ({
           </button>
         </div>
       </div>
-
       {isOfflineSelected && (
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-3">
@@ -164,7 +177,6 @@ export const PreferenceEditItem = ({
           </div>
         </div>
       )}
-
       <TimeSelectModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../lib/api/api';
+import { useUserStore } from './userStore';
 
 interface AuthState {
   accessToken: string | null;
@@ -26,6 +27,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     } catch (error) {
       console.error('로그아웃 API 호출 실패:', error);
     } finally {
+      useUserStore.getState().clearUserInfo();
       set({ accessToken: null });
 
       localStorage.clear();
@@ -53,6 +55,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         error.response?.data?.message || '회원 탈퇴 중 오류가 발생했습니다.';
       alert(message);
     } finally {
+      useUserStore.getState().clearUserInfo();
       set({ accessToken: null });
       localStorage.clear();
       sessionStorage.clear();
