@@ -17,6 +17,7 @@ export default async function SkillDetailPage({
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/${skillId}`,
+    { cache: 'no-store' },
   );
 
   if (!res.ok) {
