@@ -21,7 +21,7 @@ export default async function SkillDetailPage({
   );
 
   if (!res.ok) {
-    return null;
+    return <div>존재하지 않는 스킬입니다.</div>;
   }
 
   const skillDetail: SkillDetailDto = (await res.json()).data;

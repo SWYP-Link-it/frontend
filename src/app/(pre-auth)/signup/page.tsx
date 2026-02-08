@@ -40,7 +40,9 @@ export default function Signup() {
         if (serverError.code === 'U002') {
           setErrorMessage('사용 중인 닉네임입니다.');
         } else if (serverError.code === 'C006') {
-          setErrorMessage('유효하지 않은 닉네임입니다.');
+          toast.error(serverError.data[0].message);
+        } else if (serverError.message) {
+          toast.error(serverError.message);
         } else {
           toast.error('회원가입에 실패하였습니다.');
           console.error(serverError);

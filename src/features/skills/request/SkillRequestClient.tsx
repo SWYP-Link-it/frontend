@@ -86,7 +86,14 @@ export default function SkillRequestClient() {
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        toast.error(serverError.message);
+        if (serverError.code === 'C006') {
+          toast.error(serverError.data[0].message);
+        } else if (serverError.message) {
+          toast.error(serverError.message);
+        } else {
+          toast.error('신청에 실패하였습니다.');
+          console.error(serverError);
+        }
       });
   };
 
