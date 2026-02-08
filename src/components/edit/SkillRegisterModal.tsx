@@ -88,7 +88,7 @@ export const SkillRegisterModal = ({
   const [previews, setPreviews] = useState<string[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isProficiencyOpen, setIsProficiencyOpen] = useState(false);
-  const [isDurationOpen, setIsDurationOpen] = useState(false); // 시간 선택 영역 오픈 상태
+  const [isDurationOpen, setIsDurationOpen] = useState(false);
 
   const durationOptions = [30, 60, 90, 120, 150, 180];
 
@@ -107,6 +107,10 @@ export const SkillRegisterModal = ({
     setPreviews(urls);
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [form.newFiles]);
+
+  const validateText = (text: string) => {
+    return text.replace(/[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ\s0-9]/g, '');
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -143,7 +147,10 @@ export const SkillRegisterModal = ({
     form.name &&
     form.exchangeDuration > 0 &&
     form.title &&
-    form.title.length <= 39,
+    form.title.length > 0 &&
+    form.title.length <= 39 &&
+    form.name.length <= 20 &&
+    form.description.length <= 500,
   );
 
   const handleSubmit = () => {
@@ -166,7 +173,6 @@ export const SkillRegisterModal = ({
         <h2 className="mb-8 text-[24px] font-bold text-gray-900">스킬</h2>
 
         <div className="custom-scrollbar max-h-[70vh] space-y-10 overflow-y-auto pr-2">
-          {/* 스킬 카테고리 (기준 UI) */}
           <div className="flex flex-col gap-4">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 카테고리
@@ -207,18 +213,23 @@ export const SkillRegisterModal = ({
             )}
           </div>
 
-          {/* 스킬명 & 숙련도 */}
           <div className="grid grid-cols-2 gap-6">
             <div className="flex flex-col gap-3">
-              <label className="text-[16px] font-bold text-gray-900">
-                스킬명
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-[16px] font-bold text-gray-900">
+                  스킬명
+                </label>
+                <span className="text-[12px] text-gray-400">
+                  {form.name.length}/20
+                </span>
+              </div>
               <input
                 placeholder="구체적인 스킬명을 입력해주세요."
                 value={form.name}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, name: e.target.value }))
-                }
+                onChange={(e) => {
+                  const filtered = validateText(e.target.value);
+                  setForm((prev) => ({ ...prev, name: filtered.slice(0, 20) }));
+                }}
                 className="w-full rounded-[12px] border border-gray-200 p-4 text-[16px] outline-none focus:border-blue-400"
               />
             </div>
@@ -340,32 +351,44 @@ export const SkillRegisterModal = ({
           </div>
 
           <div className="flex flex-col gap-3">
-            <label className="text-[16px] font-bold text-gray-900">
-              스킬 제목
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-[16px] font-bold text-gray-900">
+                스킬 제목
+              </label>
+              <span className="text-[12px] text-gray-400">
+                {form.title.length}/39
+              </span>
+            </div>
             <input
               placeholder="게시글 제목을 입력해주세요."
               value={form.title}
               onChange={(e) =>
-                setForm((prev) => ({ ...prev, title: e.target.value }))
+                setForm((prev) => ({
+                  ...prev,
+                  title: e.target.value.slice(0, 39),
+                }))
               }
-              className={`w-full rounded-[12px] border p-4 text-[16px] outline-none ${
-                form.title.length > 39
-                  ? 'border-red-400'
-                  : 'border-gray-200 focus:border-blue-400'
-              }`}
+              className="w-full rounded-[12px] border border-gray-200 p-4 text-[16px] outline-none focus:border-blue-400"
             />
           </div>
 
           <div className="flex flex-col gap-3">
-            <label className="text-[16px] font-bold text-gray-900">
-              스킬 소개
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-[16px] font-bold text-gray-900">
+                스킬 소개
+              </label>
+              <span className="text-[12px] text-gray-400">
+                {form.description.length}/500
+              </span>
+            </div>
             <textarea
               placeholder="스킬을 소개해주세요."
               value={form.description}
               onChange={(e) =>
-                setForm((prev) => ({ ...prev, description: e.target.value }))
+                setForm((prev) => ({
+                  ...prev,
+                  description: e.target.value.slice(0, 500),
+                }))
               }
               className="min-h-[120px] w-full resize-none rounded-[12px] border border-gray-200 p-4 text-[16px] outline-none focus:border-blue-400"
             />
