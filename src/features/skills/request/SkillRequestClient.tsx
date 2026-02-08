@@ -16,6 +16,7 @@ import { useFormInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams
 import { toast } from 'sonner';
 import { useUserInfoStore } from '@/src/stores/userInfoStore';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
+import { CategoryFigure } from '@/src/components/skill/CategoryFigure';
 
 export type RequestFormData = {
   date: Date;
@@ -206,9 +207,11 @@ export default function SkillRequestClient() {
                       replace
                       className="flex cursor-pointer flex-col items-center gap-[17px]"
                     >
-                      <div
-                        className={`h-25 w-25 rounded-2xl ${isSelected ? 'bg-brand-200' : 'bg-gray-200'}`}
-                      ></div>
+                      <CategoryFigure
+                        category={'DESIGN'}
+                        isActive={isSelected}
+                        size="lg"
+                      />
                       <span
                         className={`text-center text-sm ${isSelected ? 'text-brand-600 font-semibold' : 'text-gray-700'}`}
                       >

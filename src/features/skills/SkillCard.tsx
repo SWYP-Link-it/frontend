@@ -1,5 +1,6 @@
 import { SkillCardDto } from '@/src/types/skill';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type SkillCardProps = {
   skill: SkillCardDto;
@@ -16,9 +17,7 @@ export const SkillCard = ({ skill }: SkillCardProps) => {
       className="flex h-[234px] cursor-pointer flex-col rounded-xl bg-white p-6"
     >
       <div className="mb-[17px] flex items-center gap-2">
-        <div className="bg-brand-100 h-7 w-7 overflow-hidden rounded-full">
-          Avatar
-        </div>
+        <Image src={'/icons/avatar.svg'} alt="profile" width={28} height={28} />
         {nickname}
       </div>
       <div className="line-clamp-3 leading-6 font-semibold text-gray-700">
