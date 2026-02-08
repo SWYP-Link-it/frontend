@@ -17,6 +17,7 @@ export default async function SkillDetailPage({
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/${skillId}`,
+    { cache: 'no-store' },
   );
 
   if (!res.ok) {
@@ -24,6 +25,7 @@ export default async function SkillDetailPage({
   }
 
   const skillDetail: SkillDetailDto = (await res.json()).data;
+  console.log(skillDetail);
 
   return (
     <>
@@ -45,7 +47,7 @@ export default async function SkillDetailPage({
             <ProfileSkillList list={skillDetail.skills} currentId={skillId} />
           </div>
         </div>
-        <DetailFooter mentorId={skillDetail.profileId} skillId={skillId} />
+        <DetailFooter mentorId={skillDetail.userId} skillId={skillId} />
       </div>
       <ScrollToTop deps={[id]} />
     </>
