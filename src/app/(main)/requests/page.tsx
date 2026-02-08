@@ -32,6 +32,8 @@ const mapStatus = (koreanStatus: string): RequestStatus => {
       return 'CANCELED';
     case '만료됨':
       return 'EXPIRED';
+    case '완료됨':
+      return 'COMPLETED';
     case '대기중':
       return 'PENDING';
     default:
