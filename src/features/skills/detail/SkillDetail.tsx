@@ -97,30 +97,35 @@ export const SkillDetail = ({
           {imageUrls &&
             imageUrls.length > 0 &&
             imageUrls.map((url) => (
-              <div key={url} className="border">
+              <div
+                key={url}
+                className="relative h-[250px] w-[250px] shrink-0 overflow-hidden rounded-3xl"
+              >
                 <Image
                   src={url}
                   alt="portfolio 이미지"
-                  width={250}
-                  height={250}
-                  className="shrink-0"
+                  fill
+                  className="object-cover"
                 />
               </div>
             ))}
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <div
-              key={idx}
-              className="flex h-[250px] w-[250px] shrink-0 flex-col items-center justify-center gap-[5px] rounded-3xl bg-gray-200"
-            >
-              <Image
-                src={'/icons/camera.svg'}
-                alt={''}
-                width={36}
-                height={36}
-              />
-              <span className="text-xs text-gray-400">이미지 촬영 필요</span>
-            </div>
-          ))}
+          {(!imageUrls || imageUrls.length === 0) &&
+            Array.from({ length: 5 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="flex h-[250px] w-[250px] shrink-0 flex-col items-center justify-center gap-[5px] rounded-3xl bg-gray-200"
+              >
+                <Image
+                  src={'/icons/camera.svg'}
+                  alt={''}
+                  width={36}
+                  height={36}
+                />
+                <span className="text-xs text-gray-400">
+                  이미지 업로드 필요
+                </span>
+              </div>
+            ))}
         </div>
       </div>
       {/* <div id="skill-detail-reviews" className="mt-3 flex flex-col gap-[9px]">

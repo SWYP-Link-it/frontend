@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Header } from '@/src/components/common/Header';
 import { Sidebar } from '@/src/components/common/Sidebar';
 
@@ -9,10 +10,12 @@ export default function MainLayout({
   return (
     <div className="bg-brand-50 flex h-screen w-full">
       <Sidebar />
-      <main className="flex flex-1 flex-col overflow-y-auto">
-        <Header />
-        {children}
-      </main>
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        <Suspense fallback={null}>
+          <Header />
+        </Suspense>
+        <main className="flex-1">{children}</main>
+      </div>
     </div>
   );
 }

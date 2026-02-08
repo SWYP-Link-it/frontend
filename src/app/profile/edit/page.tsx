@@ -17,6 +17,7 @@ import {
   REGION_MAP,
   WEEKDAY_MAP,
 } from '@/src/constants/profile';
+import Image from 'next/image';
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -165,17 +166,24 @@ export default function ProfileEditPage() {
       />
       <main className="mx-auto max-w-4xl px-6 py-12">
         <div className="rounded-[40px] border border-gray-50 bg-white p-12 shadow-xl">
-          <ProfileEditSection
-            title="경력과 경험"
-            description="전문성을 상세히 적어주세요."
-          >
+          <div className="relative mb-8 h-full w-full">
+            <Image
+              src="/icons/profile_banner.svg"
+              alt="프로필 배너"
+              width={0}
+              height={0}
+              sizes="100vw"
+              className="h-auto w-full"
+            />
+          </div>
+          <ProfileEditSection title="경력과 경험">
             <ExperienceEditItem
               value={localProfile.experienceDescription || ''}
               onChange={(val) => updateField('experienceDescription', val)}
             />
           </ProfileEditSection>
 
-          <ProfileEditSection title="스킬" description="스킬을 등록해 주세요.">
+          <ProfileEditSection title="스킬">
             <div className="grid grid-cols-1 gap-4">
               {localProfile.skills?.map((skill: any, idx: number) => (
                 <SkillEditItem
