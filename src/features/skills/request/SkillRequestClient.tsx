@@ -14,6 +14,7 @@ import { Button } from '@/src/components/Button';
 import { useRouter } from 'next/navigation';
 import { useFormInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
 import { toast } from 'sonner';
+import { useUserInfoStore } from '@/src/stores/userInfoStore';
 
 export type RequestFormData = {
   date: Date;
@@ -22,6 +23,8 @@ export type RequestFormData = {
 };
 
 export default function SkillRequestClient() {
+  const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
+
   const { mentorId, skillId } = useFormInfoFromSearchParams();
   const router = useRouter();
 
@@ -42,6 +45,13 @@ export default function SkillRequestClient() {
 
   const handleFormUpdate = (data: Partial<RequestFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
+  };
+
+  const fetchUserInfo = () => {
+    api.get(`/credits/balance-user-details`).then((response) => {
+      const { userId, userNickname, creditBalance } = response.data.data;
+      setUserInfo({ userId, userNickname, creditBalance });
+    });
   };
 
   const handleSubmit = (
@@ -69,6 +79,7 @@ export default function SkillRequestClient() {
       })
       .then(() => {
         toast.success('신청이 완료되었습니다!');
+        fetchUserInfo();
         router.push('/skills');
       })
       .catch((error) => {
