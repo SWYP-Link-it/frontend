@@ -16,9 +16,7 @@ export const Sidebar = () => {
   const menuItems = isLoggedIn ? LOGGED_IN_MENU_ITEMS : LOGGED_OUT_MENU_ITEMS;
 
   return (
-    <aside className="flex h-screen w-20 flex-col items-center bg-gray-800 py-10">
-      <h1 className="text-error-400 text-xl font-bold">Linkit</h1>
-
+    <aside className="flex h-screen w-20 flex-col items-center bg-gray-800">
       <nav className="mt-11 flex flex-col gap-5">
         {menuItems.map((item) => {
           const Icon = item.icon;
