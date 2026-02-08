@@ -5,7 +5,7 @@ import { SearchIcon } from '../icons/SearchIcon';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/src/lib/api/api';
 import { toast } from 'sonner';
 
@@ -23,6 +23,7 @@ type PopularKeyword = {
 export const Header = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -30,12 +31,21 @@ export const Header = () => {
   const [popularSkills, setPopularSkills] = useState<PopularSkill[]>([]);
   const [popularKeywords, setPopularKeywords] = useState<PopularKeyword[]>([]);
 
-  const search = (searchKeyword: string) => {
-    router.push(`/skills?searchKeyword=${searchKeyword}`);
+  const navigate = (path: string) => {
     setIsSearchModalOpen(false);
+    router.push(path);
+  };
+
+  const search = (searchKeyword: string) => {
+    navigate(`/skills?searchKeyword=${searchKeyword}`);
   };
 
   const searchKeyword = searchParams.get('searchKeyword') ?? '';
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (isSearchModalOpen) setIsSearchModalOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!isSearchModalOpen) return;
@@ -117,7 +127,11 @@ export const Header = () => {
                     </div>
                     <div className="flex flex-col gap-4 text-lg font-medium text-gray-700">
                       {popularKeywords.map(({ rank, keyword }) => (
-                        <div key={rank} className="cursor-pointer">
+                        <div
+                          key={rank}
+                          className="cursor-pointer"
+                          onClick={() => search(keyword)}
+                        >
                           <span className="text-brand-600 mr-6 font-semibold">
                             {rank}
                           </span>
@@ -128,8 +142,13 @@ export const Header = () => {
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="flex justify-between text-lg font-semibold text-gray-700">
-                      핫한 게시글
-                      <span className="text-base text-gray-600">더보기</span>
+                      최근 HOT 게시글
+                      <button
+                        className="cursor-pointer text-base text-gray-600"
+                        onClick={() => navigate('/skills')}
+                      >
+                        더보기
+                      </button>
                     </div>
                     <div className="flex gap-4 overflow-x-auto">
                       {popularSkills.map(

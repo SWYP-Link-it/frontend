@@ -110,7 +110,7 @@ export default function SkillRequestClient() {
     const formattedMonth = formatDate(currentMonth, 'YYYY-MM');
     api
       .get(
-        `/exchange/mentors/${mentorId}/available-dates?month=${formattedMonth}`,
+        `/exchange/mentors/${mentorId}/available-dates?mentorSkillId=${skillId}&month=${formattedMonth}`,
       )
       .then((response) => {
         const { availableDates } = response.data.data;
@@ -120,7 +120,7 @@ export default function SkillRequestClient() {
         const serverError = error.response?.data;
         toast.error(serverError.message);
       });
-  }, [currentMonth, mentorId]);
+  }, [currentMonth, skillId, mentorId]);
 
   useEffect(() => {
     if (!mentorId || !skillId || !formData.date) return;
