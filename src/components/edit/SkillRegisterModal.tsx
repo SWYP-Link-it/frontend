@@ -18,7 +18,9 @@ interface SkillData {
   title?: string;
   skillDescription?: string;
   description?: string;
+  exchangeDuration?: number;
   imageUrls?: string[];
+  imageFiles?: File[];
   [key: string]: any;
 }
 
@@ -26,6 +28,7 @@ interface SkillFormData {
   category: string;
   name: string;
   proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
+  exchangeDuration: number;
   title: string;
   description: string;
   existingImages: string[];
@@ -36,7 +39,7 @@ interface SkillRegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRegister: (skill: any) => void;
-  initialData?: SkillData;
+  initialData?: SkillData | null;
 }
 
 export const SkillRegisterModal = ({
@@ -57,17 +60,23 @@ export const SkillRegisterModal = ({
         proficiency: (initialData.skillProficiency ||
           initialData.proficiency ||
           'MEDIUM') as 'LOW' | 'MEDIUM' | 'HIGH',
+        exchangeDuration: initialData.exchangeDuration || 0,
         title: initialData.skillTitle || initialData.title || '',
         description:
           initialData.skillDescription || initialData.description || '',
-        existingImages: initialData.imageUrls || [],
-        newFiles: [],
+        existingImages: Array.isArray(initialData.imageUrls)
+          ? [...initialData.imageUrls]
+          : [],
+        newFiles: Array.isArray(initialData.imageFiles)
+          ? [...initialData.imageFiles]
+          : [],
       };
     }
     return {
       category: '',
       name: '',
       proficiency: 'MEDIUM',
+      exchangeDuration: 0,
       title: '',
       description: '',
       existingImages: [],
@@ -75,37 +84,28 @@ export const SkillRegisterModal = ({
     };
   }, [initialData]);
 
-  // 초기값 설정 시 함수 호출
-  const [form, setForm] = useState<SkillFormData>(() => getDefaultValues());
+  const [form, setForm] = useState<SkillFormData>(getDefaultValues);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isProficiencyOpen, setIsProficiencyOpen] = useState(false);
+  const [isDurationOpen, setIsDurationOpen] = useState(false); // 시간 선택 영역 오픈 상태
+
+  const durationOptions = [30, 60, 90, 120, 150, 180];
 
   useEffect(() => {
     if (isOpen) {
-      const timer = setTimeout(() => {
-        setForm(getDefaultValues());
-      }, 0);
-      return () => clearTimeout(timer);
+      setForm(getDefaultValues());
     }
-  }, [isOpen]);
+  }, [isOpen, getDefaultValues]);
 
   useEffect(() => {
-    let urls: string[] = [];
-
-    const timer = setTimeout(() => {
-      if (form.newFiles.length === 0) {
-        setPreviews([]);
-        return;
-      }
-      urls = form.newFiles.map((file) => URL.createObjectURL(file));
-      setPreviews(urls);
-    }, 0);
-
-    return () => {
-      clearTimeout(timer);
-      urls.forEach((url) => URL.revokeObjectURL(url));
-    };
+    if (!form.newFiles || form.newFiles.length === 0) {
+      setPreviews([]);
+      return;
+    }
+    const urls = form.newFiles.map((file) => URL.createObjectURL(file));
+    setPreviews(urls);
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [form.newFiles]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,6 +121,7 @@ export const SkillRegisterModal = ({
         newFiles: [...prev.newFiles, ...selectedFiles],
       }));
     }
+    e.target.value = '';
   };
 
   const removeExistingImage = (index: number) => {
@@ -138,7 +139,11 @@ export const SkillRegisterModal = ({
   };
 
   const isFormValid = Boolean(
-    form.category && form.name && form.title && form.title.length <= 39,
+    form.category &&
+    form.name &&
+    form.exchangeDuration > 0 &&
+    form.title &&
+    form.title.length <= 39,
   );
 
   const handleSubmit = () => {
@@ -146,11 +151,13 @@ export const SkillRegisterModal = ({
       category: form.category,
       name: form.name,
       proficiency: form.proficiency,
+      exchangeDuration: form.exchangeDuration,
       title: form.title,
       description: form.description,
       existingImages: form.existingImages,
       newFiles: form.newFiles,
     });
+    setForm(getDefaultValues());
   };
 
   return (
@@ -159,7 +166,7 @@ export const SkillRegisterModal = ({
         <h2 className="mb-8 text-[24px] font-bold text-gray-900">스킬</h2>
 
         <div className="custom-scrollbar max-h-[70vh] space-y-10 overflow-y-auto pr-2">
-          {/* 카테고리 섹션 */}
+          {/* 스킬 카테고리 (기준 UI) */}
           <div className="flex flex-col gap-4">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 카테고리
@@ -200,6 +207,7 @@ export const SkillRegisterModal = ({
             )}
           </div>
 
+          {/* 스킬명 & 숙련도 */}
           <div className="grid grid-cols-2 gap-6">
             <div className="flex flex-col gap-3">
               <label className="text-[16px] font-bold text-gray-900">
@@ -235,9 +243,7 @@ export const SkillRegisterModal = ({
                     )?.label || '선택'}
                   </span>
                   <svg
-                    className={`h-5 w-5 transition-transform ${
-                      isProficiencyOpen ? 'rotate-180' : ''
-                    }`}
+                    className={`h-5 w-5 transition-transform ${isProficiencyOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -293,6 +299,44 @@ export const SkillRegisterModal = ({
                 )}
               </div>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <label className="text-[16px] font-bold text-gray-900">
+              스킬 거래 시간
+            </label>
+            <div
+              onClick={() => setIsDurationOpen(!isDurationOpen)}
+              className={`w-full cursor-pointer rounded-[12px] border p-4 transition-all ${
+                isDurationOpen ? 'border-blue-400' : 'border-gray-200'
+              } ${form.exchangeDuration > 0 ? 'text-gray-800' : 'text-gray-400'}`}
+            >
+              {form.exchangeDuration > 0
+                ? `${form.exchangeDuration}분`
+                : '스킬을 가르칠 시간을 선택해주세요.'}
+            </div>
+
+            {isDurationOpen && (
+              <div className="flex flex-wrap gap-2 rounded-[12px] border border-gray-100 bg-white p-4 shadow-sm">
+                {durationOptions.map((min) => (
+                  <button
+                    key={min}
+                    type="button"
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, exchangeDuration: min }));
+                      setIsDurationOpen(false);
+                    }}
+                    className={`rounded-lg border px-4 py-2 text-[14px] transition-all ${
+                      form.exchangeDuration === min
+                        ? 'border-blue-500 bg-blue-50 font-bold text-blue-600'
+                        : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    {min}분
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
@@ -357,7 +401,7 @@ export const SkillRegisterModal = ({
                   <button
                     type="button"
                     onClick={() => removeExistingImage(i)}
-                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600"
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-600"
                   >
                     <span className="text-[12px] leading-none">✕</span>
                   </button>
@@ -373,7 +417,7 @@ export const SkillRegisterModal = ({
                   <button
                     type="button"
                     onClick={() => removeNewFile(i)}
-                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-white shadow-md transition-colors hover:bg-black"
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-white shadow-md hover:bg-black"
                   >
                     <span className="text-[12px] leading-none">✕</span>
                   </button>

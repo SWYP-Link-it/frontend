@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 
-export const useFromInfoFromSearchParams = () => {
+export const useFormInfoFromSearchParams = () => {
   const searchParams = useSearchParams();
 
   const mentorId = searchParams.get('mentorId');

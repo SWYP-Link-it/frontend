@@ -39,3 +39,27 @@ export interface DaySelectorProps {
   selectedDays: string[];
   onChange: (days: string[]) => void;
 }
+export type SkillData = {
+  skillCategoryType?: string;
+  category?: string;
+  skillName?: string;
+  name?: string;
+  skillProficiency?: string;
+  proficiency?: string;
+  skillTitle?: string;
+  title?: string;
+  skillDescription?: string;
+  description?: string;
+  imageUrls?: string[];
+  [key: string]: any;
+};
+
+export type SkillFormData = {
+  category: string;
+  name: string;
+  proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
+  title: string;
+  description: string;
+  existingImages: string[];
+  newFiles: File[];
+};

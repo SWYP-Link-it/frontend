@@ -10,8 +10,6 @@ export const LoginContent = () => {
         : 'https://app.desklab.kr/';
 
     const loginUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/oauth2/authorization/${provider}?returnUrl=${encodeURIComponent(returnUrl)}`;
-
-    console.log(loginUrl);
     window.location.href = loginUrl;
   };
 

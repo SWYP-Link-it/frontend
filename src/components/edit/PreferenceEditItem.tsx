@@ -26,13 +26,15 @@ export const PreferenceEditItem = ({
 }: PreferenceEditItemProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // 현재 선택된 요일의 시간대를 가져와서 시작 시간 순으로 정렬
   const currentDayTimes = times
     .filter((t) => t.dayOfWeek === activeDay)
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-  const formatTime = (timeStr: string) => {
-    const [hh, mm] = timeStr.split(':');
-    return `${hh}시 ${mm}분`;
+  const formatTimeRange = (start: string, end: string) => {
+    const s = start.substring(0, 5);
+    const e = end.substring(0, 5);
+    return `${s} ~ ${e}`;
   };
 
   const isOfflineSelected =
@@ -56,17 +58,18 @@ export const PreferenceEditItem = ({
     <div className="space-y-8">
       <div>
         <label className="mb-3 block text-sm font-bold text-gray-900">
-          가능 시간대
+          가능 시간대 ({activeDay}요일)
         </label>
         <div className="flex min-h-[90px] w-full items-start justify-between rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm">
           {currentDayTimes.length > 0 ? (
-            <div className="mr-4 grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+            <div className="mr-4 grid flex-1 grid-cols-2 gap-3 md:grid-cols-3">
+              {/* 텍스트가 길어지므로 그리드 수를 줄임 */}
               {currentDayTimes.map((slot, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-gray-100 bg-white px-2 py-3 text-center text-[13px] font-bold text-gray-500 shadow-sm"
+                  className="rounded-xl border border-blue-50 bg-blue-50/30 px-2 py-3 text-center text-[13px] font-bold text-blue-600 shadow-sm"
                 >
-                  {formatTime(slot.startTime)}
+                  {formatTimeRange(slot.startTime, slot.endTime)}
                 </div>
               ))}
             </div>
@@ -83,7 +86,7 @@ export const PreferenceEditItem = ({
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="mt-1 shrink-0 p-2 text-gray-300 hover:text-blue-500"
+              className="mt-1 shrink-0 p-2 text-gray-400 transition-colors hover:text-blue-500"
             >
               <svg
                 className="h-6 w-6"
@@ -103,6 +106,7 @@ export const PreferenceEditItem = ({
         </div>
       </div>
 
+      {/* 진행 방식 및 지역 선택 (기존과 동일) */}
       <div className="space-y-4">
         <label className="block text-sm font-bold text-gray-900">
           진행 방식

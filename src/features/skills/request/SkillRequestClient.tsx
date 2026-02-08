@@ -3,7 +3,6 @@
 import { api } from '@/src/lib/api/api';
 import { SkillInfo } from '@/src/types/skill';
 import { ReactElement, ReactNode, useEffect, useState } from 'react';
-import { useFromInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
 import { CursorBoxIcon } from '@/src/components/icons/CursorBoxIcon';
 import { ClockIcon } from '@/src/components/icons/ClockIcon';
 import Link from 'next/link';
@@ -13,6 +12,8 @@ import { formatDate } from '@/src/utils/date';
 import { AlertIcon } from '@/src/components/icons/AlertIcon';
 import { Button } from '@/src/components/Button';
 import { useRouter } from 'next/navigation';
+import { useFormInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
+import { toast } from 'sonner';
 
 export type RequestFormData = {
   date: Date;
@@ -21,7 +22,7 @@ export type RequestFormData = {
 };
 
 export default function SkillRequestClient() {
-  const { mentorId, skillId } = useFromInfoFromSearchParams();
+  const { mentorId, skillId } = useFormInfoFromSearchParams();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -49,12 +50,12 @@ export default function SkillRequestClient() {
     formData: RequestFormData,
   ) => {
     if (!formData.date) {
-      console.error('날짜를 선택해 주세요');
+      toast.error('날짜를 선택해 주세요');
       return;
     }
 
     if (!formData.time) {
-      console.error('시간을 선택해 주세요');
+      toast.error('시간을 선택해 주세요');
       return;
     }
 
@@ -66,24 +67,28 @@ export default function SkillRequestClient() {
         requestedDate: formatDate(formData.date, 'YYYY-MM-DD'),
         startTime: formData.time,
       })
-      .then((response) => {
-        console.log(response.data.message);
-        alert('신청을 완료했습니다!');
+      .then(() => {
+        toast.success('신청이 완료되었습니다!');
         router.push('/skills');
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast(serverError.message);
       });
   };
 
   useEffect(() => {
     if (!mentorId) return;
 
-    api.get(`/exchange/mentors/${mentorId}/skills`).then((response) => {
-      setSkillList(response.data.data);
-    });
+    api
+      .get(`/exchange/mentors/${mentorId}/skills`)
+      .then((response) => {
+        setSkillList(response.data.data);
+      })
+      .catch((error) => {
+        const serverError = error.response?.data;
+        toast.error(serverError.message);
+      });
   }, []);
 
   useEffect(() => {
@@ -99,8 +104,7 @@ export default function SkillRequestClient() {
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast.error(serverError.message);
       });
   }, [currentMonth, mentorId]);
 
@@ -130,8 +134,7 @@ export default function SkillRequestClient() {
       })
       .catch((error) => {
         const serverError = error.response?.data;
-        console.error(serverError.code);
-        console.error(serverError.message);
+        toast.error(serverError.message);
       });
   }, [formData.date, mentorId, skillId]);
 

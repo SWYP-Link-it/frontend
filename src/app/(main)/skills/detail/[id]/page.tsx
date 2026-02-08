@@ -25,7 +25,6 @@ export default async function SkillDetailPage({
   }
 
   const skillDetail: SkillDetailDto = (await res.json()).data;
-  console.log(skillDetail);
 
   return (
     <>

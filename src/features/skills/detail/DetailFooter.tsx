@@ -8,6 +8,7 @@ import { api } from '@/src/lib/api/api';
 import { useRouter } from 'next/navigation';
 import { useUserInfoStore } from '@/src/stores/userInfoStore';
 import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
+import { toast } from 'sonner';
 
 type DetailFooterProps = {
   mentorId: number;
@@ -22,7 +23,7 @@ export const DetailFooter = ({ mentorId, skillId }: DetailFooterProps) => {
   const handleContact = async () => {
     try {
       if (!myId) {
-        alert('로그인이 필요합니다.');
+        toast.error('로그인이 필요합니다.');
         return;
       }
       const response = await api.post('/chat/rooms', null, {
@@ -40,7 +41,6 @@ export const DetailFooter = ({ mentorId, skillId }: DetailFooterProps) => {
       }
     } catch (error) {
       console.error('채팅방 연결 실패:', error);
-      alert('채팅방을 여는 중 오류가 발생했습니다.');
     }
   };
 
