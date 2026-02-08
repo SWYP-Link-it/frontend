@@ -155,7 +155,10 @@ export const Header = () => {
                         ({ skillId, skillTitle, nickname }) => (
                           <div
                             key={skillId}
-                            className="flex w-65 shrink-0 flex-col gap-3 rounded-lg bg-[#F5F6FA] px-6 py-4 font-semibold"
+                            className="flex w-65 shrink-0 cursor-pointer flex-col gap-3 rounded-lg bg-[#F5F6FA] px-6 py-4 font-semibold"
+                            onClick={() =>
+                              navigate(`/skills/detail/${skillId}`)
+                            }
                           >
                             <span className="text-gray-400">{nickname}</span>
                             <p className="text-gray-700">{skillTitle}</p>

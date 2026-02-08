@@ -3,6 +3,8 @@
 import { Dispatch, SetStateAction } from 'react';
 import { Button } from '@/src/components/Button';
 import { useRouter } from 'next/navigation';
+import { api } from '@/src/lib/api/api';
+import { useUserInfoStore } from '@/src/stores/userInfoStore';
 import Image from 'next/image';
 
 type OnboardingStepProps = {
@@ -12,6 +14,14 @@ type OnboardingStepProps = {
 
 export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
   const router = useRouter();
+  const { setUserInfo: setUserCreditInfo } = useUserInfoStore();
+
+  const fetchUserCreditInfo = () => {
+    api.get(`/credits/balance-user-details`).then((response) => {
+      const { userId, userNickname, creditBalance } = response.data.data;
+      setUserCreditInfo({ userId, userNickname, creditBalance });
+    });
+  };
 
   return (
     <>
@@ -25,9 +35,6 @@ export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
         height={344}
         className="mt-8"
       />
-      {/* <div className="border-brand-600 mt-8 h-[350px] w-[500px] border">
-        {IMAGE[step - 1]}
-      </div> */}
 
       {step !== 3 && (
         <div className="mt-15 w-[380px]">
@@ -43,9 +50,18 @@ export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
           <Button
             text="스킬 등록하고 1크레딧 받기"
             mode="active"
-            onClick={() => router.push('/profile')}
+            onClick={() => {
+              fetchUserCreditInfo();
+              router.push('/profile');
+            }}
           />
-          <Button text="홈으로 이동하기" onClick={() => router.push('/')} />
+          <Button
+            text="홈으로 이동하기"
+            onClick={() => {
+              fetchUserCreditInfo();
+              router.push('/');
+            }}
+          />
         </div>
       )}
     </>

@@ -107,7 +107,7 @@ export default function SkillRequestClient() {
   }, []);
 
   useEffect(() => {
-    if (!mentorId || !currentMonth) return;
+    if (!mentorId || !currentMonth || !skillId) return;
     const formattedMonth = formatDate(currentMonth, 'YYYY-MM');
     api
       .get(
