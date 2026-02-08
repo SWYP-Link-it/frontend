@@ -28,14 +28,23 @@ export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
       <div className="mt-[46px] text-center text-3xl leading-[1.4] font-bold whitespace-pre-wrap">
         {TITLE_LIST[step - 1]}
       </div>
-      <Image
-        src={IMAGE[step - 1]}
-        alt={`Step ${step}`}
-        width={495}
-        height={344}
-        className="mt-8"
-      />
-
+      <div className="relative mt-8 h-[344px] w-[495px]">
+        {IMAGE.map((src, index) => (
+          <Image
+            key={src}
+            src={src}
+            alt={`Step ${index + 1}`}
+            width={495}
+            height={344}
+            className={`absolute top-0 left-0 transition-opacity duration-300 ${
+              step === index + 1
+                ? 'opacity-100'
+                : 'pointer-events-none opacity-0'
+            }`}
+            priority
+          />
+        ))}
+      </div>
       {step !== 3 && (
         <div className="mt-15 w-[380px]">
           <Button
