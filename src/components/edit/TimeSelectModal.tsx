@@ -61,8 +61,8 @@ export const TimeSelectModal = ({
     const slots: { start: string; end: string }[] = [];
 
     dayTimes.forEach((time) => {
-      let startStr = time.startTime.substring(0, 5);
-      let endStr = time.endTime.substring(0, 5);
+      const startStr = time.startTime.substring(0, 5);
+      const endStr = time.endTime.substring(0, 5);
 
       // 만약 서버에서 1시간 단위(예: 09:00~10:00)로 온다면 30분 단위 슬롯 2개로 쪼개서 displaySlots에 넣어야 함
       // 하지만 보통은 30분 단위로 저장되므로 그대로 넣습니다.
