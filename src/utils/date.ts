@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko'; // 한국어(오전/오후) 설정
+import utc from 'dayjs/plugin/utc';
 import isToday from 'dayjs/plugin/isToday';
 import isYesterday from 'dayjs/plugin/isYesterday';
 
@@ -7,9 +8,10 @@ import isYesterday from 'dayjs/plugin/isYesterday';
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.locale('ko'); // 한국어 설정 적용
+dayjs.extend(utc);
 
 export const formatMessageDate = (dateString: string): string => {
-  const date = dayjs(dateString);
+  const date = dayjs.utc(dateString);
 
   // 1. 오늘이면: "오전 9:15"
   if (date.isToday()) {
