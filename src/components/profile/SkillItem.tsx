@@ -1,5 +1,6 @@
 import { SKILL_CATEGORY_MAP } from '@/src/constants/profile';
 import { UserSkill } from '@/src/types/profile';
+import { CategoryFigure } from '../skill/CategoryFigure';
 
 interface SkillItemProps {
   skill: UserSkill;
@@ -23,9 +24,7 @@ export const SkillItem = ({ skill }: SkillItemProps) => {
   return (
     <div className="flex gap-4 border-b border-gray-50 p-4 last:border-0">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100">
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-400">
-          <span className="text-[10px] text-white">✨</span>
-        </div>
+        <CategoryFigure category={'DESIGN'} isActive={true} size="sm" />
       </div>
       <div className="flex-1">
         <div className="mb-2 flex items-center gap-2">

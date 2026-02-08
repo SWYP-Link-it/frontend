@@ -10,6 +10,7 @@ import {
   EXCHANGE_TYPE_LABELS,
   PROFICIENCY_LABELS,
 } from '@/src/constants/profile';
+import { CategoryFigure } from '@/src/components/skill/CategoryFigure';
 
 export const SkillDetail = ({
   mainSkill,
@@ -41,7 +42,7 @@ export const SkillDetail = ({
             숙련도 - {PROFICIENCY_LABELS[skillProficiency]}
           </div>
         </div>
-        <div className="bg-brand-200 h-25 w-25 rounded-2xl">그래픽 이미지</div>
+        <CategoryFigure category={'DESIGN'} isActive={true} size="lg" />
       </div>
       <div className="border-y border-gray-200 py-6">
         <div className="grid w-fit grid-cols-2 gap-x-25 text-sm font-semibold text-gray-600">
