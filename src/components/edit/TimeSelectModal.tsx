@@ -89,7 +89,7 @@ export const TimeSelectModal = ({
       daysToApply = DAYS;
     }
 
-    let updatedSchedules = [...initialTimes].filter(
+    const updatedSchedules = [...initialTimes].filter(
       (t) => !daysToApply.includes(t.dayOfWeek),
     );
 
