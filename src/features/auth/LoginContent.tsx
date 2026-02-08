@@ -34,7 +34,7 @@ export const LoginContent = () => {
             카카오 계정으로 계속하기
           </span>
         </button>
-        <button
+        {/* <button
           className="flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#02C75A] py-2"
           onClick={() => handleLogin('naver')}
         >
@@ -42,7 +42,7 @@ export const LoginContent = () => {
           <span className="font-semibold text-white">
             네이버 계정으로 계속하기
           </span>
-        </button>
+        </button> */}
       </div>
     </div>
   );
