@@ -10,12 +10,12 @@ export default function MainLayout({
   return (
     <div className="bg-brand-50 flex h-screen w-full">
       <Sidebar />
-      <div className="flex flex-1 flex-col overflow-y-auto">
+      <main className="flex flex-1 flex-col overflow-y-auto">
         <Suspense fallback={null}>
           <Header />
         </Suspense>
-        <main className="flex-1">{children}</main>
-      </div>
+        {children}
+      </main>
     </div>
   );
 }
