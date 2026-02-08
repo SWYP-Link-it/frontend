@@ -18,11 +18,14 @@ import {
   WEEKDAY_MAP,
 } from '@/src/constants/profile';
 import Image from 'next/image';
+import { useUserInfoStore } from '@/src/stores/userInfoStore';
 
 export default function ProfileEditPage() {
   const router = useRouter();
   const { accessToken } = useAuthStore();
   const { userInfo } = useUserStore();
+  const { setUserInfo: setUserCreditInfo, userInfo: userCreditInfo } =
+    useUserInfoStore();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isNewProfile, setIsNewProfile] = useState(false);
@@ -33,6 +36,13 @@ export default function ProfileEditPage() {
     null,
   );
   const [activeDay, setActiveDay] = useState('월');
+
+  const fetchUserCreditInfo = () => {
+    api.get(`/credits/balance-user-details`).then((response) => {
+      const { userId, userNickname, creditBalance } = response.data.data;
+      setUserCreditInfo({ userId, userNickname, creditBalance });
+    });
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -136,6 +146,8 @@ export default function ProfileEditPage() {
 
       if (response.data.success) {
         alert('저장되었습니다.');
+        fetchUserCreditInfo();
+
         router.push('/profile');
       }
     } catch (err: any) {
