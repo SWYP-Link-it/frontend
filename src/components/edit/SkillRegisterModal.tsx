@@ -18,6 +18,7 @@ interface SkillData {
   title?: string;
   skillDescription?: string;
   description?: string;
+  exchangeDuration?: number;
   imageUrls?: string[];
   imageFiles?: File[];
   [key: string]: any;
@@ -27,6 +28,7 @@ interface SkillFormData {
   category: string;
   name: string;
   proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
+  exchangeDuration: number;
   title: string;
   description: string;
   existingImages: string[];
@@ -46,7 +48,6 @@ export const SkillRegisterModal = ({
   onRegister,
   initialData,
 }: SkillRegisterModalProps) => {
-  // 기본값 설정 함수 - initialData 유무에 따라 완벽하게 분리
   const getDefaultValues = useCallback((): SkillFormData => {
     if (initialData) {
       const rawCategory =
@@ -59,6 +60,7 @@ export const SkillRegisterModal = ({
         proficiency: (initialData.skillProficiency ||
           initialData.proficiency ||
           'MEDIUM') as 'LOW' | 'MEDIUM' | 'HIGH',
+        exchangeDuration: initialData.exchangeDuration || 0,
         title: initialData.skillTitle || initialData.title || '',
         description:
           initialData.skillDescription || initialData.description || '',
@@ -74,6 +76,7 @@ export const SkillRegisterModal = ({
       category: '',
       name: '',
       proficiency: 'MEDIUM',
+      exchangeDuration: 0,
       title: '',
       description: '',
       existingImages: [],
@@ -85,15 +88,16 @@ export const SkillRegisterModal = ({
   const [previews, setPreviews] = useState<string[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isProficiencyOpen, setIsProficiencyOpen] = useState(false);
+  const [isDurationOpen, setIsDurationOpen] = useState(false); // 시간 선택 영역 오픈 상태
 
-  // 모달이 열릴 때마다 폼을 초기화 (수정 시 데이터 로드 포함)
+  const durationOptions = [30, 60, 90, 120, 150, 180];
+
   useEffect(() => {
     if (isOpen) {
       setForm(getDefaultValues());
     }
   }, [isOpen, getDefaultValues]);
 
-  // 미리보기 URL 생성 및 정리
   useEffect(() => {
     if (!form.newFiles || form.newFiles.length === 0) {
       setPreviews([]);
@@ -117,7 +121,6 @@ export const SkillRegisterModal = ({
         newFiles: [...prev.newFiles, ...selectedFiles],
       }));
     }
-    // 동일 파일 재선택을 위해 인풋 초기화
     e.target.value = '';
   };
 
@@ -136,7 +139,11 @@ export const SkillRegisterModal = ({
   };
 
   const isFormValid = Boolean(
-    form.category && form.name && form.title && form.title.length <= 39,
+    form.category &&
+    form.name &&
+    form.exchangeDuration > 0 &&
+    form.title &&
+    form.title.length <= 39,
   );
 
   const handleSubmit = () => {
@@ -144,12 +151,12 @@ export const SkillRegisterModal = ({
       category: form.category,
       name: form.name,
       proficiency: form.proficiency,
+      exchangeDuration: form.exchangeDuration,
       title: form.title,
       description: form.description,
       existingImages: form.existingImages,
       newFiles: form.newFiles,
     });
-    // 등록 후 폼 초기화 (덮어쓰기 방지)
     setForm(getDefaultValues());
   };
 
@@ -159,7 +166,7 @@ export const SkillRegisterModal = ({
         <h2 className="mb-8 text-[24px] font-bold text-gray-900">스킬</h2>
 
         <div className="custom-scrollbar max-h-[70vh] space-y-10 overflow-y-auto pr-2">
-          {/* 카테고리 선택 */}
+          {/* 스킬 카테고리 (기준 UI) */}
           <div className="flex flex-col gap-4">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 카테고리
@@ -294,7 +301,44 @@ export const SkillRegisterModal = ({
             </div>
           </div>
 
-          {/* 제목 섹션 */}
+          <div className="flex flex-col gap-4">
+            <label className="text-[16px] font-bold text-gray-900">
+              스킬 거래 시간
+            </label>
+            <div
+              onClick={() => setIsDurationOpen(!isDurationOpen)}
+              className={`w-full cursor-pointer rounded-[12px] border p-4 transition-all ${
+                isDurationOpen ? 'border-blue-400' : 'border-gray-200'
+              } ${form.exchangeDuration > 0 ? 'text-gray-800' : 'text-gray-400'}`}
+            >
+              {form.exchangeDuration > 0
+                ? `${form.exchangeDuration}분`
+                : '스킬을 가르칠 시간을 선택해주세요.'}
+            </div>
+
+            {isDurationOpen && (
+              <div className="flex flex-wrap gap-2 rounded-[12px] border border-gray-100 bg-white p-4 shadow-sm">
+                {durationOptions.map((min) => (
+                  <button
+                    key={min}
+                    type="button"
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, exchangeDuration: min }));
+                      setIsDurationOpen(false);
+                    }}
+                    className={`rounded-lg border px-4 py-2 text-[14px] transition-all ${
+                      form.exchangeDuration === min
+                        ? 'border-blue-500 bg-blue-50 font-bold text-blue-600'
+                        : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    {min}분
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-col gap-3">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 제목
@@ -313,7 +357,6 @@ export const SkillRegisterModal = ({
             />
           </div>
 
-          {/* 소개 섹션 */}
           <div className="flex flex-col gap-3">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 소개
@@ -328,7 +371,6 @@ export const SkillRegisterModal = ({
             />
           </div>
 
-          {/* 포트폴리오(이미지) 섹션 */}
           <div className="flex flex-col gap-3">
             <label className="text-[16px] font-bold text-gray-900">
               포트폴리오

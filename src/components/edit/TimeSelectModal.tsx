@@ -18,6 +18,28 @@ interface TimeSelectModalProps {
   onSave: (selectedSchedules: TimeSchedule[]) => void;
 }
 
+// 헬퍼: 연속된 30분 슬롯들을 하나의 범위로 합침
+const mergeTimeSlots = (slots: { start: string; end: string }[]) => {
+  if (slots.length === 0) return [];
+  // 시작 시간 기준으로 정렬
+  const sorted = [...slots].sort((a, b) => a.start.localeCompare(b.start));
+
+  const merged = [];
+  let current = { ...sorted[0] };
+
+  for (let i = 1; i < sorted.length; i++) {
+    // 현재 슬롯의 끝시간이 다음 슬롯의 시작시간과 정확히 일치할 때만 합침
+    if (current.end === sorted[i].start) {
+      current.end = sorted[i].end;
+    } else {
+      merged.push(current);
+      current = { ...sorted[i] };
+    }
+  }
+  merged.push(current);
+  return merged;
+};
+
 export const TimeSelectModal = ({
   isOpen,
   onClose,
@@ -29,63 +51,67 @@ export const TimeSelectModal = ({
   const [applyMode, setApplyMode] = useState<'none' | 'weekdays' | 'all'>(
     'none',
   );
-
-  // 핵심: useEffect 대신 useMemo를 사용하여 현재 선택된 요일의 시간대를 계산합니다.
-  // 사용자가 수동으로 시간을 토글하기 전까지는 initialTimes에서 가져온 값을 보여줍니다.
-  const currentDayInitialTimes = useMemo(() => {
-    return initialTimes
-      .filter((t) => t.dayOfWeek === selectedDay)
-      .map((t) =>
-        t.startTime.length > 5 ? t.startTime.substring(0, 5) : t.startTime,
-      );
-  }, [selectedDay, initialTimes]);
-
-  // 수동으로 선택한 시간들을 관리하는 상태
-  const [manualSelectedTimes, setManualSelectedTimes] = useState<
-    string[] | null
-  >(null);
-
-  // 현재 화면에 보여줄 시간들 (수동 선택이 있으면 그것을, 없으면 초기값을 사용)
-  const displayTimes = manualSelectedTimes ?? currentDayInitialTimes;
-
   const [expandedSections, setExpandedSections] = useState<number[]>([
     0, 1, 2, 3,
   ]);
 
-  const toggleTime = (time: string) => {
-    const currentTimes = displayTimes;
-    const newTimes = currentTimes.includes(time)
-      ? currentTimes.filter((t) => t !== time)
-      : [...currentTimes, time].sort();
+  // 서버에서 받아온 데이터를 30분 단위 슬롯 리스트로 "분해"해서 관리 (이게 핵심입니다)
+  const currentDayInitialSlots = useMemo(() => {
+    const dayTimes = initialTimes.filter((t) => t.dayOfWeek === selectedDay);
+    const slots: { start: string; end: string }[] = [];
 
-    setManualSelectedTimes(newTimes);
+    dayTimes.forEach((time) => {
+      let startStr = time.startTime.substring(0, 5);
+      let endStr = time.endTime.substring(0, 5);
+
+      // 만약 서버에서 1시간 단위(예: 09:00~10:00)로 온다면 30분 단위 슬롯 2개로 쪼개서 displaySlots에 넣어야 함
+      // 하지만 보통은 30분 단위로 저장되므로 그대로 넣습니다.
+      slots.push({ start: startStr, end: endStr });
+    });
+    return slots;
+  }, [selectedDay, initialTimes]);
+
+  const [manualSelectedSlots, setManualSelectedSlots] = useState<
+    { start: string; end: string }[] | null
+  >(null);
+  const displaySlots = manualSelectedSlots ?? currentDayInitialSlots;
+
+  // 하단 요약용 병합 데이터
+  const mergedDisplay = useMemo(
+    () => mergeTimeSlots(displaySlots),
+    [displaySlots],
+  );
+
+  const toggleTime = (slot: { start: string; end: string }) => {
+    const isSelected = displaySlots.some((s) => s.start === slot.start);
+    const newSlots = isSelected
+      ? displaySlots.filter((s) => s.start !== slot.start)
+      : [...displaySlots, slot];
+    setManualSelectedSlots(newSlots);
   };
 
   const handleDayChange = (day: string) => {
     setSelectedDay(day);
-    setManualSelectedTimes(null); // 요일이 바뀌면 해당 요일의 초기 데이터로 리셋
+    setManualSelectedSlots(null);
     setApplyMode('none');
   };
 
   const handleRegister = () => {
-    if (displayTimes.length === 0) return;
+    if (displaySlots.length === 0) return;
+
+    // 최종 저장 시에만 묶어서 보냄
+    const mergedResults = mergeTimeSlots(displaySlots);
 
     let daysToApply = [selectedDay];
     if (applyMode === 'weekdays') daysToApply = ['월', '화', '수', '목', '금'];
     else if (applyMode === 'all') daysToApply = DAYS;
 
     const result = daysToApply.flatMap((day) =>
-      displayTimes.map((time) => {
-        const [hour, minute] = time.split(':').map(Number);
-        const endMin = minute + 30;
-        const endHour = hour + Math.floor(endMin / 60);
-        const finalMin = endMin % 60;
-        return {
-          dayOfWeek: day,
-          startTime: time,
-          endTime: `${String(endHour).padStart(2, '0')}:${String(finalMin).padStart(2, '0')}`,
-        };
-      }),
+      mergedResults.map((slot) => ({
+        dayOfWeek: day,
+        startTime: slot.start,
+        endTime: slot.end,
+      })),
     );
     onSave(result);
   };
@@ -96,6 +122,7 @@ export const TimeSelectModal = ({
         <h2 className="mb-3 text-[22px] font-bold text-gray-900">
           선호 시간대
         </h2>
+
         <div className="mb-8 flex gap-1 rounded-xl bg-gray-50 p-1">
           {DAYS.map((day) => (
             <button
@@ -128,29 +155,48 @@ export const TimeSelectModal = ({
                       : [...prev, idx],
                   )
                 }
-                className="flex w-full justify-between py-4 text-sm font-bold"
+                className="flex w-full justify-between py-4 text-sm font-bold text-gray-700"
               >
                 {section.label}
               </button>
               {expandedSections.includes(idx) && (
                 <div className="grid grid-cols-4 gap-2 py-2">
-                  {section.slots.map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      onClick={() => toggleTime(slot)}
-                      className={`rounded-lg border py-3 text-sm ${
-                        displayTimes.includes(slot)
-                          ? 'border-blue-400 bg-blue-50 text-blue-500'
-                          : 'border-gray-100 text-gray-300'
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
+                  {' '}
+                  {/* 4칸 유지 */}
+                  {section.slots.map((slot, sIdx) => {
+                    const isSelected = displaySlots.some(
+                      (s) => s.start === slot.start,
+                    );
+                    return (
+                      <button
+                        key={sIdx}
+                        type="button"
+                        onClick={() => toggleTime(slot)}
+                        className={`rounded-lg border py-3 text-[10px] font-medium transition-all ${
+                          isSelected
+                            ? 'border-blue-400 bg-blue-50 font-bold text-blue-500 shadow-sm'
+                            : 'border-gray-100 bg-white text-gray-300'
+                        }`}
+                      >
+                        {/* 00:00 ~ 00:30 형식으로 변경 */}
+                        {slot.start} ~ {slot.end}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
+          ))}
+        </div>
+        {/* 선택된 요약 시간대 노출 */}
+        <div className="mt-4 flex min-h-[40px] flex-wrap gap-2">
+          {mergedDisplay.map((slot, i) => (
+            <span
+              key={i}
+              className="rounded-md border border-blue-100 bg-blue-50 px-3 py-1.5 text-[13px] font-bold text-blue-600"
+            >
+              {slot.start} ~ {slot.end}
+            </span>
           ))}
         </div>
 
@@ -158,10 +204,10 @@ export const TimeSelectModal = ({
           <button
             type="button"
             onClick={() => setApplyMode('weekdays')}
-            className={`rounded-lg border px-4 py-2 text-sm font-bold ${
+            className={`rounded-lg border px-4 py-2 text-sm font-bold transition-colors ${
               applyMode === 'weekdays'
-                ? 'bg-blue-50 text-blue-600'
-                : 'bg-gray-50 text-gray-500'
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-gray-100 bg-gray-50 text-gray-500'
             }`}
           >
             평일 적용
@@ -169,10 +215,10 @@ export const TimeSelectModal = ({
           <button
             type="button"
             onClick={() => setApplyMode('all')}
-            className={`rounded-lg border px-4 py-2 text-sm font-bold ${
+            className={`rounded-lg border px-4 py-2 text-sm font-bold transition-colors ${
               applyMode === 'all'
-                ? 'bg-blue-50 text-blue-600'
-                : 'bg-gray-50 text-gray-500'
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-gray-100 bg-gray-50 text-gray-500'
             }`}
           >
             전체 적용
@@ -182,7 +228,7 @@ export const TimeSelectModal = ({
         <button
           type="button"
           onClick={handleRegister}
-          disabled={displayTimes.length === 0}
+          disabled={displaySlots.length === 0}
           className="mt-4 w-full rounded-2xl bg-blue-500 py-5 text-lg font-bold text-white hover:bg-blue-600 disabled:bg-gray-100 disabled:text-gray-300"
         >
           시간대 등록 완료
