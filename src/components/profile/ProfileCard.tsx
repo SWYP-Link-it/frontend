@@ -1,9 +1,14 @@
 interface ProfileCardProps {
   name: string;
+  credit: number;
   onEditClick: () => void;
 }
 
-export const ProfileCard = ({ name, onEditClick }: ProfileCardProps) => {
+export const ProfileCard = ({
+  name,
+  credit,
+  onEditClick,
+}: ProfileCardProps) => {
   return (
     <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
@@ -37,7 +42,7 @@ export const ProfileCard = ({ name, onEditClick }: ProfileCardProps) => {
             <div className="h-2.5 w-2.5 rounded-full bg-blue-400" />
           </div>
           <span className="text-sm font-medium text-gray-700">
-            내 크레딧 30
+            내 크레딧 {credit}
           </span>
         </div>
         <svg

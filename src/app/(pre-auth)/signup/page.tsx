@@ -6,6 +6,7 @@ import { api } from '@/src/lib/api/api';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function Signup() {
   const router = useRouter();
@@ -34,9 +35,15 @@ export default function Signup() {
         router.push('/onboarding');
       })
       .catch((error) => {
-        // TODO: toast 에러
-        // TODO: 에러 메시지 상세화
-        setErrorMessage('회원가입 실패');
+        const serverError = error.response?.data;
+        if (serverError.code === 'U002') {
+          setErrorMessage('사용 중인 닉네임입니다.');
+        } else if (serverError.code === 'C006') {
+          setErrorMessage('유효하지 않은 닉네임입니다.');
+        } else {
+          toast.error('회원가입에 실패하였습니다.');
+          console.error(serverError);
+        }
       });
   };
 

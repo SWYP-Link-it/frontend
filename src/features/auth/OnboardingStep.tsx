@@ -34,9 +34,8 @@ export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
         <div className="mt-15 flex w-[380px] flex-col gap-3">
           <Button
             text="스킬 등록하고 2크레딧 받기"
-            // TODO: 경로 변경 필요
             mode="active"
-            onClick={() => router.push('/mypage/skills')}
+            onClick={() => router.push('/profile')}
           />
           <Button text="홈으로 이동하기" onClick={() => router.push('/')} />
         </div>

@@ -17,6 +17,7 @@ export const SkillDetail = ({
   exchangeType,
   preferredRegion,
   availableSchedules,
+  detailedLocation,
 }: SkillDetailDto) => {
   const {
     skillName,
@@ -56,7 +57,7 @@ export const SkillDetail = ({
           </div>
           <div className="py-2">
             <span className="mr-4 font-normal text-gray-500">선호 지역</span>
-            {REGION_LABELS[preferredRegion]}
+            {REGION_LABELS[preferredRegion]} {detailedLocation}
           </div>
         </div>
       </div>
