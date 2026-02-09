@@ -10,6 +10,7 @@ import {
   EXCHANGE_TYPE_LABELS,
   PROFICIENCY_LABELS,
 } from '@/src/constants/profile';
+import { CategoryFigure } from '@/src/components/skill/CategoryFigure';
 
 export const SkillDetail = ({
   mainSkill,
@@ -17,6 +18,7 @@ export const SkillDetail = ({
   exchangeType,
   preferredRegion,
   availableSchedules,
+  detailedLocation,
 }: SkillDetailDto) => {
   const {
     skillName,
@@ -30,7 +32,9 @@ export const SkillDetail = ({
     <div className="flex flex-col gap-12 rounded-2xl bg-white px-9 pt-[54px] pb-20">
       <div id="skill-detail-overview" className="flex justify-between">
         <div className="flex flex-col">
-          <div className="mb-3">{skillName}</div>
+          <div className="mb-3 w-fit rounded-md bg-[#E9F0FF] px-[10px] py-1 text-xs font-semibold text-[#3477FF]">
+            {skillName}
+          </div>
           <div className="mb-1 text-xl leading-[30px] font-bold text-gray-900">
             {skillTitle}
           </div>
@@ -38,7 +42,7 @@ export const SkillDetail = ({
             숙련도 - {PROFICIENCY_LABELS[skillProficiency]}
           </div>
         </div>
-        <div className="bg-brand-200 h-25 w-25 rounded-2xl">그래픽 이미지</div>
+        <CategoryFigure category={'DESIGN'} isActive={true} size="lg" />
       </div>
       <div className="border-y border-gray-200 py-6">
         <div className="grid w-fit grid-cols-2 gap-x-25 text-sm font-semibold text-gray-600">
@@ -56,7 +60,7 @@ export const SkillDetail = ({
           </div>
           <div className="py-2">
             <span className="mr-4 font-normal text-gray-500">선호 지역</span>
-            {REGION_LABELS[preferredRegion]}
+            {REGION_LABELS[preferredRegion]} {detailedLocation}
           </div>
         </div>
       </div>

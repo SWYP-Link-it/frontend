@@ -3,11 +3,12 @@
 import { useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
-
+import utc from 'dayjs/plugin/utc';
 import { ChatMessage } from '@/src/types/chat';
 import { MessageBubble } from './MessageBubble';
 
 dayjs.locale('ko');
+dayjs.extend(utc);
 
 interface MessageListProps {
   messages: ChatMessage[];
@@ -35,9 +36,9 @@ export const MessageList = ({
         const prevMsg = messages[index - 1];
         const nextMsg = messages[index + 1];
 
-        const currentMoment = dayjs(msg.createdAtEpochMs);
-        const prevMoment = prevMsg ? dayjs(prevMsg.createdAtEpochMs) : null;
-        const nextMoment = nextMsg ? dayjs(nextMsg.createdAtEpochMs) : null;
+        const currentMoment = dayjs.utc(msg.createdAtEpochMs);
+        const prevMoment = prevMsg ? dayjs.utc(prevMsg.createdAtEpochMs) : null;
+        const nextMoment = nextMsg ? dayjs.utc(nextMsg.createdAtEpochMs) : null;
 
         const isNewDay =
           !prevMoment ||

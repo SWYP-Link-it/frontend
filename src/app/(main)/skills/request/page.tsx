@@ -1,5 +1,3 @@
-'use client';
-
 import SkillRequestClient from '@/src/features/skills/request/SkillRequestClient';
 import { Suspense } from 'react';
 

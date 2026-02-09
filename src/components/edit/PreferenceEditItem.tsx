@@ -183,13 +183,7 @@ export const PreferenceEditItem = ({
         activeDay={activeDay}
         initialTimes={times}
         onSave={(newSchedules) => {
-          const affectedDays = Array.from(
-            new Set(newSchedules.map((s) => s.dayOfWeek)),
-          );
-          const remainingTimes = times.filter(
-            (t) => !affectedDays.includes(t.dayOfWeek),
-          );
-          onTimesChange([...remainingTimes, ...newSchedules]);
+          onTimesChange(newSchedules);
           setIsModalOpen(false);
         }}
       />

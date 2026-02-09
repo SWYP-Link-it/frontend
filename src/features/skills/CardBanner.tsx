@@ -1,6 +1,6 @@
 export const CardBanner = () => {
   return (
-    <div className="bg-brand-200 flex h-[234px] cursor-pointer flex-col gap-[7px] rounded-xl p-6">
+    <div className="bg-brand-200 flex h-[234px] flex-col gap-[7px] rounded-xl p-6">
       <div className="leading-[1.5] font-bold text-[#2F333B]">
         누구나 스킬을 가르칠 수 있어요!
       </div>

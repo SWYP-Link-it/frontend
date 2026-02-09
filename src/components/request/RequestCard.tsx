@@ -1,6 +1,7 @@
 'use client';
 
 import { SkillRequest } from '@/src/types/request';
+import Image from 'next/image';
 
 interface RequestCardProps {
   request: SkillRequest;
@@ -74,29 +75,13 @@ export const RequestCard = ({
     <div className="border-brand-50 rounded-[16px] border bg-white p-6 transition-all hover:shadow-sm">
       <div className="mb-6 flex flex-col items-start justify-between md:flex-row">
         <div className="flex items-start space-x-4">
-          <div className="bg-brand-50 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-            {request.partnerProfileImageUrl ? (
-              <img
-                src={request.partnerProfileImageUrl}
-                alt="profile"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="text-blue-600"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            )}
-          </div>
-
+          <Image
+            key={request.id}
+            src={'/icons/avatar.svg'}
+            alt="profile"
+            width={32}
+            height={32}
+          />
           <div>
             <div className="mb-1 flex items-center space-x-2">
               <h3 className="text-lg font-bold text-gray-900">

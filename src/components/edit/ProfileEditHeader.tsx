@@ -51,10 +51,10 @@ export const ProfileEditHeader = ({
         className={`rounded-xl px-8 py-2.5 text-sm font-bold transition-all ${
           canSave
             ? 'bg-blue-500 text-white shadow-lg shadow-blue-100 hover:bg-blue-600'
-            : 'cursor-not-allowed bg-gray-100 text-gray-400'
+            : 'bg-gray-100 text-gray-400'
         }`}
       >
-        작성 완료
+        저장하기
       </button>
     </header>
   );

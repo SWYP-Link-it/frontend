@@ -53,8 +53,11 @@ export default function ProfilePage() {
             setProfileData(profileRes.data.data);
           }
         } catch (profileError: any) {
-          if (profileError.response?.status === 404) {
+          const errorCode = profileError.response?.data?.code;
+          if (errorCode === 'UP001' || profileError.response?.status === 404) {
             setProfileData(null);
+          } else {
+            console.error('Profile fetch error:', profileError);
           }
         }
 

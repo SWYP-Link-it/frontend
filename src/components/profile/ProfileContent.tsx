@@ -6,7 +6,7 @@ import { SkillItem } from './SkillItem';
 import { ProfileData } from '@/src/types/profile';
 import { useAuthStore } from '@/src/stores/authStore';
 import { WithdrawalModal } from '../edit/WithdrawalModal';
-import { REGION_MAP } from '@/src/constants/profile';
+import { REGION_LABELS, REGION_MAP } from '@/src/constants/profile';
 
 interface ProfileContentProps {
   data: ProfileData | null;
@@ -206,7 +206,7 @@ export const ProfileContent = ({
               <p className="mb-2 text-xs font-bold text-gray-900">선호 지역</p>
               <div className="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-600">
                 {data?.preferredRegion
-                  ? REGION_MAP[data.preferredRegion] || data.preferredRegion
+                  ? REGION_LABELS[data.preferredRegion] || data.preferredRegion
                   : '지역 정보 없음'}
               </div>
             </div>
@@ -221,8 +221,8 @@ export const ProfileContent = ({
       </div>
 
       <div className="space-y-6 border-t border-gray-100 py-8">
-        <h3 className="text-lg font-bold text-gray-900">계정 설정</h3>
-        <div className="group flex cursor-pointer items-center justify-between">
+        {/* <h3 className="text-lg font-bold text-gray-900">계정 설정</h3> */}
+        {/* <div className="group flex cursor-pointer items-center justify-between">
           <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900">
             약관 및 개인정보 처리 동의
           </span>
@@ -239,15 +239,15 @@ export const ProfileContent = ({
               d="M9 5l7 7-7 7"
             />
           </svg>
-        </div>
+        </div> */}
 
         {/* 서비스 탈퇴 버튼: 클릭 시 모달 열기 */}
-        <button
+        {/* <button
           onClick={() => setIsWithdrawModalOpen(true)}
           className="text-sm font-medium text-gray-300 hover:text-red-400"
         >
           서비스 탈퇴
-        </button>
+        </button> */}
       </div>
 
       {/* 회원 탈퇴 전용 모달 */}

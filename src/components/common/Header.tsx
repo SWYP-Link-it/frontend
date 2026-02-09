@@ -5,7 +5,7 @@ import { SearchIcon } from '../icons/SearchIcon';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/src/lib/api/api';
 import { toast } from 'sonner';
 
@@ -23,6 +23,7 @@ type PopularKeyword = {
 export const Header = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -30,12 +31,21 @@ export const Header = () => {
   const [popularSkills, setPopularSkills] = useState<PopularSkill[]>([]);
   const [popularKeywords, setPopularKeywords] = useState<PopularKeyword[]>([]);
 
-  const search = (searchKeyword: string) => {
-    router.push(`/skills?searchKeyword=${searchKeyword}`);
+  const navigate = (path: string) => {
     setIsSearchModalOpen(false);
+    router.push(path);
+  };
+
+  const search = (searchKeyword: string) => {
+    navigate(`/skills?searchKeyword=${searchKeyword}`);
   };
 
   const searchKeyword = searchParams.get('searchKeyword') ?? '';
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (isSearchModalOpen) setIsSearchModalOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!isSearchModalOpen) return;
@@ -54,8 +64,7 @@ export const Header = () => {
     <>
       <header className="sticky top-0 z-50 flex min-h-18 w-full items-center justify-center bg-white">
         <div className="mx-28 flex w-284 items-center justify-between">
-          {/* TODO: 로고 바뀌면 재조정 */}
-          <Image src="/icons/logo.svg" alt="logo" width={67} height={26} />
+          <Image src="/icons/logo.svg" alt="logo" width={86} height={36} />
           <button
             onClick={() => setIsSearchModalOpen(true)}
             className="border-brand-600 flex h-[37px] w-[342px] cursor-pointer items-center gap-[7px] rounded-lg border p-[10px]"
@@ -98,7 +107,7 @@ export const Header = () => {
                           searchInputRef.current?.value ?? '';
 
                         if (!searchKeyword) {
-                          toast('검색어를 입력해주세요.');
+                          toast.warning('검색어를 입력해주세요.');
                           return;
                         }
 
@@ -117,7 +126,11 @@ export const Header = () => {
                     </div>
                     <div className="flex flex-col gap-4 text-lg font-medium text-gray-700">
                       {popularKeywords.map(({ rank, keyword }) => (
-                        <div key={rank} className="cursor-pointer">
+                        <div
+                          key={rank}
+                          className="cursor-pointer"
+                          onClick={() => search(keyword)}
+                        >
                           <span className="text-brand-600 mr-6 font-semibold">
                             {rank}
                           </span>
@@ -128,15 +141,23 @@ export const Header = () => {
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="flex justify-between text-lg font-semibold text-gray-700">
-                      핫한 게시글
-                      <span className="text-base text-gray-600">더보기</span>
+                      최근 HOT 게시글
+                      <button
+                        className="cursor-pointer text-base text-gray-600"
+                        onClick={() => navigate('/skills')}
+                      >
+                        더보기
+                      </button>
                     </div>
                     <div className="flex gap-4 overflow-x-auto">
                       {popularSkills.map(
                         ({ skillId, skillTitle, nickname }) => (
                           <div
                             key={skillId}
-                            className="flex w-65 shrink-0 flex-col gap-3 rounded-lg bg-[#F5F6FA] px-6 py-4 font-semibold"
+                            className="flex w-65 shrink-0 cursor-pointer flex-col gap-3 rounded-lg bg-[#F5F6FA] px-6 py-4 font-semibold"
+                            onClick={() =>
+                              navigate(`/skills/detail/${skillId}`)
+                            }
                           >
                             <span className="text-gray-400">{nickname}</span>
                             <p className="text-gray-700">{skillTitle}</p>

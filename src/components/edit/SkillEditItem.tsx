@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { SKILL_CATEGORY_MAP } from '@/src/constants/profile';
 import { UserSkill } from '@/src/types/profile';
-
+import { DeleteConfirmModal } from './DeleteConfirmModal';
 interface SkillEditItemProps {
   skill: UserSkill;
   onEdit: () => void;
@@ -14,6 +15,8 @@ export const SkillEditItem = ({
   onEdit,
   onDelete,
 }: SkillEditItemProps) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const proficiencyLabel =
     skill.skillProficiency === 'HIGH'
       ? '상'
@@ -25,6 +28,11 @@ export const SkillEditItem = ({
     Object.keys(SKILL_CATEGORY_MAP).find(
       (key) => SKILL_CATEGORY_MAP[key] === skill.skillCategoryType,
     ) || '기타';
+
+  const handleConfirmDelete = () => {
+    onDelete();
+    setIsDeleteModalOpen(false);
+  };
 
   return (
     <div className="group relative rounded-xl border border-gray-100 bg-white p-6">
@@ -47,8 +55,9 @@ export const SkillEditItem = ({
             />
           </svg>
         </button>
+
         <button
-          onClick={onDelete}
+          onClick={() => setIsDeleteModalOpen(true)}
           className="text-gray-400 transition-colors hover:text-red-400"
         >
           <svg
@@ -82,6 +91,12 @@ export const SkillEditItem = ({
       <p className="max-w-[90%] text-xs leading-relaxed text-gray-400">
         {skill.skillDescription}
       </p>
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

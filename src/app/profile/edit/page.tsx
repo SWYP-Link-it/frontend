@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { api } from '@/src/lib/api/api';
 import { useUserStore } from '@/src/stores/userStore';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -18,21 +19,31 @@ import {
   WEEKDAY_MAP,
 } from '@/src/constants/profile';
 import Image from 'next/image';
+import { useUserInfoStore } from '@/src/stores/userInfoStore';
+import { ProfileData, ExchangeType } from '@/src/types/profile';
 
 export default function ProfileEditPage() {
   const router = useRouter();
   const { accessToken } = useAuthStore();
   const { userInfo } = useUserStore();
+  const { setUserInfo: setUserCreditInfo } = useUserInfoStore();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isNewProfile, setIsNewProfile] = useState(false);
-  const [localProfile, setLocalProfile] = useState<any>(null);
+  const [localProfile, setLocalProfile] = useState<ProfileData | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
   const [editingSkillIndex, setEditingSkillIndex] = useState<number | null>(
     null,
   );
   const [activeDay, setActiveDay] = useState('월');
+
+  const fetchUserCreditInfo = () => {
+    api.get(`/credits/balance-user-details`).then((response) => {
+      const { userId, userNickname, creditBalance } = response.data.data;
+      setUserCreditInfo({ userId, userNickname, creditBalance });
+    });
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -42,19 +53,16 @@ export default function ProfileEditPage() {
         const res = await api.get(`/profile/${userInfo.userId}/edit`);
         if (res.data.success && res.data.data) {
           const profileData = res.data.data;
-
           const splitSchedules: any[] = [];
           if (profileData.availableSchedules) {
             profileData.availableSchedules.forEach((s: any) => {
               let currentStart = s.startTime.substring(0, 5);
               const endStr = s.endTime.substring(0, 5);
-
               while (currentStart < endStr) {
                 const [h, m] = currentStart.split(':').map(Number);
                 const date = new Date(2000, 0, 1, h, m);
                 date.setMinutes(date.getMinutes() + 30);
                 const nextEnd = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-
                 splitSchedules.push({
                   id: s.id,
                   dayOfWeek: s.dayOfWeek,
@@ -65,13 +73,11 @@ export default function ProfileEditPage() {
               }
             });
           }
-
           const skillsWithImages = (profileData.skills || []).map((s: any) => ({
             ...s,
             imageUrls: s.imageUrls || [],
             imageFiles: [],
           }));
-
           setLocalProfile({
             ...profileData,
             availableSchedules: splitSchedules,
@@ -85,9 +91,10 @@ export default function ProfileEditPage() {
           setLocalProfile({
             nickname: userInfo.nickname || '',
             experienceDescription: '',
+            timesTaught: 0,
             skills: [],
             availableSchedules: [],
-            exchangeType: 'ONLINE',
+            exchangeType: 'NONE',
             preferredRegion: '',
             detailedLocation: '',
           });
@@ -101,14 +108,81 @@ export default function ProfileEditPage() {
 
   const isValid = useMemo(() => {
     if (!localProfile) return false;
-    return Boolean(
-      localProfile.experienceDescription?.trim().length > 0 &&
-      localProfile.skills?.length > 0,
-    );
-  }, [localProfile]);
+    if (isNewProfile) {
+      return Boolean(
+        localProfile.experienceDescription?.trim().length > 0 &&
+        localProfile.skills?.length > 0,
+      );
+    }
+    return true;
+  }, [localProfile, isNewProfile]);
 
   const handleSave = async () => {
     if (!localProfile) return;
+
+    const currentSkills = localProfile.skills || [];
+    const currentExchangeType = localProfile.exchangeType;
+
+    if (
+      currentSkills.length > 0 &&
+      (!currentExchangeType || currentExchangeType === 'NONE')
+    ) {
+      toast.warning('교환 방식을 선택해주세요.', {
+        description: '스킬을 작성하셨다면 온라인/오프라인 선택은 필수입니다.',
+      });
+      return;
+    }
+
+    const schedulesByDay: Record<string, any[]> = {};
+    localProfile.availableSchedules.forEach((s) => {
+      if (!schedulesByDay[s.dayOfWeek]) schedulesByDay[s.dayOfWeek] = [];
+      schedulesByDay[s.dayOfWeek].push({ ...s });
+    });
+
+    let maxAvailableDuration = 0;
+    Object.keys(schedulesByDay).forEach((day) => {
+      const sorted = schedulesByDay[day].sort((a, b) =>
+        a.startTime.localeCompare(b.startTime),
+      );
+      if (sorted.length === 0) return;
+      let currentStart = sorted[0].startTime;
+      let currentEnd = sorted[0].endTime;
+      for (let i = 1; i < sorted.length; i++) {
+        if (currentEnd === sorted[i].startTime) {
+          currentEnd = sorted[i].endTime;
+        } else {
+          const [sh, sm] = currentStart.split(':').map(Number);
+          const [eh, em] = currentEnd.split(':').map(Number);
+          maxAvailableDuration = Math.max(
+            maxAvailableDuration,
+            eh * 60 + em - (sh * 60 + sm),
+          );
+          currentStart = sorted[i].startTime;
+          currentEnd = sorted[i].endTime;
+        }
+      }
+      const [sh, sm] = currentStart.split(':').map(Number);
+      const [eh, em] = currentEnd.split(':').map(Number);
+      maxAvailableDuration = Math.max(
+        maxAvailableDuration,
+        eh * 60 + em - (sh * 60 + sm),
+      );
+    });
+
+    const maxSkillDuration = currentSkills.reduce(
+      (max, s) => Math.max(max, Number(s.exchangeDuration) || 0),
+      0,
+    );
+
+    if (
+      localProfile.availableSchedules.length > 0 &&
+      maxAvailableDuration < maxSkillDuration
+    ) {
+      toast.warning('선호 시간대가 스킬 거래 시간보다 짧습니다.', {
+        description: `연속된 ${maxSkillDuration}분 이상의 시간이 필요합니다.`,
+      });
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -116,29 +190,17 @@ export default function ProfileEditPage() {
         !time ? '09:00' : time.length > 5 ? time.substring(0, 5) : time;
 
       const mergedSchedules: any[] = [];
-      const schedulesByDay: Record<string, any[]> = {};
-
-      localProfile.availableSchedules.forEach((s: any) => {
-        const day = s.dayOfWeek;
-        if (!schedulesByDay[day]) schedulesByDay[day] = [];
-        schedulesByDay[day].push({ ...s });
-      });
-
       Object.keys(schedulesByDay).forEach((day) => {
         const sorted = schedulesByDay[day].sort((a, b) =>
           a.startTime.localeCompare(b.startTime),
         );
-
-        if (sorted.length === 0) return;
-
         let current = { ...sorted[0] };
         for (let i = 1; i < sorted.length; i++) {
-          const next = sorted[i];
-          if (formatTime(current.endTime) === formatTime(next.startTime)) {
-            current.endTime = next.endTime;
+          if (formatTime(current.endTime) === formatTime(sorted[i].startTime)) {
+            current.endTime = sorted[i].endTime;
           } else {
             mergedSchedules.push(current);
-            current = { ...next };
+            current = { ...sorted[i] };
           }
         }
         mergedSchedules.push(current);
@@ -147,28 +209,31 @@ export default function ProfileEditPage() {
       const payload = {
         nickname: localProfile.nickname,
         experienceDescription: localProfile.experienceDescription || '',
-        exchangeType: localProfile.exchangeType || 'ONLINE',
+        exchangeType: currentExchangeType,
         preferredRegion:
           REGION_MAP[localProfile.preferredRegion] ||
           localProfile.preferredRegion ||
           null,
         detailedLocation: localProfile.detailedLocation?.trim() || null,
-        availableSchedules: mergedSchedules.map((s: any) => ({
-          dayOfWeek: WEEKDAY_MAP[s.dayOfWeek] || s.dayOfWeek,
-          startTime: formatTime(s.startTime),
-          endTime: formatTime(s.endTime),
-        })),
-        skills: localProfile.skills.map((s: any) => ({
+        availableSchedules:
+          mergedSchedules.length > 0
+            ? mergedSchedules.map((s) => ({
+                dayOfWeek: WEEKDAY_MAP[s.dayOfWeek] || s.dayOfWeek,
+                startTime: formatTime(s.startTime),
+                endTime: formatTime(s.endTime),
+              }))
+            : null,
+        skills: currentSkills.map((s) => ({
           id: s.id || null,
           skillCategoryType: s.skillCategoryType,
-          skillName: s.skillName || '',
-          skillTitle: s.skillTitle || '',
+          skillName: s.skillName,
+          skillTitle: s.skillTitle,
           skillProficiency:
             PROFICIENCY_MAP[s.skillProficiency] || s.skillProficiency,
-          skillDescription: s.skillDescription || '',
+          skillDescription: s.skillDescription,
           exchangeDuration: Number(s.exchangeDuration) || 60,
           isVisible: true,
-          imageUrls: s.imageUrls || [],
+          imageUrls: s.imageUrls,
         })),
       };
 
@@ -176,25 +241,27 @@ export default function ProfileEditPage() {
         'profile',
         new Blob([JSON.stringify(payload)], { type: 'application/json' }),
       );
-
-      localProfile.skills.forEach((skill: any, idx: number) => {
-        if (skill.imageFiles && skill.imageFiles.length > 0) {
-          skill.imageFiles.forEach((file: File) => {
-            formData.append(`skill-${idx}-images`, file);
-          });
+      currentSkills.forEach((skill: any, idx: number) => {
+        if (skill.imageFiles?.length > 0) {
+          skill.imageFiles.forEach((file: File) =>
+            formData.append(`skill-${idx}-images`, file),
+          );
         }
       });
 
       const response = isNewProfile
         ? await api.post('/profile', formData)
         : await api.put('/profile', formData);
-
       if (response.data.success) {
-        alert('저장되었습니다.');
+        toast.success('저장되었습니다.');
+        setIsDirty(false);
+        fetchUserCreditInfo();
         router.push('/profile');
       }
     } catch (err: any) {
-      alert(`저장 실패: ${err.response?.data?.message || '서버 오류'}`);
+      toast.error(
+        err.response?.data?.message || '저장 중 오류가 발생했습니다.',
+      );
     }
   };
 
@@ -207,9 +274,7 @@ export default function ProfileEditPage() {
     return <div className="py-20 text-center">로딩 중...</div>;
 
   const selectedDayNames = Array.from(
-    new Set(
-      localProfile.availableSchedules?.map((s: any) => s.dayOfWeek) || [],
-    ),
+    new Set(localProfile.availableSchedules?.map((s) => s.dayOfWeek) || []),
   ) as string[];
 
   return (
@@ -224,7 +289,7 @@ export default function ProfileEditPage() {
           <div className="flex px-12 pt-10">
             <Image
               src="/icons/profile_banner.svg"
-              alt="프로필 배너"
+              alt="배너"
               width={0}
               height={0}
               sizes="100vw"
@@ -239,10 +304,9 @@ export default function ProfileEditPage() {
                 onChange={(val) => updateField('experienceDescription', val)}
               />
             </ProfileEditSection>
-
             <ProfileEditSection title="스킬">
               <div className="grid grid-cols-1 gap-4">
-                {localProfile.skills?.map((skill: any, idx: number) => (
+                {localProfile.skills?.map((skill, idx) => (
                   <SkillEditItem
                     key={idx}
                     skill={skill}
@@ -252,9 +316,24 @@ export default function ProfileEditPage() {
                     }}
                     onDelete={() => {
                       const filtered = localProfile.skills.filter(
-                        (_: any, i: number) => i !== idx,
+                        (_, i) => i !== idx,
                       );
-                      updateField('skills', filtered);
+                      if (filtered.length === 0) {
+                        setLocalProfile((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                skills: [],
+                                availableSchedules: [],
+                                exchangeType: 'NONE',
+                                preferredRegion: '',
+                                detailedLocation: '',
+                              }
+                            : null,
+                        );
+                      } else {
+                        updateField('skills', filtered);
+                      }
                     }}
                   />
                 ))}
@@ -270,57 +349,57 @@ export default function ProfileEditPage() {
                 </button>
               </div>
             </ProfileEditSection>
-
-            <ProfileEditSection title="선호 시간대">
-              <DaySelector
-                selectedDays={selectedDayNames}
-                activeDay={activeDay}
-                onActiveDayChange={setActiveDay}
-                onChange={(days) => {
-                  const filteredSchedules =
-                    localProfile.availableSchedules?.filter((s: any) =>
-                      days.includes(s.dayOfWeek),
-                    ) || [];
-
-                  const newDays = days.filter(
-                    (d) =>
-                      !filteredSchedules.some((s: any) => s.dayOfWeek === d),
-                  );
-
-                  const addedSchedules = newDays.map((day) => ({
-                    dayOfWeek: day,
-                    startTime: '09:00',
-                    endTime: '09:30',
-                  }));
-
-                  updateField('availableSchedules', [
-                    ...filteredSchedules,
-                    ...addedSchedules,
-                  ]);
-                }}
-              />
-              <PreferenceEditItem
-                activeDay={activeDay}
-                times={localProfile.availableSchedules || []}
-                exchangeType={localProfile.exchangeType}
-                location={{
-                  region: localProfile.preferredRegion || '',
-                  detail: localProfile.detailedLocation || '',
-                }}
-                onTimesChange={(newSchedules) =>
-                  updateField('availableSchedules', newSchedules)
-                }
-                onExchangeChange={(type) => updateField('exchangeType', type)}
-                onLocationChange={(loc) => {
-                  updateField('preferredRegion', loc.region);
-                  updateField('detailedLocation', loc.detail);
-                }}
-              />
-            </ProfileEditSection>
+            <div
+              className={`${!(localProfile.skills?.length > 0) ? 'pointer-events-none opacity-40' : ''} transition-all duration-300`}
+            >
+              <ProfileEditSection title="선호 시간대">
+                <DaySelector
+                  selectedDays={selectedDayNames}
+                  activeDay={activeDay}
+                  onActiveDayChange={setActiveDay}
+                  onChange={(days) => {
+                    const filteredSchedules =
+                      localProfile.availableSchedules?.filter((s) =>
+                        days.includes(s.dayOfWeek),
+                      ) || [];
+                    const addedSchedules = days
+                      .filter(
+                        (d) =>
+                          !filteredSchedules.some((s) => s.dayOfWeek === d),
+                      )
+                      .map((day) => ({
+                        dayOfWeek: day,
+                        startTime: '09:00',
+                        endTime: '09:30',
+                      }));
+                    updateField('availableSchedules', [
+                      ...filteredSchedules,
+                      ...addedSchedules,
+                    ]);
+                  }}
+                />
+                <PreferenceEditItem
+                  activeDay={activeDay}
+                  times={localProfile.availableSchedules || []}
+                  exchangeType={localProfile.exchangeType}
+                  location={{
+                    region: localProfile.preferredRegion || '',
+                    detail: localProfile.detailedLocation || '',
+                  }}
+                  onTimesChange={(newSchedules) =>
+                    updateField('availableSchedules', newSchedules)
+                  }
+                  onExchangeChange={(type) => updateField('exchangeType', type)}
+                  onLocationChange={(loc) => {
+                    updateField('preferredRegion', loc.region);
+                    updateField('detailedLocation', loc.detail);
+                  }}
+                />
+              </ProfileEditSection>
+            </div>
           </div>
         </div>
       </main>
-
       <SkillRegisterModal
         isOpen={isSkillModalOpen}
         initialData={
@@ -348,15 +427,15 @@ export default function ProfileEditPage() {
               imageUrls: skillData.existingImages || [],
               imageFiles: skillData.newFiles || [],
             };
-
-            const nextSkills =
-              editingSkillIndex !== null
-                ? currentSkills.map((s, i) =>
-                    i === editingSkillIndex ? updatedEntry : s,
-                  )
-                : [...currentSkills, updatedEntry];
-
-            return { ...prev, skills: nextSkills };
+            return {
+              ...prev,
+              skills:
+                editingSkillIndex !== null
+                  ? currentSkills.map((s, i) =>
+                      i === editingSkillIndex ? updatedEntry : s,
+                    )
+                  : [...currentSkills, updatedEntry],
+            };
           });
           setIsSkillModalOpen(false);
           setEditingSkillIndex(null);
