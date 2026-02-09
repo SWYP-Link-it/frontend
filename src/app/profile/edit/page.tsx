@@ -20,6 +20,7 @@ import {
 } from '@/src/constants/profile';
 import Image from 'next/image';
 import { useUserInfoStore } from '@/src/stores/userInfoStore';
+import { ProfileData, ExchangeType } from '@/src/types/profile';
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function ProfileEditPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isNewProfile, setIsNewProfile] = useState(false);
-  const [localProfile, setLocalProfile] = useState<any>(null);
+  const [localProfile, setLocalProfile] = useState<ProfileData | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
   const [editingSkillIndex, setEditingSkillIndex] = useState<number | null>(
@@ -90,9 +91,10 @@ export default function ProfileEditPage() {
           setLocalProfile({
             nickname: userInfo.nickname || '',
             experienceDescription: '',
+            timesTaught: 0,
             skills: [],
             availableSchedules: [],
-            exchangeType: null,
+            exchangeType: 'NONE',
             preferredRegion: '',
             detailedLocation: '',
           });
@@ -118,27 +120,23 @@ export default function ProfileEditPage() {
   const handleSave = async () => {
     if (!localProfile) return;
 
-    if (localProfile.skills && localProfile.skills.length > 0) {
-      if (!localProfile.exchangeType) {
-        toast.warning('교환 방식을 선택해주세요.', {
-          description: '스킬을 작성하셨다면 온라인/오프라인 선택은 필수입니다.',
-        });
-        return;
-      }
+    const currentSkills = localProfile.skills || [];
+    const currentExchangeType = localProfile.exchangeType;
+
+    if (
+      currentSkills.length > 0 &&
+      (!currentExchangeType || currentExchangeType === 'NONE')
+    ) {
+      toast.warning('교환 방식을 선택해주세요.', {
+        description: '스킬을 작성하셨다면 온라인/오프라인 선택은 필수입니다.',
+      });
+      return;
     }
 
-    const maxSkillDuration = localProfile.skills.reduce(
-      (max: number, skill: any) => {
-        return Math.max(max, Number(skill.exchangeDuration) || 0);
-      },
-      0,
-    );
-
     const schedulesByDay: Record<string, any[]> = {};
-    localProfile.availableSchedules.forEach((s: any) => {
-      const day = s.dayOfWeek;
-      if (!schedulesByDay[day]) schedulesByDay[day] = [];
-      schedulesByDay[day].push({ ...s });
+    localProfile.availableSchedules.forEach((s) => {
+      if (!schedulesByDay[s.dayOfWeek]) schedulesByDay[s.dayOfWeek] = [];
+      schedulesByDay[s.dayOfWeek].push({ ...s });
     });
 
     let maxAvailableDuration = 0;
@@ -147,10 +145,8 @@ export default function ProfileEditPage() {
         a.startTime.localeCompare(b.startTime),
       );
       if (sorted.length === 0) return;
-
       let currentStart = sorted[0].startTime;
       let currentEnd = sorted[0].endTime;
-
       for (let i = 1; i < sorted.length; i++) {
         if (currentEnd === sorted[i].startTime) {
           currentEnd = sorted[i].endTime;
@@ -173,6 +169,11 @@ export default function ProfileEditPage() {
       );
     });
 
+    const maxSkillDuration = currentSkills.reduce(
+      (max, s) => Math.max(max, Number(s.exchangeDuration) || 0),
+      0,
+    );
+
     if (
       localProfile.availableSchedules.length > 0 &&
       maxAvailableDuration < maxSkillDuration
@@ -193,7 +194,6 @@ export default function ProfileEditPage() {
         const sorted = schedulesByDay[day].sort((a, b) =>
           a.startTime.localeCompare(b.startTime),
         );
-        if (sorted.length === 0) return;
         let current = { ...sorted[0] };
         for (let i = 1; i < sorted.length; i++) {
           if (formatTime(current.endTime) === formatTime(sorted[i].startTime)) {
@@ -209,7 +209,7 @@ export default function ProfileEditPage() {
       const payload = {
         nickname: localProfile.nickname,
         experienceDescription: localProfile.experienceDescription || '',
-        exchangeType: localProfile.exchangeType || null,
+        exchangeType: currentExchangeType,
         preferredRegion:
           REGION_MAP[localProfile.preferredRegion] ||
           localProfile.preferredRegion ||
@@ -217,23 +217,23 @@ export default function ProfileEditPage() {
         detailedLocation: localProfile.detailedLocation?.trim() || null,
         availableSchedules:
           mergedSchedules.length > 0
-            ? mergedSchedules.map((s: any) => ({
+            ? mergedSchedules.map((s) => ({
                 dayOfWeek: WEEKDAY_MAP[s.dayOfWeek] || s.dayOfWeek,
                 startTime: formatTime(s.startTime),
                 endTime: formatTime(s.endTime),
               }))
             : null,
-        skills: localProfile.skills.map((s: any) => ({
+        skills: currentSkills.map((s) => ({
           id: s.id || null,
           skillCategoryType: s.skillCategoryType,
-          skillName: s.skillName || '',
-          skillTitle: s.skillTitle || '',
+          skillName: s.skillName,
+          skillTitle: s.skillTitle,
           skillProficiency:
             PROFICIENCY_MAP[s.skillProficiency] || s.skillProficiency,
-          skillDescription: s.skillDescription || '',
+          skillDescription: s.skillDescription,
           exchangeDuration: Number(s.exchangeDuration) || 60,
           isVisible: true,
-          imageUrls: s.imageUrls || [],
+          imageUrls: s.imageUrls,
         })),
       };
 
@@ -241,7 +241,7 @@ export default function ProfileEditPage() {
         'profile',
         new Blob([JSON.stringify(payload)], { type: 'application/json' }),
       );
-      localProfile.skills.forEach((skill: any, idx: number) => {
+      currentSkills.forEach((skill: any, idx: number) => {
         if (skill.imageFiles?.length > 0) {
           skill.imageFiles.forEach((file: File) =>
             formData.append(`skill-${idx}-images`, file),
@@ -254,6 +254,7 @@ export default function ProfileEditPage() {
         : await api.put('/profile', formData);
       if (response.data.success) {
         toast.success('저장되었습니다.');
+        setIsDirty(false);
         fetchUserCreditInfo();
         router.push('/profile');
       }
@@ -273,11 +274,8 @@ export default function ProfileEditPage() {
     return <div className="py-20 text-center">로딩 중...</div>;
 
   const selectedDayNames = Array.from(
-    new Set(
-      localProfile.availableSchedules?.map((s: any) => s.dayOfWeek) || [],
-    ),
+    new Set(localProfile.availableSchedules?.map((s) => s.dayOfWeek) || []),
   ) as string[];
-  const hasSkills = localProfile.skills && localProfile.skills.length > 0;
 
   return (
     <div className="bg-brand-50 min-h-screen pb-32">
@@ -308,7 +306,7 @@ export default function ProfileEditPage() {
             </ProfileEditSection>
             <ProfileEditSection title="스킬">
               <div className="grid grid-cols-1 gap-4">
-                {localProfile.skills?.map((skill: any, idx: number) => (
+                {localProfile.skills?.map((skill, idx) => (
                   <SkillEditItem
                     key={idx}
                     skill={skill}
@@ -318,21 +316,24 @@ export default function ProfileEditPage() {
                     }}
                     onDelete={() => {
                       const filtered = localProfile.skills.filter(
-                        (_: any, i: number) => i !== idx,
+                        (_, i) => i !== idx,
                       );
                       if (filtered.length === 0) {
-                        setLocalProfile((prev: any) => ({
-                          ...prev,
-                          skills: [],
-                          availableSchedules: [],
-                          exchangeType: null,
-                          preferredRegion: '',
-                          detailedLocation: '',
-                        }));
+                        setLocalProfile((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                skills: [],
+                                availableSchedules: [],
+                                exchangeType: 'NONE',
+                                preferredRegion: '',
+                                detailedLocation: '',
+                              }
+                            : null,
+                        );
                       } else {
                         updateField('skills', filtered);
                       }
-                      setIsDirty(true);
                     }}
                   />
                 ))}
@@ -349,7 +350,7 @@ export default function ProfileEditPage() {
               </div>
             </ProfileEditSection>
             <div
-              className={`${!hasSkills ? 'pointer-events-none opacity-40' : ''} transition-all duration-300`}
+              className={`${!(localProfile.skills?.length > 0) ? 'pointer-events-none opacity-40' : ''} transition-all duration-300`}
             >
               <ProfileEditSection title="선호 시간대">
                 <DaySelector
@@ -358,18 +359,19 @@ export default function ProfileEditPage() {
                   onActiveDayChange={setActiveDay}
                   onChange={(days) => {
                     const filteredSchedules =
-                      localProfile.availableSchedules?.filter((s: any) =>
+                      localProfile.availableSchedules?.filter((s) =>
                         days.includes(s.dayOfWeek),
                       ) || [];
-                    const newDays = days.filter(
-                      (d) =>
-                        !filteredSchedules.some((s: any) => s.dayOfWeek === d),
-                    );
-                    const addedSchedules = newDays.map((day) => ({
-                      dayOfWeek: day,
-                      startTime: '09:00',
-                      endTime: '09:30',
-                    }));
+                    const addedSchedules = days
+                      .filter(
+                        (d) =>
+                          !filteredSchedules.some((s) => s.dayOfWeek === d),
+                      )
+                      .map((day) => ({
+                        dayOfWeek: day,
+                        startTime: '09:00',
+                        endTime: '09:30',
+                      }));
                     updateField('availableSchedules', [
                       ...filteredSchedules,
                       ...addedSchedules,
