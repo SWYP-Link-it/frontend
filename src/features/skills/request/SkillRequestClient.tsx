@@ -166,7 +166,7 @@ export default function SkillRequestClient() {
 
   return (
     <>
-      <div className="flex h-full flex-col bg-[#F8FAFE]">
+      <div className="flex flex-1 flex-col bg-[#F8FAFE]">
         <div className="w-full bg-white">
           <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 items-center justify-between">
             <div className="flex flex-col gap-[2px] pt-[22px] pb-6">
