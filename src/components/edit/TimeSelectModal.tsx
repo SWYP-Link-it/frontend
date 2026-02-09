@@ -80,7 +80,7 @@ export const TimeSelectModal = ({
   };
 
   const handleRegister = () => {
-    if (displaySlots.length === 0) return;
+    // if (displaySlots.length === 0) return;
 
     let daysToApply = [selectedDay];
     if (applyMode === 'weekdays') {
@@ -102,6 +102,7 @@ export const TimeSelectModal = ({
     );
 
     onSave([...updatedSchedules, ...newSlots]);
+    onClose();
   };
 
   return (
@@ -217,7 +218,7 @@ export const TimeSelectModal = ({
         <button
           type="button"
           onClick={handleRegister}
-          disabled={displaySlots.length === 0}
+          // disabled={displaySlots.length === 0}
           className="mt-4 w-full rounded-2xl bg-blue-500 py-5 text-lg font-bold text-white hover:bg-blue-600 disabled:bg-gray-100"
         >
           시간대 등록 완료

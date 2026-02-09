@@ -10,14 +10,10 @@ import { useAuthStore } from '@/src/stores/authStore';
 import { useUserStore } from '@/src/stores/userStore';
 import { api } from '@/src/lib/api/api';
 import { ProfileData } from '@/src/types/profile';
-// import { useUserInfoStore } from '@/src/stores/userInfoStore';
 
 export default function ProfilePage() {
   const { accessToken } = useAuthStore();
   const { userInfo, setUserInfo } = useUserStore();
-  // const creditBalance = useUserInfoStore(
-  //   (state) => state.userInfo?.creditBalance,
-  // );
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [creditBalance, setCreditBalance] = useState<number>(0);
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -57,8 +53,11 @@ export default function ProfilePage() {
             setProfileData(profileRes.data.data);
           }
         } catch (profileError: any) {
-          if (profileError.response?.status === 404) {
+          const errorCode = profileError.response?.data?.code;
+          if (errorCode === 'UP001' || profileError.response?.status === 404) {
             setProfileData(null);
+          } else {
+            console.error('Profile fetch error:', profileError);
           }
         }
 
