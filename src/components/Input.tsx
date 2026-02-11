@@ -5,15 +5,17 @@ import React, { useState } from 'react';
 const sizeStyles = {
   md: {
     label: 'text-md text-gray-700 font-semibold',
-    input: 'rounded-lg px-4 py-[14px] text-sm h-12',
+    input: 'px-4 py-[14px] text-sm h-12 rounded-md',
     error: '',
     gap: 'gap-3',
+    radius: 'rounded-lg',
   },
   lg: {
     label: 'text-xl font-medium text-gray-800/65',
-    input: 'rounded-2xl px-6 py-[14px] text-xl h-[58px] ',
+    input: 'px-6 py-[14px] text-xl h-[58px] rounded-[14px]',
     error: 'text-base font-semibold',
     gap: 'gap-3',
+    radius: 'rounded-2xl',
   },
 };
 
@@ -42,26 +44,28 @@ export const Input = ({
   const styles = sizeStyles[size];
 
   const borderColor = errorMessage
-    ? 'border-[#FF4242]/60'
+    ? 'bg-[#FF4242]/60'
     : isFocused
-      ? 'border-brand-600'
-      : 'border-gray-300';
+      ? 'input-gradient'
+      : 'bg-gray-300';
 
   return (
     <div className={`flex flex-col ${styles.gap} ${className}`}>
       {label && <span className={` ${styles.label}`}>{label}</span>}
-      <input
-        {...props}
-        className={`${borderColor} border-2 bg-white placeholder-gray-400 outline-none ${styles.input}`}
-        onFocus={(e) => {
-          setIsFocused(true);
-          onFocus?.(e);
-        }}
-        onBlur={(e) => {
-          setIsFocused(false);
-          onBlur?.(e);
-        }}
-      />
+      <div className={`${borderColor} bg-amber-600 p-[2px] ${styles.radius}`}>
+        <input
+          {...props}
+          className={`h-full w-full bg-white placeholder-gray-400 outline-none ${styles.input} ${styles.radius}`}
+          onFocus={(e) => {
+            setIsFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            onBlur?.(e);
+          }}
+        />
+      </div>
       {errorMessage && (
         <div className={`text-[#FF4242]/65 ${styles.error}`}>
           {errorMessage}

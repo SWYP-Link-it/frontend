@@ -16,7 +16,7 @@ export const Sidebar = () => {
   const menuItems = isLoggedIn ? LOGGED_IN_MENU_ITEMS : LOGGED_OUT_MENU_ITEMS;
 
   return (
-    <aside className="flex h-screen w-20 flex-col items-center bg-gray-800">
+    <aside className="flex h-screen w-20 shrink-0 flex-col items-center bg-gray-800">
       <nav className="mt-11 flex flex-col gap-5">
         {menuItems.map((item) => {
           const Icon = item.icon;
