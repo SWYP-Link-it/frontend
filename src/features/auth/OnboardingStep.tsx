@@ -3,9 +3,9 @@
 import { Dispatch, SetStateAction } from 'react';
 import { Button } from '@/src/components/Button';
 import { useRouter } from 'next/navigation';
-import { api } from '@/src/lib/api/api';
-import { useUserInfoStore } from '@/src/stores/userInfoStore';
 import Image from 'next/image';
+import { useQueryClient } from '@tanstack/react-query';
+import { profileQueryKey } from '../profile/queryKeys';
 
 type OnboardingStepProps = {
   step: number;
@@ -13,13 +13,12 @@ type OnboardingStepProps = {
 };
 
 export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
+  const queryClient = useQueryClient();
   const router = useRouter();
-  const { setUserInfo: setUserCreditInfo } = useUserInfoStore();
 
-  const fetchUserCreditInfo = () => {
-    api.get(`/credits/balance-user-details`).then((response) => {
-      const { userId, userNickname, creditBalance } = response.data.data;
-      setUserCreditInfo({ userId, userNickname, creditBalance });
+  const refreshCreditBalance = () => {
+    queryClient.invalidateQueries({
+      queryKey: profileQueryKey.creditBalance,
     });
   };
 
@@ -60,14 +59,14 @@ export const OnboardingStep = ({ step, setStep }: OnboardingStepProps) => {
             text="스킬 등록하고 1크레딧 받기"
             mode="active"
             onClick={() => {
-              fetchUserCreditInfo();
+              refreshCreditBalance();
               router.push('/profile');
             }}
           />
           <Button
             text="홈으로 이동하기"
             onClick={() => {
-              fetchUserCreditInfo();
+              refreshCreditBalance();
               router.push('/');
             }}
           />
