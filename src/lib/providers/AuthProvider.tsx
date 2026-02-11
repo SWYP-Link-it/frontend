@@ -1,19 +1,15 @@
-import { useUserInfoStore } from '@/src/stores/userInfoStore';
 import { ReactNode, useEffect } from 'react';
-import { api } from '../api/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { profileQueryKey } from '@/src/features/profile/queryKeys';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
-
-  const fetchUserInfo = () => {
-    api.get(`/credits/balance-user-details`).then((response) => {
-      const { userId, userNickname, creditBalance } = response.data.data;
-      setUserInfo({ userId, userNickname, creditBalance });
-    });
-  };
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    fetchUserInfo();
+    // credit 무효화로 api 재요청 유도
+    queryClient.invalidateQueries({
+      queryKey: profileQueryKey.creditBalance,
+    });
   }, []);
   return children;
 };

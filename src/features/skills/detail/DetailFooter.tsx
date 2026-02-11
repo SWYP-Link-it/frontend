@@ -6,10 +6,10 @@ import { RequiredAuth } from '@/src/features/auth/RequiredAuth';
 import { Button } from '@/src/components/Button';
 import { api } from '@/src/lib/api/api';
 import { useRouter } from 'next/navigation';
-import { useUserInfoStore } from '@/src/stores/userInfoStore';
 import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
 import { toast } from 'sonner';
 import { Tooltip } from '@/src/components/Tooltip';
+import { useUserStore } from '@/src/stores/userStore';
 
 type DetailFooterProps = {
   mentorId: number;
@@ -21,7 +21,7 @@ const HAS_SEEN_TOOLTIP = 'hasSeenSkillDetailRequestButtonTooltip';
 export const DetailFooter = ({ mentorId, skillId }: DetailFooterProps) => {
   const router = useRouter();
 
-  const myId = useUserInfoStore((state) => state.userInfo?.userId);
+  const myId = useUserStore((state) => state.userInfo?.userId);
 
   const handleContact = async () => {
     try {
