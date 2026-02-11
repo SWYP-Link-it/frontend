@@ -28,6 +28,7 @@ export function useProfileEdit() {
         const res = await api.get(`/profile/${userInfo?.userId}/edit`);
         const profileData = res.data.data;
         const splitSchedules: any[] = [];
+
         if (profileData.availableSchedules) {
           profileData.availableSchedules.forEach((s: any) => {
             let currentStart = s.startTime.substring(0, 5);
@@ -47,16 +48,20 @@ export function useProfileEdit() {
             }
           });
         }
+
         const skillsWithImages = (profileData.skills || []).map((s: any) => ({
           ...s,
           imageUrls: s.imageUrls || [],
           imageFiles: [],
         }));
+
         const data = {
           ...profileData,
           availableSchedules: splitSchedules,
           skills: skillsWithImages,
+          exchangeType: profileData.exchangeType || null,
         };
+
         setLocalProfile(data);
         setIsNewProfile(false);
         return data;
@@ -69,7 +74,7 @@ export function useProfileEdit() {
             timesTaught: 0,
             skills: [],
             availableSchedules: [],
-            exchangeType: 'NONE',
+            exchangeType: null,
             preferredRegion: '',
             detailedLocation: '',
           };
@@ -84,13 +89,18 @@ export function useProfileEdit() {
 
   const isValid = useMemo(() => {
     if (!localProfile) return false;
+
+    const hasNickname = Boolean(localProfile.nickname?.trim());
+
     if (isNewProfile) {
-      return Boolean(
-        localProfile.experienceDescription?.trim().length > 0 &&
-        localProfile.skills?.length > 0,
+      return (
+        hasNickname &&
+        Boolean(localProfile.experienceDescription?.trim()) &&
+        localProfile.skills?.length > 0
       );
     }
-    return true;
+
+    return hasNickname;
   }, [localProfile, isNewProfile]);
 
   const updateField = (field: string, value: any) => {
@@ -102,18 +112,16 @@ export function useProfileEdit() {
     mutationFn: async () => {
       if (!localProfile) return;
       const currentSkills = localProfile.skills || [];
+      const hasSkills = currentSkills.length > 0;
       const currentExchangeType = localProfile.exchangeType;
 
-      if (
-        currentSkills.length > 0 &&
-        (!currentExchangeType || currentExchangeType === 'NONE')
-      ) {
+      if (hasSkills && currentExchangeType === null) {
         toast.warning('교환 방식을 선택해주세요.');
         return;
       }
 
       const schedulesByDay: Record<string, any[]> = {};
-      localProfile.availableSchedules.forEach((s) => {
+      localProfile.availableSchedules?.forEach((s) => {
         if (!schedulesByDay[s.dayOfWeek]) schedulesByDay[s.dayOfWeek] = [];
         schedulesByDay[s.dayOfWeek].push({ ...s });
       });
@@ -140,21 +148,26 @@ export function useProfileEdit() {
 
       const payload = {
         nickname: localProfile.nickname,
-        experienceDescription: localProfile.experienceDescription || '',
-        exchangeType: currentExchangeType,
+        experienceDescription:
+          localProfile.experienceDescription?.trim() || null,
+
+        exchangeType: hasSkills ? currentExchangeType : null,
+
         preferredRegion:
           REGION_MAP[localProfile.preferredRegion] ||
           localProfile.preferredRegion ||
           null,
         detailedLocation: localProfile.detailedLocation?.trim() || null,
+
         availableSchedules:
-          mergedSchedules.length > 0
+          hasSkills && mergedSchedules.length > 0
             ? mergedSchedules.map((s) => ({
                 dayOfWeek: WEEKDAY_MAP[s.dayOfWeek] || s.dayOfWeek,
                 startTime: formatTime(s.startTime),
                 endTime: formatTime(s.endTime),
               }))
             : null,
+
         skills: currentSkills.map((s) => ({
           id: s.id || null,
           skillCategoryType: s.skillCategoryType,
@@ -174,6 +187,7 @@ export function useProfileEdit() {
         'profile',
         new Blob([JSON.stringify(payload)], { type: 'application/json' }),
       );
+
       currentSkills.forEach((skill: any, idx: number) => {
         if (skill.imageFiles?.length > 0) {
           skill.imageFiles.forEach((file: File) =>

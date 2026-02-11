@@ -66,7 +66,7 @@ export const PreferenceEditItem = ({
     let nextIsOffline = isOfflineSelected;
     if (type === 'ONLINE') nextIsOnline = !isOnlineSelected;
     else nextIsOffline = !isOfflineSelected;
-    let nextType: ExchangeType = 'NONE';
+    let nextType: ExchangeType = null;
     if (nextIsOnline && nextIsOffline) nextType = 'BOTH';
     else if (nextIsOnline) nextType = 'ONLINE';
     else if (nextIsOffline) nextType = 'OFFLINE';

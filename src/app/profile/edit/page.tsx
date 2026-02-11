@@ -1,4 +1,3 @@
-// ProfileEditPage.tsx
 'use client';
 
 import { useState } from 'react';
@@ -83,10 +82,11 @@ export default function ProfileEditPage() {
                           ...prev,
                           skills: [],
                           availableSchedules: [],
-                          exchangeType: 'NONE',
+                          exchangeType: null,
                           preferredRegion: '',
                           detailedLocation: '',
                         }));
+                        setIsDirty(true);
                       } else {
                         updateField('skills', filtered);
                       }

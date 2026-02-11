@@ -1,5 +1,5 @@
 export type SkillProficiency = 'LOW' | 'MEDIUM' | 'HIGH';
-export type ExchangeType = 'ONLINE' | 'OFFLINE' | 'BOTH' | 'NONE';
+export type ExchangeType = 'ONLINE' | 'OFFLINE' | 'BOTH' | null;
 
 export interface UserSkill {
   id: number;
