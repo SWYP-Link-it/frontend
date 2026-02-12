@@ -22,7 +22,7 @@ export const SkillItem = ({ skill }: SkillItemProps) => {
     '기타';
 
   return (
-    <div className="flex gap-4 border-b border-gray-50 p-4 last:border-0">
+    <div className="flex gap-4 border-b border-gray-100 p-4 first:pt-0 last:border-0 last:pb-0">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100">
         <CategoryFigure category={'DESIGN'} isActive={true} size="sm" />
       </div>
@@ -33,10 +33,10 @@ export const SkillItem = ({ skill }: SkillItemProps) => {
           </h4>
         </div>
         <div className="mb-2 flex gap-2">
-          <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
+          <span className="border-brand-200 text-brand-600 rounded-md border px-2 py-1 text-xs font-semibold">
             {skill.skillName}
           </span>
-          <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
+          <span className="border-brand-200 text-brand-600 rounded-md border px-2 py-1 text-xs font-semibold">
             {proficiencyLabel}
           </span>
         </div>

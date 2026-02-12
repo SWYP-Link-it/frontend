@@ -47,7 +47,7 @@ export default function ProfileEditPage() {
         <div className="overflow-hidden rounded-[40px] border border-gray-50 bg-white shadow-xl">
           <div className="flex px-12 pt-10">
             <Image
-              src="/icons/profile_banner.svg"
+              src="/images/profile_banner.svg"
               alt="배너"
               width={0}
               height={0}

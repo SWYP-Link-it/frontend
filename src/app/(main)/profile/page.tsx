@@ -101,51 +101,53 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-white px-[112px]">
-      <div className="flex h-[100px] flex-col justify-center">
-        <h1 className="mb-[4px] text-[24px] font-semibold text-gray-800">
-          마이프로필
-        </h1>
-        <p className="text-[12px] text-gray-400">
-          내 정보와 활동 내역을 확인해요.
-        </p>
+    <div className="w-full bg-white">
+      <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-col pb-[126px]">
+        <div className="my-6 flex flex-col justify-center">
+          <h1 className="mb-[4px] text-[24px] font-semibold text-gray-800">
+            마이프로필
+          </h1>
+          <p className="text-[12px] text-gray-400">
+            내 정보와 활동 내역을 확인해요.
+          </p>
+        </div>
+
+        <div className="flex items-start justify-between">
+          <aside className="sticky top-[100px] mr-[100px] w-64 flex-shrink-0">
+            <ProfileTab />
+          </aside>
+
+          <main className="flex-1">
+            <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
+              <h2 className="text-xl font-semibold text-gray-900">내 프로필</h2>
+            </div>
+
+            <ProfileCard
+              name={profileData?.nickname || userInfo?.nickname || '사용자'}
+              credit={creditBalance}
+              onEditClick={() => setIsEditModalOpen(true)}
+            />
+
+            <ProfileContent
+              data={profileData}
+              onWithdrawClick={() => setIsWithdrawModalOpen(true)}
+            />
+          </main>
+        </div>
+
+        <ProfileEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          initialName={profileData?.nickname || userInfo?.nickname || ''}
+          onSave={handleEditSave}
+        />
+
+        <WithdrawalModal
+          isOpen={isWithdrawModalOpen}
+          onClose={() => setIsWithdrawModalOpen(false)}
+          onConfirm={handleWithdrawConfirm}
+        />
       </div>
-
-      <div className="flex items-start justify-between">
-        <aside className="sticky top-[100px] mr-[100px] w-64 flex-shrink-0">
-          <ProfileTab />
-        </aside>
-
-        <main className="flex-1">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">내 프로필</h2>
-          </div>
-
-          <ProfileCard
-            name={profileData?.nickname || userInfo?.nickname || '사용자'}
-            credit={creditBalance}
-            onEditClick={() => setIsEditModalOpen(true)}
-          />
-
-          <ProfileContent
-            data={profileData}
-            onWithdrawClick={() => setIsWithdrawModalOpen(true)}
-          />
-        </main>
-      </div>
-
-      <ProfileEditModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        initialName={profileData?.nickname || userInfo?.nickname || ''}
-        onSave={handleEditSave}
-      />
-
-      <WithdrawalModal
-        isOpen={isWithdrawModalOpen}
-        onClose={() => setIsWithdrawModalOpen(false)}
-        onConfirm={handleWithdrawConfirm}
-      />
     </div>
   );
 }
