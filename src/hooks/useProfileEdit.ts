@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -55,20 +56,22 @@ export function useProfileEdit() {
           imageFiles: [],
         }));
 
-        const data = {
+        const processed = {
           ...profileData,
           availableSchedules: splitSchedules,
           skills: skillsWithImages,
           exchangeType: profileData.exchangeType || null,
         };
 
-        setLocalProfile(data);
-        setIsNewProfile(false);
-        return data;
+        if (!localProfile && !isDirty) {
+          setLocalProfile(processed);
+        }
+
+        return processed;
       } catch (err: any) {
         if (err.response?.status === 404) {
           setIsNewProfile(true);
-          const newData: ProfileData = {
+          const newData = {
             nickname: userInfo?.nickname || '',
             experienceDescription: '',
             timesTaught: 0,
@@ -78,20 +81,22 @@ export function useProfileEdit() {
             preferredRegion: '',
             detailedLocation: '',
           };
-          setLocalProfile(newData);
+          if (!localProfile && !isDirty) {
+            setLocalProfile(newData);
+          }
           return newData;
         }
         throw err;
       }
     },
     enabled: Boolean(userInfo?.userId),
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   const isValid = useMemo(() => {
     if (!localProfile) return false;
-
     const hasNickname = Boolean(localProfile.nickname?.trim());
-
     if (isNewProfile) {
       return (
         hasNickname &&
@@ -99,7 +104,6 @@ export function useProfileEdit() {
         localProfile.skills?.length > 0
       );
     }
-
     return hasNickname;
   }, [localProfile, isNewProfile]);
 
@@ -150,15 +154,12 @@ export function useProfileEdit() {
         nickname: localProfile.nickname,
         experienceDescription:
           localProfile.experienceDescription?.trim() || null,
-
         exchangeType: hasSkills ? currentExchangeType : null,
-
         preferredRegion:
           REGION_MAP[localProfile.preferredRegion] ||
           localProfile.preferredRegion ||
           null,
         detailedLocation: localProfile.detailedLocation?.trim() || null,
-
         availableSchedules:
           hasSkills && mergedSchedules.length > 0
             ? mergedSchedules.map((s) => ({
@@ -167,7 +168,6 @@ export function useProfileEdit() {
                 endTime: formatTime(s.endTime),
               }))
             : null,
-
         skills: currentSkills.map((s) => ({
           id: s.id || null,
           skillCategoryType: s.skillCategoryType,
