@@ -6,7 +6,7 @@ import { SkillItem } from './SkillItem';
 import { ProfileData } from '@/src/types/profile';
 import { useAuthStore } from '@/src/stores/authStore';
 import { WithdrawalModal } from '../edit/WithdrawalModal';
-import { REGION_LABELS, REGION_MAP } from '@/src/constants/profile';
+import { REGION_LABELS } from '@/src/constants/profile';
 
 interface ProfileContentProps {
   data: ProfileData | null;
@@ -129,7 +129,7 @@ export const ProfileContent = ({
               return (
                 <div
                   key={day}
-                  className={`text-gray-40 flex flex-1 items-center justify-center rounded-lg px-9 py-1 text-sm font-medium transition-all ${
+                  className={`flex flex-1 items-center justify-center rounded-lg py-1 text-sm font-medium transition-all ${
                     isActive
                       ? 'bg-white font-semibold text-gray-800'
                       : 'text-gray-400'
@@ -196,6 +196,7 @@ export const ProfileContent = ({
             title="교환 방법"
             onEdit={() => router.push('/profile/edit')}
           />
+
           <div className="mb-6 grid grid-cols-2 gap-4">
             <div
               className={`rounded-lg border py-3 text-center text-sm font-medium ${

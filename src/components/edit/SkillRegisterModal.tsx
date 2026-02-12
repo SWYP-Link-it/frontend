@@ -1,44 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { BaseModal } from '../BaseModal';
 import {
   SKILL_CATEGORY_MAP,
   PROFICIENCY_OPTIONS,
 } from '@/src/constants/profile';
-
-interface SkillData {
-  skillCategoryType?: string;
-  category?: string;
-  skillName?: string;
-  name?: string;
-  skillProficiency?: string;
-  proficiency?: string;
-  skillTitle?: string;
-  title?: string;
-  skillDescription?: string;
-  description?: string;
-  exchangeDuration?: number;
-  imageUrls?: string[];
-  imageFiles?: File[];
-  [key: string]: any;
-}
-
-interface SkillFormData {
-  category: string;
-  name: string;
-  proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
-  exchangeDuration: number;
-  title: string;
-  description: string;
-  existingImages: string[];
-  newFiles: File[];
-}
+import { SkillData, SkillFormData } from '@/src/types/profile';
 
 interface SkillRegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onRegister: (skill: any) => void;
+  onRegister: (skill: SkillFormData) => void;
   initialData?: SkillData | null;
 }
 
@@ -85,7 +58,6 @@ export const SkillRegisterModal = ({
   }, [initialData]);
 
   const [form, setForm] = useState<SkillFormData>(getDefaultValues);
-  const [previews, setPreviews] = useState<string[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isProficiencyOpen, setIsProficiencyOpen] = useState(false);
   const [isDurationOpen, setIsDurationOpen] = useState(false);
@@ -94,19 +66,23 @@ export const SkillRegisterModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      setForm(getDefaultValues());
+      const timeout = setTimeout(() => {
+        setForm(getDefaultValues());
+      }, 0);
+      return () => clearTimeout(timeout);
     }
   }, [isOpen, getDefaultValues]);
 
-  useEffect(() => {
-    if (!form.newFiles || form.newFiles.length === 0) {
-      setPreviews([]);
-      return;
-    }
-    const urls = form.newFiles.map((file) => URL.createObjectURL(file));
-    setPreviews(urls);
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  const previews = useMemo(() => {
+    if (!form.newFiles || form.newFiles.length === 0) return [];
+    return form.newFiles.map((file) => URL.createObjectURL(file));
   }, [form.newFiles]);
+
+  useEffect(() => {
+    return () => {
+      previews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previews]);
 
   const validateText = (text: string) => {
     return text.replace(/[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ\s0-9]/g, '');
@@ -154,25 +130,21 @@ export const SkillRegisterModal = ({
   );
 
   const handleSubmit = () => {
-    onRegister({
-      category: form.category,
-      name: form.name,
-      proficiency: form.proficiency,
-      exchangeDuration: form.exchangeDuration,
-      title: form.title,
-      description: form.description,
-      existingImages: form.existingImages,
-      newFiles: form.newFiles,
-    });
-    setForm(getDefaultValues());
+    onRegister({ ...form });
+    onClose();
   };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-2xl">
-      <div className="p-10">
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      maxWidth="max-w-[750px]"
+      height="h-[720px]"
+    >
+      <div className="flex h-full flex-col p-10">
         <h2 className="mb-8 text-[24px] font-bold text-gray-900">스킬</h2>
 
-        <div className="custom-scrollbar max-h-[70vh] space-y-10 overflow-y-auto pr-2">
+        <div className="custom-scrollbar flex-1 space-y-10 overflow-y-auto pr-2">
           <div className="flex flex-col gap-4">
             <label className="text-[16px] font-bold text-gray-900">
               스킬 카테고리
@@ -189,7 +161,7 @@ export const SkillRegisterModal = ({
             </div>
 
             {isCategoryOpen && (
-              <div className="flex flex-wrap gap-2 rounded-[12px] border border-gray-100 bg-white p-4 shadow-sm">
+              <div className="flex flex-wrap gap-2 rounded-[12px] border border-gray-100 bg-white p-4">
                 {Object.entries(SKILL_CATEGORY_MAP).map(
                   ([korLabel, engEnum]) => (
                     <button
@@ -268,14 +240,14 @@ export const SkillRegisterModal = ({
                   </svg>
                 </button>
                 {isProficiencyOpen && (
-                  <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-gray-100 bg-white shadow-xl">
+                  <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-gray-100 bg-white shadow-lg">
                     {PROFICIENCY_OPTIONS.map((opt) => (
                       <div
                         key={opt.value}
                         onClick={() => {
                           setForm((prev) => ({
                             ...prev,
-                            proficiency: opt.value as any,
+                            proficiency: opt.value as 'LOW' | 'MEDIUM' | 'HIGH',
                           }));
                           setIsProficiencyOpen(false);
                         }}
@@ -328,7 +300,7 @@ export const SkillRegisterModal = ({
             </div>
 
             {isDurationOpen && (
-              <div className="flex flex-wrap gap-2 rounded-[12px] border border-gray-100 bg-white p-4 shadow-sm">
+              <div className="flex flex-wrap gap-2 rounded-[12px] border border-gray-100 bg-white p-4">
                 {durationOptions.map((min) => (
                   <button
                     key={min}
@@ -424,7 +396,7 @@ export const SkillRegisterModal = ({
                   <button
                     type="button"
                     onClick={() => removeExistingImage(i)}
-                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-600"
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
                   >
                     <span className="text-[12px] leading-none">✕</span>
                   </button>
@@ -440,7 +412,7 @@ export const SkillRegisterModal = ({
                   <button
                     type="button"
                     onClick={() => removeNewFile(i)}
-                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-white shadow-md hover:bg-black"
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-black"
                   >
                     <span className="text-[12px] leading-none">✕</span>
                   </button>
@@ -454,9 +426,9 @@ export const SkillRegisterModal = ({
           type="button"
           onClick={handleSubmit}
           disabled={!isFormValid}
-          className={`mt-10 w-full rounded-[12px] py-5 text-[18px] font-bold transition-all ${
+          className={`mt-10 w-full shrink-0 rounded-[12px] py-5 text-[18px] font-bold transition-all ${
             isFormValid
-              ? 'bg-blue-500 text-white hover:bg-blue-600'
+              ? 'bg-brand-500 hover:bg-brand-600 text-white'
               : 'bg-gray-100 text-gray-300'
           }`}
         >

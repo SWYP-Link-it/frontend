@@ -32,19 +32,19 @@ export default function ProfileEditPage() {
   if (isLoading || !localProfile)
     return <div className="py-20 text-center">로딩 중...</div>;
 
-  const selectedDayNames = Array.from(
-    new Set(localProfile.availableSchedules?.map((s) => s.dayOfWeek) || []),
-  ) as string[];
+  // const selectedDayNames = Array.from(
+  //   new Set(localProfile.availableSchedules?.map((s) => s.dayOfWeek) || []),
+  // ) as string[];
 
   return (
-    <div className="bg-brand-50 min-h-screen pb-32">
+    <div className="bg-brand-50 min-h-screen pb-20">
       <ProfileEditHeader
         onSave={handleSave}
         isDirty={isDirty}
         isValid={isValid}
       />
       <main className="mx-auto max-w-4xl px-6 py-12">
-        <div className="overflow-hidden rounded-[40px] border border-gray-50 bg-white shadow-xl">
+        <div className="overflow-hidden rounded-xl bg-white">
           <div className="flex px-12 pt-10">
             <Image
               src="/images/profile_banner.svg"
@@ -64,42 +64,44 @@ export default function ProfileEditPage() {
               />
             </ProfileEditSection>
             <ProfileEditSection title="스킬">
-              <div className="grid grid-cols-1 gap-4">
-                {localProfile.skills?.map((skill, idx) => (
-                  <SkillEditItem
-                    key={idx}
-                    skill={skill}
-                    onEdit={() => {
-                      setEditingSkillIndex(idx);
-                      setIsSkillModalOpen(true);
-                    }}
-                    onDelete={() => {
-                      const filtered = localProfile.skills.filter(
-                        (_, i) => i !== idx,
-                      );
-                      if (filtered.length === 0) {
-                        setLocalProfile((prev: any) => ({
-                          ...prev,
-                          skills: [],
-                          availableSchedules: [],
-                          exchangeType: null,
-                          preferredRegion: '',
-                          detailedLocation: '',
-                        }));
-                        setIsDirty(true);
-                      } else {
-                        updateField('skills', filtered);
-                      }
-                    }}
-                  />
-                ))}
+              <div className="grid grid-cols-1">
+                <div className="flex flex-col">
+                  {localProfile.skills?.map((skill, idx) => (
+                    <SkillEditItem
+                      key={idx}
+                      skill={skill}
+                      onEdit={() => {
+                        setEditingSkillIndex(idx);
+                        setIsSkillModalOpen(true);
+                      }}
+                      onDelete={() => {
+                        const filtered = localProfile.skills.filter(
+                          (_, i) => i !== idx,
+                        );
+                        if (filtered.length === 0) {
+                          setLocalProfile((prev: any) => ({
+                            ...prev,
+                            skills: [],
+                            availableSchedules: [],
+                            exchangeType: null,
+                            preferredRegion: '',
+                            detailedLocation: '',
+                          }));
+                          setIsDirty(true);
+                        } else {
+                          updateField('skills', filtered);
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
                 <button
                   type="button"
                   onClick={() => {
                     setEditingSkillIndex(null);
                     setIsSkillModalOpen(true);
                   }}
-                  className="h-[48px] w-full rounded-[12px] border border-gray-200 text-xl text-gray-300"
+                  className="mt-2 h-[48px] w-full rounded-[12px] border border-gray-200 text-xl text-gray-300 transition-colors hover:bg-gray-50"
                 >
                   +
                 </button>
@@ -110,29 +112,9 @@ export default function ProfileEditPage() {
             >
               <ProfileEditSection title="선호 시간대">
                 <DaySelector
-                  selectedDays={selectedDayNames}
+                  // selectedDays={selectedDayNames}
                   activeDay={activeDay}
                   onActiveDayChange={setActiveDay}
-                  onChange={(days) => {
-                    const filteredSchedules =
-                      localProfile.availableSchedules?.filter((s) =>
-                        days.includes(s.dayOfWeek),
-                      ) || [];
-                    const addedSchedules = days
-                      .filter(
-                        (d) =>
-                          !filteredSchedules.some((s) => s.dayOfWeek === d),
-                      )
-                      .map((day) => ({
-                        dayOfWeek: day,
-                        startTime: '09:00',
-                        endTime: '09:30',
-                      }));
-                    updateField('availableSchedules', [
-                      ...filteredSchedules,
-                      ...addedSchedules,
-                    ]);
-                  }}
                 />
                 <PreferenceEditItem
                   activeDay={activeDay}

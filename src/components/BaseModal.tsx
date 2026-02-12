@@ -5,6 +5,7 @@ interface BaseModalProps {
   onClose: () => void;
   children: ReactNode;
   maxWidth?: string;
+  height?: string;
 }
 
 export const BaseModal = ({
@@ -12,16 +13,17 @@ export const BaseModal = ({
   onClose,
   children,
   maxWidth = 'max-w-md',
+  height = 'h-auto',
 }: BaseModalProps) => {
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
     >
       <div
-        className={`w-full rounded-[32px] bg-white ${maxWidth} animate-in fade-in zoom-in relative shadow-2xl duration-200`}
+        className={`relative flex w-full flex-col rounded-[32px] bg-white ${maxWidth} ${height} animate-in fade-in zoom-in duration-200`}
         onClick={(e) => e.stopPropagation()}
       >
         <button

@@ -25,6 +25,7 @@ export const PreferenceEditItem = ({
   onLocationChange,
 }: PreferenceEditItemProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRegionOpen, setIsRegionOpen] = useState(false);
 
   const getMergedDisplayTimes = () => {
     const dayTimes = times
@@ -75,7 +76,7 @@ export const PreferenceEditItem = ({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="">
       <div>
         <div className="flex min-h-[90px] w-full items-start justify-between bg-white py-6">
           {currentDayTimes.length > 0 ? (
@@ -83,7 +84,7 @@ export const PreferenceEditItem = ({
               {currentDayTimes.map((slot, idx) => (
                 <div
                   key={idx}
-                  className="rounded-[8px] border border-blue-100 bg-blue-50/50 px-4 py-2 text-center text-sm font-medium text-blue-600"
+                  className="rounded-lg border border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-600"
                 >
                   {formatTimeRange(slot.startTime, slot.endTime)}
                 </div>
@@ -102,7 +103,7 @@ export const PreferenceEditItem = ({
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="mt-1 shrink-0 p-2 text-gray-400 transition-colors hover:text-blue-500"
+              className="mt-1 shrink-0 p-2 text-gray-400 hover:text-blue-500"
             >
               <svg
                 className="h-6 w-6"
@@ -122,48 +123,71 @@ export const PreferenceEditItem = ({
         </div>
       </div>
       <div className="space-y-4">
-        <label className="block text-lg font-bold text-gray-900">
+        <label className="mt-10 mb-2 block text-lg font-bold text-gray-900">
           교환 정보
         </label>
+        <p className="mb-7 text-sm text-gray-500">
+          온라인과 오프라인 중복 선택이 가능해요.
+        </p>
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
             onClick={() => handleToggleExchange('OFFLINE')}
-            className={`rounded-2xl border py-5 font-bold transition-all ${isOfflineSelected ? 'border-blue-400 bg-white text-blue-500 shadow-lg' : 'border-gray-100 text-gray-300'}`}
+            className={`rounded-lg border py-2 font-bold ${isOfflineSelected ? 'text-brand-600 border-brand-600 bg-white' : 'border-gray-100 text-gray-300'}`}
           >
             오프라인
           </button>
           <button
             type="button"
             onClick={() => handleToggleExchange('ONLINE')}
-            className={`rounded-2xl border py-5 font-bold transition-all ${isOnlineSelected ? 'border-blue-400 bg-white text-blue-500 shadow-lg' : 'border-gray-100 text-gray-300'}`}
+            className={`rounded-lg border py-2 font-bold ${isOnlineSelected ? 'text-brand-600 border-brand-600 bg-white' : 'border-gray-100 text-gray-300'}`}
           >
             온라인
           </button>
         </div>
       </div>
+
       {isOfflineSelected && (
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-3">
+        <div className="mt-5 grid grid-cols-1 gap-6 rounded-xl border border-gray-200 p-6 md:grid-cols-2">
+          <div className="flex flex-col gap-3">
             <label className="text-sm font-bold text-gray-900">선호 지역</label>
-            <select
-              value={location.region}
-              onChange={(e) =>
-                onLocationChange({ ...location, region: e.target.value })
-              }
-              className="w-full rounded-[15px] border-2 border-gray-100 p-[14px] outline-none focus:border-blue-400"
-            >
-              <option value="" disabled>
-                지역 선택
-              </option>
-              {Object.entries(REGION_MAP).map(([kor, eng]) => (
-                <option key={eng} value={eng}>
-                  {kor}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div
+                onClick={() => setIsRegionOpen(!isRegionOpen)}
+                className={`w-full cursor-pointer rounded-[12px] border p-4 text-[14px] ${
+                  isRegionOpen ? 'border-blue-400' : 'border-gray-200'
+                } ${location.region ? 'text-gray-800' : 'text-gray-400'}`}
+              >
+                {Object.keys(REGION_MAP).find(
+                  (key) => REGION_MAP[key] === location.region,
+                ) || '지역 선택'}
+              </div>
+
+              {isRegionOpen && (
+                <div className="absolute right-0 left-0 z-50 mt-2 flex flex-wrap gap-2 rounded-lg border border-gray-100 bg-white p-4 shadow-[0_0_20px_rgba(0,0,0,0.1)]">
+                  {Object.entries(REGION_MAP).map(([korLabel, engEnum]) => (
+                    <button
+                      key={engEnum}
+                      type="button"
+                      onClick={() => {
+                        onLocationChange({ ...location, region: engEnum });
+                        setIsRegionOpen(false);
+                      }}
+                      className={`rounded-lg border px-4 py-2 text-[14px] ${
+                        location.region === engEnum
+                          ? 'border-blue-500 bg-blue-50 font-bold text-blue-600'
+                          : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      {korLabel}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          <div className="space-y-3">
+
+          <div className="flex flex-col gap-3">
             <label className="text-sm font-bold text-gray-900">세부 위치</label>
             <input
               type="text"
@@ -172,11 +196,12 @@ export const PreferenceEditItem = ({
                 onLocationChange({ ...location, detail: e.target.value })
               }
               placeholder="예: 강남역 부근"
-              className="w-full rounded-[15px] border-2 border-gray-100 p-[14px] outline-none focus:border-blue-400"
+              className="h-[54px] w-full rounded-[12px] border border-gray-200 p-4 text-[14px] outline-none focus:border-blue-400"
             />
           </div>
         </div>
       )}
+
       <TimeSelectModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
