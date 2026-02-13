@@ -14,14 +14,12 @@ import {
 } from '@/src/types/request';
 import { Tabbar } from '@/src/components/Tabbar';
 
-// 날짜 포맷팅 유틸 (YYYY-MM-DDT... -> YYYY년 MM월 DD일)
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
-// Enum 명세 반영 매핑 함수
 const mapStatus = (koreanStatus: string): RequestStatus => {
   switch (koreanStatus) {
     case '수락됨':
@@ -34,8 +32,6 @@ const mapStatus = (koreanStatus: string): RequestStatus => {
       return 'EXPIRED';
     case '완료됨':
       return 'COMPLETED';
-    case '대기중':
-      return 'PENDING';
     default:
       return 'PENDING';
   }
@@ -62,18 +58,16 @@ export default function RequestPage() {
   const [activeTab, setActiveTab] = useState<TabType>('received');
   const [requests, setRequests] = useState<SkillRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [unreadInfo, setUnreadInfo] = useState({
+    received: false,
+    sent: false,
+  });
   const accessToken = useAuthStore((state) => state.accessToken);
 
-  // Tabbar 컴포넌트의 제네릭 구조에 맞게 수정된 아이템 리스트
   const TAB_ITEMS: { key: TabType; label: string }[] = [
     { key: 'received', label: '받은 요청' },
     { key: 'sent', label: '보낸 요청' },
   ];
-
-  // 클릭 시 전달받는 key가 바로 TabType('received' | 'sent')이므로 로직이 단순해집니다.
-  const handleTabClick = (key: TabType) => {
-    setActiveTab(key);
-  };
 
   const getMyId = () => {
     if (!accessToken) return 0;
@@ -108,16 +102,42 @@ export default function RequestPage() {
 
       setRequests(mappedRequests);
     } catch (error) {
-      console.error('불러오기 실패:', error);
       setRequests([]);
     } finally {
       setIsLoading(false);
     }
   }, [activeTab]);
 
+  const fetchUnreadStatus = useCallback(async () => {
+    try {
+      const res = await api.get('/exchange/request/notification');
+      setUnreadInfo({
+        received: res.data.data.hasUnreadReceived,
+        sent: res.data.data.hasUnreadSent,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
   useEffect(() => {
     fetchRequests();
-  }, [fetchRequests]);
+    fetchUnreadStatus();
+  }, [fetchRequests, fetchUnreadStatus]);
+
+  useEffect(() => {
+    if (
+      (activeTab === 'received' && unreadInfo.received) ||
+      (activeTab === 'sent' && unreadInfo.sent)
+    ) {
+      window.dispatchEvent(new Event('chat-update'));
+      setUnreadInfo((prev) => ({ ...prev, [activeTab]: false }));
+    }
+  }, [activeTab, unreadInfo]);
+
+  const handleTabClick = (key: TabType) => {
+    setActiveTab(key);
+  };
 
   const handleAccept = async (id: number) => {
     if (!confirm('요청을 수락하시겠습니까?')) return;
@@ -144,7 +164,6 @@ export default function RequestPage() {
   const handleCancel = async (id: number) => {
     if (!confirm('요청을 취소하시겠습니까?')) return;
     try {
-      // 명세서에 따라 POST /cancel 사용
       await api.post(`/exchange/request/${id}/cancel`);
       alert('취소되었습니다.');
       fetchRequests();
@@ -173,14 +192,26 @@ export default function RequestPage() {
 
   return (
     <div className="mx-auto flex h-[calc(100%-80px)] w-[calc(100%-224px)] max-w-284 flex-col items-center bg-white shadow-[0_0_0_100vh_white]">
-      <div className="w-full border-b border-gray-100 bg-white">
+      <div className="w-full shrink-0 border-b border-gray-100 bg-white">
         <div className="my-6 flex shrink-0 flex-col justify-center gap-1">
           <h2 className="text-[24px] font-semibold text-gray-800">요청 관리</h2>
           <p className="text-[12px] text-gray-400">
             파트너와 주고받은 스킬 교환 요청을 확인하세요.
           </p>
         </div>
-        <div className="mt-2">
+        <div className="relative mt-2">
+          <div className="pointer-events-none absolute top-0 left-0 z-10 flex h-[40px]">
+            <div className="relative w-[90px]">
+              {unreadInfo.received && (
+                <span className="absolute top-[14px] right-[12px] h-1.5 w-1.5 rounded-full bg-red-500" />
+              )}
+            </div>
+            <div className="relative w-[90px]">
+              {unreadInfo.sent && (
+                <span className="absolute top-[14px] right-[12px] h-1.5 w-1.5 rounded-full bg-red-500" />
+              )}
+            </div>
+          </div>
           <Tabbar
             items={TAB_ITEMS}
             currentItem={activeTab}
@@ -189,7 +220,7 @@ export default function RequestPage() {
         </div>
       </div>
 
-      <main className="mx-auto w-full max-w-[1200px] flex-1 px-6 py-10">
+      <main className="w-full flex-1 overflow-y-auto px-6 py-10">
         <div className="space-y-6">
           {isLoading ? (
             <div className="flex h-60 items-center justify-center font-medium text-gray-400">

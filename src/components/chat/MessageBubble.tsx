@@ -15,25 +15,27 @@ export const MessageBubble = ({
   fileUrl,
   timestamp,
   isMine,
-  showTime,
   showProfile = true,
   profileUrl,
+  showTime,
 }: MessageBubbleProps) => {
   return (
     <div className={`flex w-full ${isMine ? 'justify-end' : 'justify-start'}`}>
-      {showProfile && !isMine && (
+      {!isMine && (
         <div className="mr-2 shrink-0">
-          <div className="relative h-8 w-8 overflow-hidden rounded-full bg-gray-200">
-            {profileUrl ? (
-              <Image
-                src="/icons/avatar.svg"
-                alt="profile"
-                fill
-                unoptimized
-                className="object-cover"
-              />
+          <div className="relative h-8 w-8 overflow-hidden rounded-full">
+            {showProfile ? (
+              <div className="relative h-full w-full bg-gray-200">
+                <Image
+                  src="/icons/avatar.svg"
+                  alt="profile"
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
             ) : (
-              <div className="h-full w-full bg-gray-300" />
+              <div className="h-full w-full bg-transparent" />
             )}
           </div>
         </div>
