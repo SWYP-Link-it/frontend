@@ -75,6 +75,7 @@ export const MessageList = ({
             <div className={marginBottom}>
               <MessageBubble
                 content={msg.content}
+                fileUrl={msg.fileUrl}
                 timestamp={formattedTime}
                 isMine={msg.isMine}
                 showTime={showTime}

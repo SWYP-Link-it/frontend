@@ -6,10 +6,10 @@ export default function ChatLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-full w-full flex-col items-center px-[112px]">
+    <div className="mx-auto flex h-[calc(100%-80px)] w-[calc(100%-224px)] max-w-284 flex-col items-center bg-white shadow-[0_0_0_100vh_white]">
       <div className="flex h-full w-full flex-col pb-[28px]">
-        <div className="flex h-[100px] shrink-0 flex-col justify-center gap-1">
-          <h2 className="text-[24px] font-bold text-gray-800">메세지</h2>
+        <div className="my-6 flex shrink-0 flex-col justify-center gap-1">
+          <h2 className="text-[24px] font-semibold text-gray-800">메세지</h2>
           <p className="text-[12px] text-gray-400">
             채팅으로 궁금한 걸 묻고 답해요
           </p>

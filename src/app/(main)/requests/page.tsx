@@ -172,22 +172,20 @@ export default function RequestPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F8FAFC]">
+    <div className="mx-auto flex h-[calc(100%-80px)] w-[calc(100%-224px)] max-w-284 flex-col items-center bg-white shadow-[0_0_0_100vh_white]">
       <div className="w-full border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="flex h-[100px] flex-col justify-center">
-            <h1 className="text-[24px] font-bold text-gray-900">요청 관리</h1>
-            <p className="text-sm text-gray-500">
-              파트너와 주고받은 스킬 교환 요청을 확인하세요.
-            </p>
-          </div>
-          <div className="mt-2">
-            <Tabbar
-              items={TAB_ITEMS}
-              currentItem={activeTab}
-              onClickItem={handleTabClick}
-            />
-          </div>
+        <div className="my-6 flex shrink-0 flex-col justify-center gap-1">
+          <h2 className="text-[24px] font-semibold text-gray-800">요청 관리</h2>
+          <p className="text-[12px] text-gray-400">
+            파트너와 주고받은 스킬 교환 요청을 확인하세요.
+          </p>
+        </div>
+        <div className="mt-2">
+          <Tabbar
+            items={TAB_ITEMS}
+            currentItem={activeTab}
+            onClickItem={handleTabClick}
+          />
         </div>
       </div>
 

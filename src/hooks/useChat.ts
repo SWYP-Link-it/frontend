@@ -38,86 +38,119 @@ export const useChat = (roomId: number) => {
     }
   }, [roomId]);
 
-  const fetchInitialData = useCallback(async () => {
-    if (!roomId) return;
-    try {
-      setIsLoading(true);
-      const [roomRes, messagesRes] = await Promise.all([
-        api.get(`/chat/rooms/${roomId}`),
-        api.get(`/chat/rooms/${roomId}/messages`),
-      ]);
-
-      if (roomRes.data.success) {
-        setRoomInfo(roomRes.data.data);
-      }
-      if (messagesRes.data.success) {
-        const myId = Number(getMyId());
-        const fixedMessages = messagesRes.data.data.map((msg: any) => ({
-          ...msg,
-          isMine: msg.senderId === myId,
-        }));
-        setMessages(fixedMessages);
-        await markAsRead();
-      }
-    } catch (error) {
-      console.error('채팅 데이터 로딩 실패:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [roomId, getMyId, markAsRead]);
-
   useEffect(() => {
     if (!accessToken || !roomId) return;
 
-    const setupSocket = async () => {
+    let isComponentMounted = true;
+
+    const initChat = async () => {
       try {
+        setIsLoading(true);
+
+        const [roomRes, messagesRes] = await Promise.all([
+          api.get(`/chat/rooms/${roomId}`),
+          api.get(`/chat/rooms/${roomId}/messages`),
+        ]);
+        console.log(messagesRes);
+        if (!isComponentMounted) return;
+
+        if (roomRes.data.success) setRoomInfo(roomRes.data.data);
+        if (messagesRes.data.success) {
+          const myId = Number(getMyId());
+          const fixedMessages = messagesRes.data.data.map((msg: any) => ({
+            ...msg,
+            isMine: msg.senderId === myId,
+          }));
+          setMessages(fixedMessages);
+          await markAsRead();
+        }
+
         await connectSocket(accessToken);
         enterRoom(roomId);
+
+        if (subscriptionRef.current) {
+          subscriptionRef.current.unsubscribe();
+        }
 
         subscriptionRef.current = subscribeToRoom(
           roomId,
           (payload: ChatPayload) => {
             if (!payload.system) {
               const myId = Number(getMyId());
-              const newMessage: ChatMessage = {
-                messageId: payload.messageId,
-                roomId: payload.roomId,
-                senderId: payload.senderId,
-                senderRole: payload.senderRole,
-                content: payload.text,
-                createdAtEpochMs: payload.sentAtEpochMs,
-                isMine: payload.senderId === myId,
-              };
-              setMessages((prev) => [...prev, newMessage]);
 
-              if (payload.senderId !== myId) {
-                markAsRead();
-              }
+              setMessages((prev) => {
+                const isAlreadyExists = prev.some(
+                  (m) => m.messageId === payload.messageId,
+                );
+                if (isAlreadyExists) return prev;
 
+                const newMessage: ChatMessage = {
+                  messageId: payload.messageId,
+                  roomId: payload.roomId,
+                  senderId: payload.senderId,
+                  senderRole: payload.senderRole,
+                  content: payload.text || '',
+                  fileUrl: (payload as any).imageUrl || payload.fileUrl || null,
+                  createdAtEpochMs: payload.sentAtEpochMs,
+                  isMine: payload.senderId === myId,
+                };
+                return [...prev, newMessage];
+              });
+
+              if (payload.senderId !== myId) markAsRead();
               window.dispatchEvent(new Event('chat-update'));
             }
           },
         );
       } catch (err) {
-        console.error('소켓 연결 실패:', err);
+        console.error('채팅 연결 에러:', err);
+      } finally {
+        if (isComponentMounted) setIsLoading(false);
       }
     };
 
-    fetchInitialData().then(() => setupSocket());
+    initChat();
 
     return () => {
+      isComponentMounted = false;
       if (subscriptionRef.current) {
         subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
       }
       exitRoom(roomId);
       disconnectSocket();
     };
-  }, [roomId, accessToken, fetchInitialData, getMyId, markAsRead]);
+  }, [roomId, accessToken, getMyId, markAsRead]);
 
-  const sendMessage = async (content: string) => {
-    if (!content.trim()) return;
+  const sendMessage = async (content: string, file?: File) => {
+    if (!content.trim() && !file) return;
     try {
-      sendSocketMessage(roomId, content);
+      const fileUrl = null;
+
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const uploadRes = await api.post(
+          `/chat/file/upload?roomId=${roomId}`,
+          formData,
+          {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          },
+        );
+
+        // console.log('1. 이미지 업로드 응답:', uploadRes.data);
+
+        // if (uploadRes.data.success) {
+        //   // 서버 응답 구조가 { data: "http://..." } 인지 확인 필요
+        //   fileUrl = uploadRes.data.data;
+        //   console.log('2. 설정된 fileUrl:', fileUrl);
+        // }
+      }
+
+      // console.log('3. 최종 소켓 전송 데이터:', { roomId, content, fileUrl });
+
+      sendSocketMessage(roomId, content, fileUrl);
       window.dispatchEvent(new Event('chat-update'));
     } catch (error) {
       console.error('메시지 전송 실패:', error);
