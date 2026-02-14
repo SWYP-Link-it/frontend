@@ -16,6 +16,7 @@ export interface ChatPayload {
   senderId: number;
   senderRole: 'MENTOR' | 'MENTEE';
   text: string;
+  fileUrl?: string | null;
   sentAtEpochMs: number;
   system: boolean;
   readUpToMessageId?: number;
@@ -90,12 +91,24 @@ export const exitRoom = (roomId: number) => {
   }
 };
 
-// 5. 메시지 전송 (Send)
-export const sendMessage = (roomId: number, text: string) => {
+export const sendMessage = (
+  roomId: number,
+  text: string,
+  imageUrl?: string | null,
+) => {
   if (stompClient?.connected) {
+    const payload = {
+      roomId: roomId,
+      text: text || '',
+      messageType: imageUrl ? 'IMAGE' : 'TEXT',
+      imageUrl: imageUrl || null,
+    };
+
+    // console.log('[백엔드 가이드 반영 전송]:', payload);
+
     stompClient.publish({
       destination: '/app/chat/send',
-      body: JSON.stringify({ roomId, text }),
+      body: JSON.stringify(payload),
     });
   }
 };

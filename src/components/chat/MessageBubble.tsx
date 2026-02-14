@@ -2,6 +2,7 @@ import Image from 'next/image';
 
 interface MessageBubbleProps {
   content: string;
+  fileUrl?: string | null;
   timestamp: string;
   isMine: boolean;
   showTime: boolean;
@@ -11,48 +12,72 @@ interface MessageBubbleProps {
 
 export const MessageBubble = ({
   content,
+  fileUrl,
   timestamp,
   isMine,
-  showTime,
   showProfile = true,
   profileUrl,
+  showTime,
 }: MessageBubbleProps) => {
   return (
     <div className={`flex w-full ${isMine ? 'justify-end' : 'justify-start'}`}>
       {!isMine && (
-        <div className="mr-[8px] flex w-[40px] flex-col items-center">
-          {showProfile ? (
-            <div className="relative h-[40px] w-[40px] overflow-hidden rounded-full border border-gray-200 bg-gray-100">
-              {profileUrl ? (
+        <div className="mr-2 shrink-0">
+          <div className="relative h-8 w-8 overflow-hidden rounded-full">
+            {showProfile ? (
+              <div className="relative h-full w-full bg-gray-200">
                 <Image
-                  src={'/icons/avatar.svg'}
+                  src="/icons/avatar.svg"
                   alt="profile"
                   fill
+                  unoptimized
                   className="object-cover"
                 />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gray-300 text-[10px] text-white">
-                  User
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="w-[40px]" />
-          )}
+              </div>
+            ) : (
+              <div className="h-full w-full bg-transparent" />
+            )}
+          </div>
         </div>
       )}
 
       <div
-        className={`flex max-w-[70%] items-end gap-[4px] ${isMine ? 'flex-row-reverse' : 'flex-row'}`}
+        className={`flex max-w-[70%] items-end gap-[4px] ${
+          isMine ? 'flex-row-reverse' : 'flex-row'
+        }`}
       >
-        <div
-          className={`rounded-[18px] px-[16px] py-[10px] text-sm leading-[1.5] break-all ${
-            isMine
-              ? 'bg-brand-600 rounded-tr-none text-white'
-              : 'bg-brand-100 rounded-tl-none text-gray-900'
-          } `}
-        >
-          {content}
+        <div className="flex flex-col gap-2">
+          {fileUrl && (
+            <div className="relative overflow-hidden rounded-[12px]">
+              <Image
+                src={fileUrl}
+                alt="chat-image"
+                width={0}
+                height={0}
+                sizes="100vw"
+                unoptimized
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  maxHeight: '300px',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+            </div>
+          )}
+
+          {content && (
+            <div
+              className={`rounded-[8px] px-[16px] py-[10px] text-sm leading-[1.5] break-all ${
+                isMine
+                  ? 'bg-brand-600 rounded-tr-none text-white'
+                  : 'bg-brand-100 rounded-tl-none text-gray-900'
+              }`}
+            >
+              {content}
+            </div>
+          )}
         </div>
 
         {showTime && (
