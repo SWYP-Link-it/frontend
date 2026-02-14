@@ -94,44 +94,50 @@ export default function ProfilePage() {
 
   if (isPageLoading) {
     return (
-      <div className="mx-auto flex max-w-6xl justify-center px-6 py-20">
+      <div className="mx-auto flex max-w-284 justify-center px-28 py-20">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white px-[112px]">
-      <div className="flex h-[100px] flex-col justify-center">
-        <h1 className="mb-[4px] text-[24px] font-semibold text-gray-800">
-          마이프로필
-        </h1>
-        <p className="text-[12px] text-gray-400">
-          내 정보와 활동 내역을 확인해요.
-        </p>
+    <div className="flex flex-col bg-white">
+      <div className="w-full bg-white px-28">
+        <div className="mx-auto max-w-284">
+          <div className="my-6 flex flex-col justify-center">
+            <h1 className="text-[24px] font-semibold text-gray-800">
+              마이프로필
+            </h1>
+            <p className="text-[12px] text-gray-400">
+              내 정보와 활동 내역을 확인해요.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-start justify-between">
-        <aside className="sticky top-[100px] mr-[100px] w-64 flex-shrink-0">
-          <ProfileTab />
-        </aside>
+      <div className="w-full px-28 pb-[126px]">
+        <div className="mx-auto flex max-w-284">
+          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink">
+            <ProfileTab />
+          </aside>
 
-        <main className="flex-1">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">내 프로필</h2>
-          </div>
+          <main className="min-w-0 flex-1">
+            <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-3">
+              <h2 className="text-xl font-semibold text-gray-900">내 프로필</h2>
+            </div>
 
-          <ProfileCard
-            name={profileData?.nickname || userInfo?.nickname || '사용자'}
-            credit={creditBalance}
-            onEditClick={() => setIsEditModalOpen(true)}
-          />
+            <ProfileCard
+              name={profileData?.nickname || userInfo?.nickname || '사용자'}
+              credit={creditBalance}
+              onEditClick={() => setIsEditModalOpen(true)}
+            />
 
-          <ProfileContent
-            data={profileData}
-            onWithdrawClick={() => setIsWithdrawModalOpen(true)}
-          />
-        </main>
+            <ProfileContent
+              data={profileData}
+              onWithdrawClick={() => setIsWithdrawModalOpen(true)}
+            />
+          </main>
+        </div>
       </div>
 
       <ProfileEditModal

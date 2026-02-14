@@ -5,7 +5,7 @@ export const ProfileTab = () => {
 
   const tabs = [
     { label: '내 프로필 보기', active: true },
-    // { label: '내 크레딧 보기', active: false },
+    // { label: '내 크레딧 보기', active: false }
   ];
 
   return (
@@ -20,7 +20,8 @@ export const ProfileTab = () => {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            {tab.label}
+            {/* 글자가 줄어들 때 줄바꿈 방지하려면 whitespace-nowrap 추가 가능 */}
+            <span className="whitespace-nowrap">{tab.label}</span>
           </button>
         ))}
         <button
@@ -29,7 +30,7 @@ export const ProfileTab = () => {
               logout();
             }
           }}
-          className="mt-4 w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-gray-400 transition-colors hover:text-gray-600"
+          className="mt-4 w-full rounded-lg px-4 py-3 text-left text-sm font-medium whitespace-nowrap text-gray-400 transition-colors hover:text-gray-600"
         >
           로그아웃
         </button>
