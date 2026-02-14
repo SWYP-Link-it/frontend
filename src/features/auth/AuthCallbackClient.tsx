@@ -4,6 +4,7 @@ import { api } from '@/src/lib/api/api';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 export default function AuthCallbackClient() {
   const router = useRouter();
@@ -15,10 +16,15 @@ export default function AuthCallbackClient() {
 
   useEffect(() => {
     if (status === 'ACTIVE') {
-      api.get('/auth/success').then((response) => {
-        setAccessToken(response.data.data.accessToken);
-        router.push('/');
-      });
+      api
+        .get('/auth/success')
+        .then((response) => {
+          setAccessToken(response.data.data.accessToken);
+          router.push('/');
+        })
+        .catch(() => {
+          toast.error('로그인에 실패하였습니다.');
+        });
     } else if (status === 'PENDING') {
       router.push('/signup');
     }
