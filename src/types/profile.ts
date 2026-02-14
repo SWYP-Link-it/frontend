@@ -1,5 +1,5 @@
 export type SkillProficiency = 'LOW' | 'MEDIUM' | 'HIGH';
-export type ExchangeType = 'ONLINE' | 'OFFLINE' | 'BOTH' | 'NONE';
+export type ExchangeType = 'ONLINE' | 'OFFLINE' | 'BOTH' | null;
 
 export interface UserSkill {
   id: number;
@@ -50,14 +50,17 @@ export type SkillData = {
   title?: string;
   skillDescription?: string;
   description?: string;
+  exchangeDuration?: number;
   imageUrls?: string[];
-  [key: string]: any;
+  imageFiles?: File[];
+  // [key: string]: unknown;
 };
 
 export type SkillFormData = {
   category: string;
   name: string;
   proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
+  exchangeDuration: number;
   title: string;
   description: string;
   existingImages: string[];

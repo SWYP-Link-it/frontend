@@ -30,7 +30,7 @@ export const WithdrawalModal = ({
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 rounded-xl bg-blue-500 py-4 font-bold text-white shadow-lg shadow-blue-100 transition-colors hover:bg-blue-600"
+            className="flex-1 rounded-xl bg-blue-500 py-4 font-bold text-white transition-colors hover:bg-blue-600"
           >
             탈퇴하기
           </button>

@@ -27,7 +27,7 @@ export const DeleteConfirmModal = ({
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 rounded-xl bg-blue-500 py-4 font-bold text-white shadow-lg shadow-blue-100 transition-shadow hover:bg-blue-600"
+            className="x flex-1 rounded-xl bg-blue-500 py-4 font-bold text-white hover:bg-blue-600"
           >
             확인
           </button>
