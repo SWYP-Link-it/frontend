@@ -174,7 +174,8 @@ export default function SkillRequestClient() {
                 스킬 요청서 작성
               </h1>
               <div className="text-xs font-medium text-gray-400">
-                사용자님에게 스킬을 배우기 위한 요청서를 작성해요.
+                {selectedSkillInfo?.nickname}님에게 스킬을 배우기 위한 요청서를
+                작성해요.
               </div>
             </div>
             <div className="flex h-fit">

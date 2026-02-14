@@ -95,6 +95,7 @@ export type SkillDetailDto = {
 };
 
 export type SkillInfo = {
+  nickname: string;
   skillId: number;
   skillName: string;
   exchangeDuration: number;
