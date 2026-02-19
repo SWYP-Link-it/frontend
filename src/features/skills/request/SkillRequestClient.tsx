@@ -177,7 +177,7 @@ export default function SkillRequestClient() {
     }
   }, [isAvailableTimesError, availableTimesError]);
 
-  if (!mentorId || !skillId) {
+  if (!mentorId) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-lg text-gray-700">
         <AlertIcon size={20} />
@@ -322,7 +322,10 @@ export default function SkillRequestClient() {
             <Button
               text="작성 완료"
               mode={isFormCompleted ? 'active' : 'inactive'}
-              onClick={() => handleSubmit(mentorId, skillId, formData)}
+              onClick={() => {
+                if (!skillId) return;
+                handleSubmit(mentorId, skillId, formData);
+              }}
             />
           </div>
         </div>
