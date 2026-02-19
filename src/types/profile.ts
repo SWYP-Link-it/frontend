@@ -66,3 +66,20 @@ export type SkillFormData = {
   existingImages: string[];
   newFiles: File[];
 };
+
+export type CreditTransactionType =
+  | 'CANCEL'
+  | 'REQUEST'
+  | 'REJECT'
+  | 'REWARD'
+  | 'COMPLETED';
+
+export interface CreditTransaction {
+  id: string;
+  opponent: string;
+  skillName: string;
+  date: string;
+  type: CreditTransactionType;
+  amount: number;
+  isSystem?: boolean;
+}
