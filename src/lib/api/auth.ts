@@ -3,7 +3,7 @@ import { useAuthStore } from '@/src/stores/authStore';
 
 let refreshPromise: Promise<string> | null = null;
 
-export function refreshAccessToken(): Promise<string> {
+export const refreshAccessToken = (): Promise<string> => {
   if (!refreshPromise) {
     refreshPromise = axios
       .post(
@@ -27,4 +27,4 @@ export function refreshAccessToken(): Promise<string> {
   }
 
   return refreshPromise;
-}
+};

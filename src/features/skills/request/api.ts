@@ -33,7 +33,7 @@ export const getAvailableTimes = async (
   return response.data.data.slots;
 };
 
-export const requestSkillExchange = async (body: {
+export const requestSkillExchange = (body: {
   mentorId: number;
   skillId: number;
   message?: string;
