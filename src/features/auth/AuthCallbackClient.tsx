@@ -1,5 +1,6 @@
 'use client';
 
+import { AlertIcon } from '@/src/components/icons/AlertIcon';
 import { api } from '@/src/lib/api/api';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -31,7 +32,12 @@ export default function AuthCallbackClient() {
   }, []);
 
   if (status !== 'ACTIVE' && status !== 'PENDING') {
-    return <div>잘못된 접근입니다.</div>;
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-lg text-gray-700">
+        <AlertIcon size={20} />
+        잘못된 접근입니다.
+      </div>
+    );
   }
 
   return null;
