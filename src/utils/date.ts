@@ -33,3 +33,8 @@ export const formatDate = (
 ): string => {
   return dayjs(dateString).format(template);
 };
+
+// 2024.01.20 12:00 포맷
+export const formatCreditDate = (dateString: string): string => {
+  return dayjs(dateString).format('YYYY.MM.DD HH:mm');
+};
