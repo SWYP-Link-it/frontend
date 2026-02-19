@@ -78,6 +78,7 @@ export default function SkillRequestClient() {
     queryFn: () => getMentorSkills(mentorId!),
     enabled: Boolean(mentorId),
     staleTime: 5 * 60 * 1000,
+    retry: 0,
   });
 
   const {
@@ -89,6 +90,7 @@ export default function SkillRequestClient() {
     queryFn: () => getAvailableDates(mentorId!, skillId!, currentMonth),
     enabled: Boolean(mentorId) && Boolean(skillId),
     staleTime: 5 * 60 * 1000,
+    retry: 0,
   });
 
   const {
@@ -100,6 +102,7 @@ export default function SkillRequestClient() {
     queryFn: () => getAvailableTimes(mentorId!, skillId!, formData.date),
     enabled: Boolean(mentorId) && Boolean(skillId),
     staleTime: 5 * 60 * 1000,
+    retry: 0,
   });
 
   const handleFormUpdate = (data: Partial<RequestFormData>) => {
@@ -175,7 +178,12 @@ export default function SkillRequestClient() {
   }, [isAvailableTimesError, availableTimesError]);
 
   if (!mentorId || !skillId) {
-    return <div>경고: 잘못된 경로입니다.</div>;
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-lg text-gray-700">
+        <AlertIcon size={20} />
+        잘못된 경로입니다.
+      </div>
+    );
   }
 
   return (
