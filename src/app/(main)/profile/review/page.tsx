@@ -5,12 +5,20 @@ import { ProfileTab } from '@/src/components/profile/ProfileTab';
 import { ReviewCard } from '@/src/components/profile/ReviewCard';
 import { Star } from 'lucide-react';
 import { useReview } from '@/src/hooks/useReview';
+import { BaseModal } from '@/src/components/BaseModal';
+import { SkillReviewModalContent } from '@/src/components/request/SkillReviewModalContent';
+import { DeleteConfirmModal } from '@/src/components/edit/DeleteConfirmModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function ProfileReviewPage() {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'received' | 'written'>(
     'received',
   );
   const [filter, setFilter] = useState('전체');
+  const [selectedReview, setSelectedReview] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const { allReviews, isLoading, deleteReview, hasNextPage, fetchNextPage } =
     useReview(activeTab);
@@ -28,6 +36,24 @@ export default function ProfileReviewPage() {
 
   const hasReviews = filteredReviews.length > 0;
 
+  const handleEditClick = (review: any) => {
+    setSelectedReview(review);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (review: any) => {
+    setSelectedReview(review);
+    setIsDeleteModalOpen(true);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-white py-20 text-center text-gray-400">
+        데이터를 불러오는 중입니다...
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       <div className="w-full px-28">
@@ -40,8 +66,8 @@ export default function ProfileReviewPage() {
       </div>
 
       <div className="w-full flex-1 px-28 pb-[126px]">
-        <div className="mx-auto flex max-w-284">
-          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink-0">
+        <div className="mx-auto flex h-full max-w-284">
+          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink-0 self-start">
             <ProfileTab />
           </aside>
 
@@ -53,11 +79,7 @@ export default function ProfileReviewPage() {
                     setActiveTab('received');
                     setFilter('전체');
                   }}
-                  className={`flex items-center justify-center rounded-xl px-4 py-1.5 text-xs font-bold transition-all ${
-                    activeTab === 'received'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-400 hover:text-gray-500'
-                  }`}
+                  className={`flex items-center justify-center rounded-xl px-4 py-1.5 text-xs font-bold transition-all ${activeTab === 'received' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-500'}`}
                 >
                   받은 리뷰
                 </button>
@@ -66,11 +88,7 @@ export default function ProfileReviewPage() {
                     setActiveTab('written');
                     setFilter('전체');
                   }}
-                  className={`flex items-center justify-center rounded-xl px-4 py-1.5 text-xs font-bold transition-all ${
-                    activeTab === 'written'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-400 hover:text-gray-500'
-                  }`}
+                  className={`flex items-center justify-center rounded-xl px-4 py-1.5 text-xs font-bold transition-all ${activeTab === 'written' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-500'}`}
                 >
                   작성한 리뷰
                 </button>
@@ -84,17 +102,12 @@ export default function ProfileReviewPage() {
                     <button
                       key={cat}
                       onClick={() => setFilter(cat)}
-                      className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition-all ${
-                        filter === cat
-                          ? 'border-gray-900 bg-gray-900 text-white'
-                          : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
-                      }`}
+                      className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition-all ${filter === cat ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
                     >
                       {cat}
                     </button>
                   ))}
                 </div>
-
                 {hasReviews && (
                   <div className="flex flex-col items-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                     <span className="mb-1 text-[10px] font-bold text-gray-400 uppercase">
@@ -118,39 +131,72 @@ export default function ProfileReviewPage() {
               </div>
             )}
 
-            {isLoading ? (
-              <div className="py-20 text-center text-gray-400">로딩 중...</div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {hasReviews ? (
-                  <>
-                    {filteredReviews.map((review: any) => (
-                      <ReviewCard
-                        key={review.reviewId}
-                        review={review}
-                        showActions={activeTab === 'written'}
-                        onDelete={(id) => deleteReview.mutate(id)}
-                      />
-                    ))}
-                    {hasNextPage && (
+            <div className="flex flex-col gap-4">
+              {hasReviews ? (
+                <>
+                  {filteredReviews.map((review: any) => (
+                    <ReviewCard
+                      key={review.reviewId}
+                      review={review}
+                      showActions={activeTab === 'written'}
+                      onDelete={() => handleDeleteClick(review)}
+                      onEdit={() => handleEditClick(review)}
+                    />
+                  ))}
+                  {hasNextPage && (
+                    <div className="mt-8 flex justify-center">
                       <button
                         onClick={() => fetchNextPage()}
-                        className="mt-8 self-center rounded-lg border border-gray-200 px-6 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        className="rounded-lg border border-gray-200 px-6 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                       >
                         리뷰 더 불러오기
                       </button>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex h-[400px] flex-col items-center justify-center text-gray-300">
-                    <p className="text-sm font-medium">리뷰 내역이 없습니다.</p>
-                  </div>
-                )}
-              </div>
-            )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex h-[400px] flex-col items-center justify-center text-gray-300">
+                  <p className="text-sm font-medium">리뷰 내역이 없습니다.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      <BaseModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      >
+        {selectedReview && (
+          <SkillReviewModalContent
+            reviewId={selectedReview.reviewId}
+            skillExchangeId={selectedReview.skillExchangeId}
+            skillId={selectedReview.skillId}
+            mentorId={selectedReview.mentorId}
+            onSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: ['reviews'] });
+              setIsEditModalOpen(false);
+            }}
+            onClose={() => setIsEditModalOpen(false)}
+          />
+        )}
+      </BaseModal>
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (selectedReview) {
+            deleteReview.mutate(selectedReview.reviewId, {
+              onSuccess: () => {
+                setIsDeleteModalOpen(false);
+                setSelectedReview(null);
+              },
+            });
+          }
+        }}
+      />
     </div>
   );
 }
