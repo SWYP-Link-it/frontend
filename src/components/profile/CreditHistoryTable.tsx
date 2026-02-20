@@ -79,7 +79,7 @@ export const CreditHistoryTable = ({
                 </td>
                 <td className={`px-6 py-4 text-right tabular-nums`}>
                   <span
-                    className={`text-base font-bold ${isPlus ? 'text-brand-600' : 'text-gray-900'}`}
+                    className={`text-base font-bold ${isPlus ? 'text-brand-600' : 'text-red-600'}`}
                   >
                     {isPlus ? `+${tx.changeAmount}` : `-${tx.changeAmount}`}
                   </span>

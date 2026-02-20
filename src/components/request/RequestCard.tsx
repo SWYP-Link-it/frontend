@@ -2,6 +2,7 @@
 
 import { SkillRequest } from '@/src/types/request';
 import Image from 'next/image';
+import { MessageIcon } from '../icons/MessageIcon';
 
 interface RequestCardProps {
   request: SkillRequest;
@@ -60,15 +61,11 @@ export const RequestCard = ({
     }
   };
 
-  // 버튼 노출 로직 (명세 기준)
   const isPending = request.status === 'PENDING';
   const isAccepted = request.status === 'ACCEPTED';
 
-  // 멘티(보낸 사람): 대기중, 수락됨 상태에서 취소 가능
-  // 멘토(받은 사람): 수락됨 상태에서 취소 가능
   const canCancel = request.isSentByMe ? isPending || isAccepted : isAccepted;
 
-  // 수락/거절은 멘토가 대기중일 때만 가능
   const canRespond = !request.isSentByMe && isPending;
 
   return (
@@ -87,7 +84,7 @@ export const RequestCard = ({
               <h3 className="text-lg font-bold text-gray-900">
                 {request.partnerNickname}
               </h3>
-              <span className="rounded bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
+              <span className="text-brand-600 rounded bg-blue-50 px-2 py-0.5 text-[11px] font-semibold">
                 {request.partnerTag}
               </span>
               {getStatusBadge(request.status)}
@@ -98,7 +95,7 @@ export const RequestCard = ({
 
         <div className="mt-4 flex space-x-8 md:mt-0">
           <div>
-            <p className="mb-1 text-xs text-gray-300">날짜</p>
+            <p className="mb-1 text-xs text-gray-300">날짜 및 시간</p>
             <p className="text-sm font-bold text-gray-700">
               {request.sessionDate}
             </p>
@@ -125,18 +122,8 @@ export const RequestCard = ({
           onClick={() => onInquiry?.(request.partnerId)}
           className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50"
         >
-          <svg
-            className="mr-2"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-          문의하기
+          <MessageIcon className="mr-2" />
+          문의
         </button>
 
         <div className="flex flex-1 gap-3">
@@ -144,7 +131,7 @@ export const RequestCard = ({
             <>
               <button
                 onClick={() => onAccept?.(request.id)}
-                className="flex-1 rounded-[12px] bg-blue-600 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
+                className="bg-brand-600 flex-1 rounded-[12px] py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
               >
                 수락
               </button>
