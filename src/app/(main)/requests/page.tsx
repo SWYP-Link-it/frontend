@@ -98,6 +98,9 @@ export default function RequestPage() {
         credits: item.creditPrice,
         createdAt: item.requestedDate,
         isSentByMe: activeTab === 'sent',
+        canReview: item.canReview,
+        reviewId: item.reviewId,
+        skillId: item.skillId,
       }));
 
       setRequests(mappedRequests);
@@ -231,6 +234,7 @@ export default function RequestPage() {
               <RequestCard
                 key={request.id}
                 request={request}
+                fetchRequests={fetchRequests}
                 onAccept={handleAccept}
                 onReject={handleReject}
                 onCancel={handleCancel}

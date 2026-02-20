@@ -57,7 +57,7 @@ export const SkillRegisterModal = ({
     };
   }, [initialData]);
 
-  const [form, setForm] = useState<SkillFormData>(getDefaultValues);
+  const [form, setForm] = useState<SkillFormData>(getDefaultValues());
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isProficiencyOpen, setIsProficiencyOpen] = useState(false);
   const [isDurationOpen, setIsDurationOpen] = useState(false);
