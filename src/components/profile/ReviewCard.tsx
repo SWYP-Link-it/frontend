@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { Trash2, Edit3, Star } from 'lucide-react';
 import { formatCreditDate } from '@/src/utils/date';
@@ -5,13 +7,15 @@ import { formatCreditDate } from '@/src/utils/date';
 interface ReviewCardProps {
   review: any;
   showActions: boolean;
-  onDelete: (id: number) => void;
+  onDelete: () => void;
+  onEdit: () => void;
 }
 
 export const ReviewCard = ({
   review,
   showActions,
   onDelete,
+  onEdit,
 }: ReviewCardProps) => {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-6 transition-all hover:border-gray-200 hover:shadow-sm">
@@ -36,13 +40,16 @@ export const ReviewCard = ({
           {showActions && (
             <div className="flex gap-1.5">
               <button
-                onClick={() => onDelete(review.reviewId)}
+                onClick={onDelete}
                 className="flex h-8 items-center gap-1.5 rounded-lg border border-gray-100 bg-white px-3 text-[12px] font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-red-500"
               >
                 <Trash2 size={14} />
                 삭제
               </button>
-              <button className="flex h-8 items-center gap-1.5 rounded-lg border border-gray-100 bg-white px-3 text-[12px] font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900">
+              <button
+                onClick={onEdit}
+                className="flex h-8 items-center gap-1.5 rounded-lg border border-gray-100 bg-white px-3 text-[12px] font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
+              >
                 <Edit3 size={14} />
                 수정
               </button>

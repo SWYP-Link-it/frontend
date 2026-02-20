@@ -5,12 +5,18 @@ import { ProfileTab } from '@/src/components/profile/ProfileTab';
 import { ReviewCard } from '@/src/components/profile/ReviewCard';
 import { Star } from 'lucide-react';
 import { useReview } from '@/src/hooks/useReview';
+import { BaseModal } from '@/src/components/BaseModal';
+import { SkillReviewModalContent } from '@/src/components/request/SkillReviewModalContent';
+import { DeleteConfirmModal } from '@/src/components/edit/DeleteConfirmModal';
 
 export default function ProfileReviewPage() {
   const [activeTab, setActiveTab] = useState<'received' | 'written'>(
     'received',
   );
   const [filter, setFilter] = useState('전체');
+  const [selectedReview, setSelectedReview] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const { allReviews, isLoading, deleteReview, hasNextPage, fetchNextPage } =
     useReview(activeTab);
@@ -27,6 +33,16 @@ export default function ProfileReviewPage() {
   }, [allReviews, filter]);
 
   const hasReviews = filteredReviews.length > 0;
+
+  const handleEditClick = (review: any) => {
+    setSelectedReview(review);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (review: any) => {
+    setSelectedReview(review);
+    setIsDeleteModalOpen(true);
+  };
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
@@ -53,11 +69,7 @@ export default function ProfileReviewPage() {
                     setActiveTab('received');
                     setFilter('전체');
                   }}
-                  className={`flex items-center justify-center rounded-xl px-4 py-1.5 text-xs font-bold transition-all ${
-                    activeTab === 'received'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-400 hover:text-gray-500'
-                  }`}
+                  className={`flex items-center justify-center rounded-xl px-4 py-1.5 text-xs font-bold transition-all ${activeTab === 'received' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-500'}`}
                 >
                   받은 리뷰
                 </button>
@@ -66,11 +78,7 @@ export default function ProfileReviewPage() {
                     setActiveTab('written');
                     setFilter('전체');
                   }}
-                  className={`flex items-center justify-center rounded-xl px-4 py-1.5 text-xs font-bold transition-all ${
-                    activeTab === 'written'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-400 hover:text-gray-500'
-                  }`}
+                  className={`flex items-center justify-center rounded-xl px-4 py-1.5 text-xs font-bold transition-all ${activeTab === 'written' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-500'}`}
                 >
                   작성한 리뷰
                 </button>
@@ -84,17 +92,12 @@ export default function ProfileReviewPage() {
                     <button
                       key={cat}
                       onClick={() => setFilter(cat)}
-                      className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition-all ${
-                        filter === cat
-                          ? 'border-gray-900 bg-gray-900 text-white'
-                          : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
-                      }`}
+                      className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition-all ${filter === cat ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
                     >
                       {cat}
                     </button>
                   ))}
                 </div>
-
                 {hasReviews && (
                   <div className="flex flex-col items-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                     <span className="mb-1 text-[10px] font-bold text-gray-400 uppercase">
@@ -129,7 +132,8 @@ export default function ProfileReviewPage() {
                         key={review.reviewId}
                         review={review}
                         showActions={activeTab === 'written'}
-                        onDelete={(id) => deleteReview.mutate(id)}
+                        onDelete={() => handleDeleteClick(review)}
+                        onEdit={() => handleEditClick(review)}
                       />
                     ))}
                     {hasNextPage && (
@@ -151,6 +155,37 @@ export default function ProfileReviewPage() {
           </div>
         </div>
       </div>
+
+      <BaseModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      >
+        {selectedReview && (
+          <SkillReviewModalContent
+            reviewId={selectedReview.reviewId}
+            skillExchangeId={selectedReview.skillExchangeId}
+            skillId={selectedReview.skillId}
+            mentorId={selectedReview.mentorId}
+            onSuccess={() => setIsEditModalOpen(false)}
+            onClose={() => setIsEditModalOpen(false)}
+          />
+        )}
+      </BaseModal>
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (selectedReview) {
+            deleteReview.mutate(selectedReview.reviewId, {
+              onSuccess: () => {
+                setIsDeleteModalOpen(false);
+                setSelectedReview(null);
+              },
+            });
+          }
+        }}
+      />
     </div>
   );
 }
