@@ -9,7 +9,7 @@ import { ko } from 'react-day-picker/locale';
 import { formatDate } from '@/src/utils/date';
 import { AlertIcon } from '@/src/components/icons/AlertIcon';
 import { Button } from '@/src/components/Button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useFormInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
 import { toast } from 'sonner';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
@@ -32,6 +32,7 @@ export type RequestFormData = {
 
 export default function SkillRequestClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
   const { mentorId, skillId } = useFormInfoFromSearchParams();
@@ -176,6 +177,16 @@ export default function SkillRequestClient() {
       return;
     }
   }, [isAvailableTimesError, availableTimesError]);
+
+  useEffect(() => {
+    if (!skillId && skillsData) {
+      const firstSkill = skillsData[0];
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('skillId', String(firstSkill.skillId));
+
+      router.replace(`?${params.toString()}`);
+    }
+  }, [skillsData]);
 
   if (!mentorId) {
     return (
