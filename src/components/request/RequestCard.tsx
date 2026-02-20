@@ -153,7 +153,7 @@ export const RequestCard = ({
           {canCancel && (
             <button
               onClick={() => onCancel?.(request.id)}
-              className="ml-auto h-[58px] w-[380px] cursor-pointer rounded-[12px] bg-gray-200 py-3 text-lg font-semibold text-gray-800 hover:bg-gray-200"
+              className="ml-auto w-[380px] rounded-[12px] bg-gray-100 py-3 text-sm font-bold text-gray-500 hover:bg-gray-200"
             >
               취소하기
             </button>
@@ -162,7 +162,7 @@ export const RequestCard = ({
             <>
               <button
                 onClick={() => setIsReviewModalOpen(true)}
-                className="ml-auto h-[58px] w-[380px] cursor-pointer rounded-[12px] bg-gray-200 py-3 text-lg font-semibold text-gray-800 hover:bg-gray-200"
+                className="ml-auto w-[380px] rounded-[12px] bg-gray-100 py-3 text-sm font-bold text-gray-500 hover:bg-gray-200"
               >
                 <span className="relative">
                   {request.reviewId === null || request.reviewId === undefined
