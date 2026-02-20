@@ -44,8 +44,16 @@ export default function ProfileReviewPage() {
     setIsDeleteModalOpen(true);
   };
 
+  if (isLoading) {
+    return (
+      <div className="py-20 text-center text-gray-400">
+        데이터를 불러오는 중입니다...
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen w-full flex-col bg-white">
+    <div className="flex flex-col bg-white">
       <div className="w-full px-28">
         <div className="mx-auto my-6 flex max-w-284 flex-col justify-center">
           <h1 className="text-[24px] font-semibold text-gray-800">내 리뷰</h1>
@@ -55,9 +63,9 @@ export default function ProfileReviewPage() {
         </div>
       </div>
 
-      <div className="w-full flex-1 px-28 pb-[126px]">
+      <div className="w-full px-28 pb-[126px]">
         <div className="mx-auto flex max-w-284">
-          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink-0">
+          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink">
             <ProfileTab />
           </aside>
 
@@ -121,37 +129,35 @@ export default function ProfileReviewPage() {
               </div>
             )}
 
-            {isLoading ? (
-              <div className="py-20 text-center text-gray-400">로딩 중...</div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {hasReviews ? (
-                  <>
-                    {filteredReviews.map((review: any) => (
-                      <ReviewCard
-                        key={review.reviewId}
-                        review={review}
-                        showActions={activeTab === 'written'}
-                        onDelete={() => handleDeleteClick(review)}
-                        onEdit={() => handleEditClick(review)}
-                      />
-                    ))}
-                    {hasNextPage && (
+            <div className="flex flex-col gap-4">
+              {hasReviews ? (
+                <>
+                  {filteredReviews.map((review: any) => (
+                    <ReviewCard
+                      key={review.reviewId}
+                      review={review}
+                      showActions={activeTab === 'written'}
+                      onDelete={() => handleDeleteClick(review)}
+                      onEdit={() => handleEditClick(review)}
+                    />
+                  ))}
+                  {hasNextPage && (
+                    <div className="mt-8 flex justify-center">
                       <button
                         onClick={() => fetchNextPage()}
-                        className="mt-8 self-center rounded-lg border border-gray-200 px-6 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        className="rounded-lg border border-gray-200 px-6 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                       >
                         리뷰 더 불러오기
                       </button>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex h-[400px] flex-col items-center justify-center text-gray-300">
-                    <p className="text-sm font-medium">리뷰 내역이 없습니다.</p>
-                  </div>
-                )}
-              </div>
-            )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex h-[400px] flex-col items-center justify-center text-gray-300">
+                  <p className="text-sm font-medium">리뷰 내역이 없습니다.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
