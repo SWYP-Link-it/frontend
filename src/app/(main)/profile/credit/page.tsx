@@ -11,9 +11,12 @@ export default function CreditPage() {
   const [filter, setFilter] = useState<'all' | 'ADD' | 'USE'>('all');
 
   const filteredTransactions = history.filter((tx: any) => {
-    if (filter === 'ADD')
-      return tx.statusLabel === '리워드' || tx.statusLabel === '정산';
-    if (filter === 'USE') return tx.statusLabel === '요청';
+    if (filter === 'ADD') {
+      return ['리워드', '정산', '취소', '거절'].includes(tx.statusLabel);
+    }
+    if (filter === 'USE') {
+      return tx.statusLabel === '요청';
+    }
     return true;
   });
 

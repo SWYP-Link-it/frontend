@@ -74,12 +74,15 @@ export type CreditTransactionType =
   | 'REWARD'
   | 'COMPLETED';
 
+export type CreditStatusLabel = '리워드' | '요청' | '취소' | '거절' | '정산';
+
 export interface CreditTransaction {
-  id: string;
-  opponent: string;
-  skillName: string;
-  date: string;
-  type: CreditTransactionType;
-  amount: number;
-  isSystem?: boolean;
+  creditHistoryId: number;
+  targetNickname: string | null;
+  contentName: string;
+  createdAt: string;
+  statusLabel: CreditStatusLabel;
+  changeAmount: number;
+  targetProfileImageUrl?: string | null;
+  skillId?: number | null;
 }
