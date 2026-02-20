@@ -15,16 +15,15 @@ export default async function SkillDetailPage({
 
   const skillId = Number(id);
 
-  const detailRes = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/${skillId}`,
-    { cache: 'no-store' },
-  );
-
-  const reviewRes = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/skills/${skillId}?size=5`,
-    { cache: 'no-store' },
-  );
-
+  const [detailRes, reviewRes] = await Promise.all([
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/${skillId}`, {
+      cache: 'no-store',
+    }),
+    fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/skills/${skillId}?size=5`,
+      { next: { revalidate: 60 } },
+    ),
+  ]);
   if (!detailRes.ok) {
     return <div>존재하지 않는 스킬입니다.</div>;
   }
