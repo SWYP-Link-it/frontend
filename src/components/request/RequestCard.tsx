@@ -76,7 +76,7 @@ export const RequestCard = ({
   const canRespond = !request.isSentByMe && isPending;
 
   return (
-    <div className="border-brand-50 rounded-[16px] border bg-white p-6 transition-all hover:shadow-sm">
+    <div className="rounded-[16px] border border-gray-200 bg-white p-6 transition-all hover:shadow-sm">
       <div className="mb-6 flex flex-col items-start justify-between md:flex-row">
         <div className="flex items-start space-x-4">
           <Image
@@ -102,13 +102,13 @@ export const RequestCard = ({
 
         <div className="mt-4 mr-12 flex space-x-8 md:mt-0">
           <div>
-            <p className="mb-1 text-xs text-gray-300">날짜 및 시간</p>
+            <p className="mb-1 text-xs text-gray-400">날짜 및 시간</p>
             <p className="text-sm font-bold text-gray-700">
               {request.sessionDate}
             </p>
           </div>
           <div className="border-l border-gray-100 pl-8">
-            <p className="mb-1 text-xs text-gray-300">조건</p>
+            <p className="mb-1 text-xs text-gray-400">스킬 거래 시간</p>
             <p className="text-sm font-bold text-gray-700">
               {request.sessionTime} / {request.credits} 크레딧
             </p>
