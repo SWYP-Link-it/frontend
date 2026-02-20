@@ -82,6 +82,15 @@ export type SkillDetailDto = {
     | 'JEOLLA'
     | 'JEJU';
   detailedLocation: string;
+  userAvgRating: number;
+  skillRating: {
+    avgRating: number;
+    star1Percentage: number;
+    star2Percentage: number;
+    star3Percentage: number;
+    star4Percentage: number;
+    star5Percentage: number;
+  };
   availableSchedules: {
     id: number;
     dayOfWeek: string;
@@ -92,6 +101,19 @@ export type SkillDetailDto = {
     skillId: number;
     skillName: string;
   }[];
+};
+
+export type SkillReviewListResponseDto = {
+  contents: SkillReviewDto[];
+};
+
+export type SkillReviewDto = {
+  reviewId: number;
+  reviewerNickname: string;
+  skillName: string;
+  content: string;
+  rating: number;
+  createdDateTime: Date;
 };
 
 export type SkillInfo = {

@@ -287,8 +287,8 @@ export default function SkillRequestClient() {
               추가적으로 하고싶은 말
             </div>
             <textarea
-              placeholder="하고싶은 말에 대한 간단한 메세지를 남겨보세요."
-              className="mb-9 h-[215px] resize-none rounded-[15px] border border-gray-200 p-6 text-sm text-gray-800 placeholder-gray-400 outline-none"
+              placeholder="간단한 메세지를 남겨보세요."
+              className="focus:border-brand-600 mb-9 h-[215px] resize-none rounded-[15px] border border-gray-200 p-6 text-sm text-gray-800 placeholder-gray-400 outline-none"
               value={formData.message}
               onChange={(e) => handleFormUpdate({ message: e.target.value })}
             />

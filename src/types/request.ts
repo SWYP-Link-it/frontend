@@ -24,6 +24,8 @@ export type ApiRequestItem = {
   requestedDate: string;
   exchangeDateTime: string;
   exchangeDuration: number;
+  canReview?: boolean;
+  reviewId?: number;
   isNew: boolean;
 };
 
@@ -40,4 +42,7 @@ export type SkillRequest = {
   credits: number;
   createdAt: string;
   isSentByMe: boolean;
+  canReview?: boolean;
+  reviewId?: number;
+  skillId: number;
 };
