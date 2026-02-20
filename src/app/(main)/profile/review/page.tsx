@@ -8,8 +8,10 @@ import { useReview } from '@/src/hooks/useReview';
 import { BaseModal } from '@/src/components/BaseModal';
 import { SkillReviewModalContent } from '@/src/components/request/SkillReviewModalContent';
 import { DeleteConfirmModal } from '@/src/components/edit/DeleteConfirmModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function ProfileReviewPage() {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'received' | 'written'>(
     'received',
   );
@@ -53,7 +55,6 @@ export default function ProfileReviewPage() {
   }
 
   return (
-    // min-h-screen을 주어 데이터가 적어도 배경은 화면 끝까지 차게 합니다.
     <div className="flex min-h-screen w-full flex-col bg-white">
       <div className="w-full px-28">
         <div className="mx-auto my-6 flex max-w-284 flex-col justify-center">
@@ -173,7 +174,10 @@ export default function ProfileReviewPage() {
             skillExchangeId={selectedReview.skillExchangeId}
             skillId={selectedReview.skillId}
             mentorId={selectedReview.mentorId}
-            onSuccess={() => setIsEditModalOpen(false)}
+            onSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: ['reviews'] });
+              setIsEditModalOpen(false);
+            }}
             onClose={() => setIsEditModalOpen(false)}
           />
         )}
