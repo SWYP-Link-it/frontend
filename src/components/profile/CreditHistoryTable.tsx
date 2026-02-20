@@ -1,10 +1,11 @@
+import { CreditTransaction } from '@/src/types/profile';
 import { formatCreditDate } from '@/src/utils/date';
 import Image from 'next/image';
 
 export const CreditHistoryTable = ({
   transactions,
 }: {
-  transactions: any[];
+  transactions: CreditTransaction[];
 }) => {
   return (
     <div className="mt-4 overflow-x-auto rounded-lg border border-gray-100">
@@ -20,8 +21,9 @@ export const CreditHistoryTable = ({
         </thead>
         <tbody className="divide-y divide-gray-50">
           {transactions.map((tx) => {
-            const isPlus =
-              tx.statusLabel === '리워드' || tx.statusLabel === '정산';
+            const isPlus = ['리워드', '정산', '취소', '거절'].includes(
+              tx.statusLabel,
+            );
             const isSystem =
               !tx.targetNickname || tx.targetNickname === '시스템';
 
@@ -77,7 +79,7 @@ export const CreditHistoryTable = ({
                 </td>
                 <td className={`px-6 py-4 text-right tabular-nums`}>
                   <span
-                    className={`text-base font-bold ${isPlus ? 'text-brand-600' : 'text-red-600'}`}
+                    className={`text-base font-bold ${isPlus ? 'text-brand-600' : 'text-gray-900'}`}
                   >
                     {isPlus ? `+${tx.changeAmount}` : `-${tx.changeAmount}`}
                   </span>
