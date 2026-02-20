@@ -25,7 +25,9 @@ export default async function Skills({
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills?${params.toString()}`,
-    { cache: 'no-store' },
+    {
+      next: { revalidate: 30 },
+    },
   );
 
   if (!res.ok) {
