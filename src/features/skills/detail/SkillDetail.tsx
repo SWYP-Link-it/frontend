@@ -1,4 +1,4 @@
-import { SkillDetailDto } from '@/src/types/skill';
+import { SkillDetailDto, SkillReviewDto } from '@/src/types/skill';
 import Image from 'next/image';
 import { ReviewSection } from './ReviewSection';
 import { ReactElement } from 'react';
@@ -11,24 +11,32 @@ import {
   PROFICIENCY_LABELS,
 } from '@/src/constants/profile';
 import { CategoryFigure } from '@/src/components/skill/CategoryFigure';
+import { EditIcon } from '@/src/components/icons/EditIcon';
 
-export const SkillDetail = ({
-  mainSkill,
-  experienceDescription,
-  exchangeType,
-  preferredRegion,
-  availableSchedules,
-  detailedLocation,
-}: SkillDetailDto) => {
+type SkillDetailProps = {
+  skillDetail: SkillDetailDto;
+  reviews: SkillReviewDto[];
+};
+
+export const SkillDetail = ({ skillDetail, reviews }: SkillDetailProps) => {
   const {
-    skillName,
-    skillTitle,
-    skillDescription,
-    skillProficiency,
-    skillCategoryType,
-    exchangeDuration,
-    imageUrls,
-  } = mainSkill;
+    mainSkill: {
+      skillName,
+      skillTitle,
+      skillDescription,
+      skillProficiency,
+      exchangeDuration,
+      skillCategoryType,
+      imageUrls,
+    },
+    skillRating,
+    experienceDescription,
+    exchangeType,
+    preferredRegion,
+    availableSchedules,
+    detailedLocation,
+  } = skillDetail;
+
   return (
     <div className="flex flex-col gap-12 rounded-2xl bg-white px-9 pt-[54px] pb-20">
       <div id="skill-detail-overview" className="flex justify-between">
@@ -52,20 +60,30 @@ export const SkillDetail = ({
       <div className="border-y border-gray-200 py-6">
         <div className="grid w-fit grid-cols-2 gap-x-25 text-sm font-semibold text-gray-600">
           <div className="py-2">
-            <span className="mr-4 font-normal text-gray-500">경력</span>
+            <span className="mr-4 inline-block w-16 font-normal text-gray-500">
+              경력
+            </span>
             {experienceDescription}
           </div>
           <div className="py-2">
-            <span className="mr-4 font-normal text-gray-500">가능 크레딧</span>
+            <span className="mr-4 inline-block w-16 font-normal text-gray-500">
+              가능 크레딧
+            </span>
             {exchangeDuration}분 / 1회
           </div>
           <div className="py-2">
-            <span className="mr-4 font-normal text-gray-500">선호 방식</span>
+            <span className="mr-4 inline-block w-16 font-normal text-gray-500">
+              선호 방식
+            </span>
             {EXCHANGE_TYPE_LABELS[exchangeType]}
           </div>
           <div className="py-2">
-            <span className="mr-4 font-normal text-gray-500">선호 지역</span>
-            {REGION_LABELS[preferredRegion]} {detailedLocation}
+            <span className="mr-4 inline-block w-16 font-normal text-gray-500">
+              선호 지역
+            </span>
+            {REGION_LABELS[preferredRegion]
+              ? `${REGION_LABELS[preferredRegion]} ${detailedLocation}`
+              : '-'}
           </div>
         </div>
       </div>
@@ -137,13 +155,13 @@ export const SkillDetail = ({
             ))}
         </div>
       </div>
-      {/* <div id="skill-detail-reviews" className="mt-3 flex flex-col gap-[9px]">
+      <div id="skill-detail-reviews" className="mt-3 flex flex-col gap-[9px]">
         <SectionTitle
           icon={<EditIcon size={18} className="text-gray-800" />}
           title="이용 후기"
         />
-        <ReviewSection reviews={reviews} />
-      </div> */}
+        <ReviewSection reviews={reviews} skillRating={skillRating} />
+      </div>
     </div>
   );
 };

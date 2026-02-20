@@ -3,7 +3,7 @@ import { UserProfile } from '@/src/features/skills/detail/UserProfile';
 import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
-import { SkillDetailDto } from '@/src/types/skill';
+import { SkillDetailDto, SkillReviewListResponseDto } from '@/src/types/skill';
 import { DetailFooter } from '@/src/features/skills/detail/DetailFooter';
 
 export default async function SkillDetailPage({
@@ -15,16 +15,22 @@ export default async function SkillDetailPage({
 
   const skillId = Number(id);
 
-  const res = await fetch(
+  const detailRes = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/${skillId}`,
     { cache: 'no-store' },
   );
 
-  if (!res.ok) {
+  const reviewRes = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/skills/${skillId}?size=5`,
+    { cache: 'no-store' },
+  );
+
+  if (!detailRes.ok) {
     return <div>존재하지 않는 스킬입니다.</div>;
   }
 
-  const skillDetail: SkillDetailDto = (await res.json()).data;
+  const skillDetail: SkillDetailDto = (await detailRes.json()).data;
+  const reviewList: SkillReviewListResponseDto = (await reviewRes.json()).data;
 
   return (
     <>
@@ -34,13 +40,17 @@ export default async function SkillDetailPage({
             <UserProfile
               nickname={skillDetail.nickname}
               timesTaught={skillDetail.timesTaught}
+              userAvgRating={skillDetail.userAvgRating}
             />
             <DetailSectionTab />
           </div>
         </div>
         <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-1 gap-5 pt-12 pb-9">
           <div className="w-0 flex-1">
-            <SkillDetail {...skillDetail} />
+            <SkillDetail
+              skillDetail={skillDetail}
+              reviews={reviewList.contents}
+            />
           </div>
           <div className="sticky top-75 h-fit w-[173px]">
             <ProfileSkillList list={skillDetail.skills} currentId={skillId} />

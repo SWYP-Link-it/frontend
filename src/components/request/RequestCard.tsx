@@ -2,9 +2,14 @@
 
 import { SkillRequest } from '@/src/types/request';
 import Image from 'next/image';
+import { MessageIcon } from '../icons/MessageIcon';
+import { BaseModal } from '../BaseModal';
+import { SkillReviewModalContent } from './SkillReviewModalContent';
+import { useState } from 'react';
 
 interface RequestCardProps {
   request: SkillRequest;
+  fetchRequests: () => void;
   onAccept?: (id: number) => void;
   onReject?: (id: number) => void;
   onCancel?: (id: number) => void;
@@ -13,16 +18,19 @@ interface RequestCardProps {
 
 export const RequestCard = ({
   request,
+  fetchRequests,
   onAccept,
   onReject,
   onCancel,
   onInquiry,
 }: RequestCardProps) => {
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACCEPTED':
         return (
-          <span className="rounded bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
+          <span className="bg-success-100 text-success-500 rounded px-2 py-0.5 text-[11px] font-semibold">
             수락됨
           </span>
         );
@@ -60,15 +68,11 @@ export const RequestCard = ({
     }
   };
 
-  // 버튼 노출 로직 (명세 기준)
   const isPending = request.status === 'PENDING';
   const isAccepted = request.status === 'ACCEPTED';
 
-  // 멘티(보낸 사람): 대기중, 수락됨 상태에서 취소 가능
-  // 멘토(받은 사람): 수락됨 상태에서 취소 가능
   const canCancel = request.isSentByMe ? isPending || isAccepted : isAccepted;
 
-  // 수락/거절은 멘토가 대기중일 때만 가능
   const canRespond = !request.isSentByMe && isPending;
 
   return (
@@ -87,7 +91,7 @@ export const RequestCard = ({
               <h3 className="text-lg font-bold text-gray-900">
                 {request.partnerNickname}
               </h3>
-              <span className="rounded bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
+              <span className="text-brand-600 rounded bg-blue-50 px-2 py-0.5 text-[11px] font-semibold">
                 {request.partnerTag}
               </span>
               {getStatusBadge(request.status)}
@@ -96,9 +100,9 @@ export const RequestCard = ({
           </div>
         </div>
 
-        <div className="mt-4 flex space-x-8 md:mt-0">
+        <div className="mt-4 mr-12 flex space-x-8 md:mt-0">
           <div>
-            <p className="mb-1 text-xs text-gray-300">날짜</p>
+            <p className="mb-1 text-xs text-gray-300">날짜 및 시간</p>
             <p className="text-sm font-bold text-gray-700">
               {request.sessionDate}
             </p>
@@ -115,7 +119,7 @@ export const RequestCard = ({
       <div className="my-6 border-t border-gray-100"></div>
 
       <div className="mb-8">
-        <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-600">
+        <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
           {request.description}
         </p>
       </div>
@@ -123,20 +127,10 @@ export const RequestCard = ({
       <div className="flex items-center gap-3">
         <button
           onClick={() => onInquiry?.(request.partnerId)}
-          className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50"
+          className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-3 text-lg text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
         >
-          <svg
-            className="mr-2"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-          문의하기
+          <MessageIcon className="mr-2" />
+          문의
         </button>
 
         <div className="flex flex-1 gap-3">
@@ -144,7 +138,7 @@ export const RequestCard = ({
             <>
               <button
                 onClick={() => onAccept?.(request.id)}
-                className="flex-1 rounded-[12px] bg-blue-600 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
+                className="bg-brand-600 flex-1 rounded-[12px] py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
               >
                 수락
               </button>
@@ -159,10 +153,42 @@ export const RequestCard = ({
           {canCancel && (
             <button
               onClick={() => onCancel?.(request.id)}
-              className="w-full rounded-[12px] bg-gray-100 py-3 text-sm font-bold text-gray-500 hover:bg-gray-200"
+              className="ml-auto w-[380px] rounded-[12px] bg-gray-100 py-3 text-sm font-bold text-gray-500 hover:bg-gray-200"
             >
-              요청 취소
+              취소하기
             </button>
+          )}
+          {request.canReview && (
+            <>
+              <button
+                onClick={() => setIsReviewModalOpen(true)}
+                className="ml-auto w-[380px] rounded-[12px] bg-gray-100 py-3 text-sm font-bold text-gray-500 hover:bg-gray-200"
+              >
+                <span className="relative">
+                  {request.reviewId === null || request.reviewId === undefined
+                    ? '후기 쓰기'
+                    : '후기 수정'}
+                  {(request.reviewId === null ||
+                    request.reviewId === undefined) && (
+                    <span className="absolute -top-0.5 -right-3 h-1.5 w-1.5 rounded-full bg-red-500" />
+                  )}
+                </span>
+              </button>
+              <BaseModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+                maxWidth="max-w-lg"
+              >
+                <SkillReviewModalContent
+                  reviewId={request.reviewId}
+                  skillExchangeId={request.id}
+                  mentorId={request.partnerId}
+                  skillId={request.skillId}
+                  onSuccess={() => fetchRequests()}
+                  onClose={() => setIsReviewModalOpen(false)}
+                />
+              </BaseModal>
+            </>
           )}
         </div>
       </div>

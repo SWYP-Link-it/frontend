@@ -43,7 +43,7 @@ export default async function Skills({
               <h1 className="text-2xl leading-[1.5] font-semibold text-gray-800">
                 스킬 게시판
               </h1>
-              <span className="leading-[1.5] font-medium text-gray-400">
+              <span className="text-xs font-medium text-gray-400">
                 게시글을 확인하고 진짜 실력자에게 스킬을 배워보세요!
               </span>
             </div>
