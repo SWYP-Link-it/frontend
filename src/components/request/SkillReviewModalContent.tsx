@@ -108,8 +108,6 @@ export const SkillReviewModalContent = ({
       // 없으면 리뷰 생성
       createReview({ rating, content });
     }
-
-    onClose();
   };
 
   useEffect(() => {

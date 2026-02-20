@@ -1,5 +1,6 @@
 import { SkillReviewDto } from '@/src/types/skill';
 import Image from 'next/image';
+import { ReviewContentCard } from './ReviewContentCard';
 
 type ReviewSectionProps = {
   reviews: SkillReviewDto[];
@@ -44,18 +45,8 @@ export const ReviewSection = ({ reviews, skillRating }: ReviewSectionProps) => {
       </div>
       <div className="mt-15 flex gap-5 overflow-x-auto pb-[30px]">
         {reviews.length > 0 &&
-          reviews.map(({ reviewId, content, reviewerNickname }) => (
-            <div
-              key={reviewId}
-              className="flex w-[370px] shrink-0 flex-col gap-[10px] rounded-3xl bg-gray-100 px-8 py-[29px]"
-            >
-              <div className="line-clamp-3 leading-6 text-gray-800">
-                {content}
-              </div>
-              <span className="text-sm leading-[1.5] font-semibold text-gray-500">
-                {reviewerNickname} 님
-              </span>
-            </div>
+          reviews.map((review) => (
+            <ReviewContentCard key={review.reviewId} review={review} />
           ))}
         {reviews.length <= 0 && (
           <div className="flex h-20 w-full items-center justify-center text-sm text-gray-400">
