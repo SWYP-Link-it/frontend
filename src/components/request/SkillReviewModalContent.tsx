@@ -7,6 +7,7 @@ import { StarIcon } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '@/src/lib/api/api';
 import { isAxiosError } from 'axios';
+import Image from 'next/image';
 
 type SkillReviewModalContentProps = {
   reviewId?: number;
@@ -131,12 +132,23 @@ export const SkillReviewModalContent = ({
         평점을 선택해주세요
       </h2>
       <div className="mb-8 flex">
-        {Array.from({ length: 5 }).map((_, idx) => (
-          <button key={idx} onClick={() => setRating(idx + 1)}>
-            <StarIcon
-              className={`h-10 w-10 p-1 transition-colors hover:cursor-pointer ${idx + 1 <= rating ? 'text-brand-600' : 'text-gray-600'}`}
-            />
-          </button>
+        {Array.from({ length: rating }).map((_, idx) => (
+          <Image
+            onClick={() => setRating(idx + 1)}
+            key={idx}
+            src={'/icons/star.svg'}
+            alt="별"
+            width={40}
+            height={40}
+            className="p-1 hover:cursor-pointer"
+          />
+        ))}
+        {Array.from({ length: 5 - rating }).map((_, idx) => (
+          <StarIcon
+            key={idx}
+            onClick={() => setRating(rating + idx + 1)}
+            className={`h-10 w-10 p-1 text-gray-400 hover:cursor-pointer`}
+          />
         ))}
       </div>
 

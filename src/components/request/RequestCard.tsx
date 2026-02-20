@@ -181,6 +181,7 @@ export const RequestCard = ({
               <BaseModal
                 isOpen={isReviewModalOpen}
                 onClose={() => setIsReviewModalOpen(false)}
+                maxWidth="max-w-lg"
               >
                 <SkillReviewModalContent
                   reviewId={request.reviewId}
