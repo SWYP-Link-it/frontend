@@ -46,14 +46,15 @@ export default function ProfileReviewPage() {
 
   if (isLoading) {
     return (
-      <div className="py-20 text-center text-gray-400">
+      <div className="flex min-h-screen w-full items-center justify-center bg-white py-20 text-center text-gray-400">
         데이터를 불러오는 중입니다...
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col bg-white">
+    // min-h-screen을 주어 데이터가 적어도 배경은 화면 끝까지 차게 합니다.
+    <div className="flex min-h-screen w-full flex-col bg-white">
       <div className="w-full px-28">
         <div className="mx-auto my-6 flex max-w-284 flex-col justify-center">
           <h1 className="text-[24px] font-semibold text-gray-800">내 리뷰</h1>
@@ -63,9 +64,9 @@ export default function ProfileReviewPage() {
         </div>
       </div>
 
-      <div className="w-full px-28 pb-[126px]">
-        <div className="mx-auto flex max-w-284">
-          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink">
+      <div className="w-full flex-1 px-28 pb-[126px]">
+        <div className="mx-auto flex h-full max-w-284">
+          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink-0 self-start">
             <ProfileTab />
           </aside>
 
