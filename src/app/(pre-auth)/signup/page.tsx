@@ -2,16 +2,46 @@
 
 import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
-import { api } from '@/src/lib/api/api';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { useMutation } from '@tanstack/react-query';
+import { completeRegistration } from '@/src/features/auth/api';
+import { isAxiosError } from 'axios';
 
 export default function Signup() {
   const router = useRouter();
   const { setAccessToken } = useAuthStore();
+
+  const { mutate: handleSubmit, isPending: isSubmitPending } = useMutation({
+    mutationFn: completeRegistration,
+    onSuccess: (response) => {
+      setAccessToken(response.data.data.accessToken);
+      router.push('/onboarding');
+    },
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        const serverError = error.response?.data;
+        if (serverError.code === 'U002') {
+          setErrorMessage('사용 중인 닉네임입니다.');
+          return;
+        }
+        if (serverError.code === 'C006') {
+          toast.error(serverError.data[0].message);
+          return;
+        }
+        if (serverError.message) {
+          toast.error(serverError.message);
+          return;
+        }
+      } else {
+        toast.error('회원가입에 실패하였습니다.');
+        console.error(error);
+      }
+    },
+  });
 
   const [nickname, setNickname] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -24,30 +54,6 @@ export default function Signup() {
     if (!allowedRegex.test(e.key) && !isControlKey) {
       e.preventDefault();
     }
-  };
-
-  const handleSubmit = async () => {
-    api
-      .post('/auth/complete-registration', {
-        nickname,
-      })
-      .then((response) => {
-        setAccessToken(response.data.data.accessToken);
-        router.push('/onboarding');
-      })
-      .catch((error) => {
-        const serverError = error.response?.data;
-        if (serverError.code === 'U002') {
-          setErrorMessage('사용 중인 닉네임입니다.');
-        } else if (serverError.code === 'C006') {
-          toast.error(serverError.data[0].message);
-        } else if (serverError.message) {
-          toast.error(serverError.message);
-        } else {
-          toast.error('회원가입에 실패하였습니다.');
-          console.error(serverError);
-        }
-      });
   };
 
   return (
@@ -71,7 +77,10 @@ export default function Signup() {
         <Button
           text="회원가입"
           mode={!nickname ? 'inactive' : 'active'}
-          onClick={handleSubmit}
+          onClick={() => {
+            if (isSubmitPending) return;
+            handleSubmit(nickname);
+          }}
         />
       </div>
     </div>

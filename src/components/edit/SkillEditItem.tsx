@@ -35,7 +35,7 @@ export const SkillEditItem = ({
   };
 
   return (
-    <div className="group relative rounded-xl border border-gray-100 bg-white p-6">
+    <div className="group relative border-b border-gray-100 bg-white py-6 first:pt-0 last:border-0">
       <div className="absolute top-6 right-6 flex gap-3 opacity-100">
         <button
           onClick={onEdit}
@@ -81,10 +81,10 @@ export const SkillEditItem = ({
       </h3>
 
       <div className="mb-3 flex gap-2">
-        <span className="rounded border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-600">
+        <span className="text-brand-600 border-brand-200 rounded border px-2 py-1 text-xs font-bold">
           {skill.skillName}
         </span>
-        <span className="rounded border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-600">
+        <span className="text-brand-600 border-brand-200 rounded border px-2 py-1 text-xs font-bold">
           {proficiencyLabel}
         </span>
       </div>

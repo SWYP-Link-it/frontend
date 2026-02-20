@@ -7,9 +7,7 @@ type SkillCardProps = {
 };
 
 export const SkillCard = ({ skill }: SkillCardProps) => {
-  const { skillId, skillTitle, skillName, nickname } = skill;
-
-  const dummyRate = 3.5;
+  const { skillId, skillTitle, skillName, nickname, avgRating } = skill;
 
   return (
     <Link
@@ -23,15 +21,15 @@ export const SkillCard = ({ skill }: SkillCardProps) => {
       <div className="line-clamp-3 leading-6 font-semibold text-gray-700">
         {skillTitle}
       </div>
-      {/* <div className="mt-auto flex items-center gap-[3.27px]">
-        <span>별</span>
+      <div className="mt-auto mb-3 flex items-center gap-[3.27px]">
+        <Image src={'/icons/star.svg'} alt="별" width={16} height={16} />
         <div
-          className={`text-sm leading-[1.5] font-medium ${dummyRate ? 'text-gray-600' : 'text-gray-400'}`}
+          className={`text-sm leading-[1.5] font-medium ${avgRating ? 'text-gray-600' : 'text-gray-400'}`}
         >
-          {dummyRate ? `${dummyRate}/5` : '평가 없음'}
+          {avgRating ? `${avgRating} / 5` : '평가 없음'}
         </div>
-      </div> */}
-      <span className="mt-auto w-fit rounded-md bg-[#F4F2FF] px-[10px] py-[2px] text-xs leading-[18px] font-semibold text-[#3477FF]">
+      </div>
+      <span className="w-fit rounded-md bg-[#F4F2FF] px-[10px] py-[2px] text-xs leading-[18px] font-semibold text-[#3477FF]">
         {skillName}
       </span>
     </Link>

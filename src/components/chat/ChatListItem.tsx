@@ -4,6 +4,13 @@ import { formatMessageDate } from '@/src/utils/date';
 import { ChatRoomListItem } from '@/src/types/chat';
 
 export const ChatListItem = ({ data }: { data: ChatRoomListItem }) => {
+  const displayMessage =
+    data.lastMessageContent && data.lastMessageContent.trim() !== ''
+      ? data.lastMessageContent
+      : data.lastMessageAtEpochMs
+        ? '이미지를 보냈습니다'
+        : '대화를 시작해보세요!';
+
   return (
     <Link href={`/messages/${data.roomId}`} className="block">
       <div className="m-[10px] flex h-[86px] cursor-pointer items-center rounded-[6px] p-[10px] transition-colors hover:bg-gray-50">
@@ -33,7 +40,7 @@ export const ChatListItem = ({ data }: { data: ChatRoomListItem }) => {
 
           <div className="flex items-start justify-between gap-2">
             <p className="line-clamp-2 text-[13px] leading-[1.4] text-gray-500">
-              {data.lastMessageContent || '대화를 시작해보세요!'}
+              {displayMessage}
             </p>
 
             {data.unreadCount > 0 && (

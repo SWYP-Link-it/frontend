@@ -14,8 +14,8 @@ export const ProfileEditSection = ({
   children,
 }: ProfileEditSectionProps) => {
   return (
-    <section className="mb-10">
-      <div className="mb-4 flex items-center justify-between">
+    <section className="mb-16">
+      <div className="mb-7 flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">{title}</h2>
         {onEdit && (
           <button

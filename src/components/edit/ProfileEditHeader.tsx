@@ -50,7 +50,7 @@ export const ProfileEditHeader = ({
         disabled={!canSave}
         className={`rounded-xl px-8 py-2.5 text-sm font-bold transition-all ${
           canSave
-            ? 'bg-blue-500 text-white shadow-lg shadow-blue-100 hover:bg-blue-600'
+            ? 'bg-blue-500 text-white hover:bg-blue-600'
             : 'bg-gray-100 text-gray-400'
         }`}
       >

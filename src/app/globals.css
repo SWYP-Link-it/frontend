@@ -4,6 +4,7 @@
   html,
   body {
     width: 100%;
+    min-width: 1440px;
     height: 100%;
     font-family: var(--font-pretendard), system-ui;
     letter-spacing: -3%;
@@ -13,6 +14,33 @@
   [data-sonner-toast] {
     font-family: var(--font-pretendard), system-ui;
     letter-spacing: -0.03em;
+  }
+
+  .input-gradient {
+    background-image: linear-gradient(
+      90deg,
+      #adb6fd 0%,
+      #a4c2f8 5%,
+      #8edbff 20%,
+      #a4c2f8 35%,
+      #adb6fd 40%,
+      #adb6fd 50%,
+      #a4c2f8 55%,
+      #8edbff 70%,
+      #a4c2f8 85%,
+      #adb6fd 90%
+    );
+    background-size: 200% 100%;
+    animation: gradient-x-linear 3s linear infinite;
+  }
+}
+
+@keyframes gradient-x-linear {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0% 50%;
   }
 }
 

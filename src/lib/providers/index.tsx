@@ -2,6 +2,7 @@
 
 import { AuthProvider } from './AuthProvider';
 import { MSWProvider } from './MSWProvider';
+import { QueryProvider } from './QueryProvider';
 
 export const ClientProviders = ({
   children,
@@ -10,7 +11,9 @@ export const ClientProviders = ({
 }) => {
   return (
     <MSWProvider>
-      <AuthProvider>{children}</AuthProvider>
+      <QueryProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </QueryProvider>
     </MSWProvider>
   );
 };

@@ -6,19 +6,22 @@ import { RequiredAuth } from '@/src/features/auth/RequiredAuth';
 import { Button } from '@/src/components/Button';
 import { api } from '@/src/lib/api/api';
 import { useRouter } from 'next/navigation';
-import { useUserInfoStore } from '@/src/stores/userInfoStore';
 import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
 import { toast } from 'sonner';
+import { Tooltip } from '@/src/components/Tooltip';
+import { useUserStore } from '@/src/stores/userStore';
 
 type DetailFooterProps = {
   mentorId: number;
   skillId: number;
 };
 
+const HAS_SEEN_TOOLTIP = 'hasSeenSkillDetailRequestButtonTooltip';
+
 export const DetailFooter = ({ mentorId, skillId }: DetailFooterProps) => {
   const router = useRouter();
 
-  const myId = useUserInfoStore((state) => state.userInfo?.userId);
+  const myId = useUserStore((state) => state.userInfo?.userId);
 
   const handleContact = async () => {
     try {
@@ -51,21 +54,37 @@ export const DetailFooter = ({ mentorId, skillId }: DetailFooterProps) => {
       <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 items-center gap-12">
         <MyCreditBadge />
         <div className="flex flex-1 gap-[15px]">
-          <RequiredAuth>
-            <div className="ml-auto w-full max-w-[380px]">
-              <Button
-                text={'스킬 요청하기'}
-                mode={isMySkill ? 'inactive' : 'active'}
-                icon={<RequestIcon size={20} />}
-                disabled={isMySkill}
-                onClick={() =>
-                  router.push(
-                    `/skills/request?mentorId=${mentorId}&skillId=${skillId}`,
-                  )
-                }
-              />
-            </div>
-          </RequiredAuth>
+          <Tooltip
+            showTooltipDefault={localStorage.getItem(HAS_SEEN_TOOLTIP) === null}
+            tooltipContent={
+              <p className="text-sm font-medium">
+                소개 확인 후 <span className="text-brand-400">스킬 요청</span>
+                을 보내보세요.
+                <br />
+                버튼을 누르면{' '}
+                <span className="text-brand-400">요청서 작성 화면</span>
+                으로 이동해요.
+              </p>
+            }
+            tailPosition="right"
+            onClose={() => localStorage.setItem(HAS_SEEN_TOOLTIP, 'true')}
+          >
+            <RequiredAuth>
+              <div className="ml-auto w-full max-w-[380px]">
+                <Button
+                  text={'스킬 요청하기'}
+                  mode={isMySkill ? 'inactive' : 'active'}
+                  icon={<RequestIcon size={20} />}
+                  disabled={isMySkill}
+                  onClick={() =>
+                    router.push(
+                      `/skills/request?mentorId=${mentorId}&skillId=${skillId}`,
+                    )
+                  }
+                />
+              </div>
+            </RequiredAuth>
+          </Tooltip>
           <RequiredAuth>
             <div className="w-full max-w-[380px]">
               <Button

@@ -1,9 +1,11 @@
+import { Category } from './skill';
+
 export type SkillProficiency = 'LOW' | 'MEDIUM' | 'HIGH';
-export type ExchangeType = 'ONLINE' | 'OFFLINE' | 'BOTH' | 'NONE';
+export type ExchangeType = 'ONLINE' | 'OFFLINE' | 'BOTH' | null;
 
 export interface UserSkill {
   id: number;
-  skillCategoryType: string;
+  skillCategoryType: Exclude<Category, 'ALL'>;
   skillCategoryName: string;
   skillName: string;
   skillTitle: string;
@@ -50,16 +52,39 @@ export type SkillData = {
   title?: string;
   skillDescription?: string;
   description?: string;
+  exchangeDuration?: number;
   imageUrls?: string[];
-  [key: string]: any;
+  imageFiles?: File[];
+  // [key: string]: unknown;
 };
 
 export type SkillFormData = {
   category: string;
   name: string;
   proficiency: 'LOW' | 'MEDIUM' | 'HIGH';
+  exchangeDuration: number;
   title: string;
   description: string;
   existingImages: string[];
   newFiles: File[];
 };
+
+export type CreditTransactionType =
+  | 'CANCEL'
+  | 'REQUEST'
+  | 'REJECT'
+  | 'REWARD'
+  | 'COMPLETED';
+
+export type CreditStatusLabel = '리워드' | '요청' | '취소' | '거절' | '정산';
+
+export interface CreditTransaction {
+  creditHistoryId: number;
+  targetNickname: string | null;
+  contentName: string;
+  createdAt: string;
+  statusLabel: CreditStatusLabel;
+  changeAmount: number;
+  targetProfileImageUrl?: string | null;
+  skillId?: number | null;
+}

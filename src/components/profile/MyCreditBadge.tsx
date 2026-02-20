@@ -1,23 +1,19 @@
 'use client';
 
-import { useUserInfoStore } from '@/src/stores/userInfoStore';
+import { useQueryCreditBalance } from '@/src/features/profile/hooks/useQueryCreditBalance';
 
 type MyCreditBadgeProps = {
   className?: string;
 };
 
 export const MyCreditBadge = ({ className }: MyCreditBadgeProps) => {
-  const creditBalance = useUserInfoStore(
-    (state) => state.userInfo?.creditBalance,
-  );
+  const { data: credit } = useQueryCreditBalance();
 
-  if (creditBalance === undefined) return null;
-
-  return (
+  return credit !== undefined ? (
     <span
       className={`text-brand-600 w-fit rounded-lg bg-[#F4F2FF] px-3 py-[5px] text-base font-semibold ${className}`}
     >
-      내 크레딧 | {creditBalance}
+      내 크레딧 | {credit}
     </span>
-  );
+  ) : null;
 };

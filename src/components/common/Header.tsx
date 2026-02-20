@@ -65,17 +65,19 @@ export const Header = () => {
       <header className="sticky top-0 z-50 flex min-h-18 w-full items-center justify-center bg-white">
         <div className="mx-28 flex w-284 items-center justify-between">
           <Image src="/icons/logo.svg" alt="logo" width={86} height={36} />
-          <button
-            onClick={() => setIsSearchModalOpen(true)}
-            className="border-brand-600 flex h-[37px] w-[342px] cursor-pointer items-center gap-[7px] rounded-lg border p-[10px]"
-          >
-            <SearchIcon className="text-gray-600" size={14} />
-            <div
-              className={`text-sm font-medium text-gray-700 outline-none ${searchKeyword ? '' : 'opacity-65'}`}
+          <div className="input-gradient h-[37px] w-[342px] rounded-lg p-[1.5px]">
+            <button
+              onClick={() => setIsSearchModalOpen(true)}
+              className="flex h-full w-full cursor-pointer items-center gap-[7px] rounded-[7px] bg-white p-[10px]"
             >
-              {searchKeyword || '찾는 스킬을 입력해주세요.'}
-            </div>
-          </button>
+              <SearchIcon className="text-gray-600" size={14} />
+              <div
+                className={`text-sm font-medium text-gray-700 opacity-65 outline-none`}
+              >
+                {searchKeyword || '찾는 스킬을 입력해주세요.'}
+              </div>
+            </button>
+          </div>
         </div>
       </header>
       {isSearchModalOpen

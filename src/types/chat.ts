@@ -29,6 +29,7 @@ export type ChatMessage = {
   senderId: number;
   senderRole: 'MENTOR' | 'MENTEE';
   content: string;
+  fileUrl?: string | null;
   createdAtEpochMs: number;
   isMine: boolean;
 };
