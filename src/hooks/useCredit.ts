@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { api } from '@/src/lib/api/api';
 
 export function useCredit() {
@@ -12,19 +12,37 @@ export function useCredit() {
     },
   });
 
-  const { data: historyData, isLoading: isHistoryLoading } = useQuery({
+  const {
+    data: historyData,
+    isLoading: isHistoryLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ['credit', 'histories'],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       const res = await api.get('/credits/histories', {
-        params: { size: 20 },
+        params: {
+          page: pageParam,
+          size: 20,
+        },
       });
-      return res.data.data.contents;
+      return res.data.data;
     },
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasNext ? lastPage.pageNumber + 1 : undefined;
+    },
+    initialPageParam: 0,
   });
+
+  const allHistory = historyData?.pages.flatMap((page) => page.contents) || [];
 
   return {
     balance: balanceData,
-    history: historyData || [],
+    history: allHistory,
     isLoading: isBalanceLoading || isHistoryLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   };
 }

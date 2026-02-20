@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 import { api } from '@/src/lib/api/api';
 import { useAuthStore } from '@/src/stores/authStore';
 import { RequestCard } from '@/src/components/request/RequestCard';
@@ -14,11 +16,7 @@ import {
 } from '@/src/types/request';
 import { Tabbar } from '@/src/components/Tabbar';
 
-const formatDate = (dateString: string) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
+dayjs.locale('ko');
 
 const mapStatus = (koreanStatus: string): RequestStatus => {
   switch (koreanStatus) {
@@ -93,7 +91,9 @@ export default function RequestPage() {
         partnerProfileImageUrl: item.targetProfileImageUrl,
         description: item.message,
         status: mapStatus(item.exchangeStatus),
-        sessionDate: formatDate(item.exchangeDateTime),
+        sessionDate: dayjs(item.exchangeDateTime.replace('T', ' ')).format(
+          'YYYY년 M월 D일 A h:mm',
+        ),
         sessionTime: `${item.exchangeDuration}분`,
         credits: item.creditPrice,
         createdAt: item.requestedDate,
@@ -194,7 +194,7 @@ export default function RequestPage() {
   };
 
   return (
-    <div className="mx-auto flex h-[calc(100%-80px)] w-[calc(100%-224px)] max-w-284 flex-col items-center bg-white shadow-[0_0_0_100vh_white]">
+    <div className="mx-auto flex min-h-screen w-[calc(100%-224px)] max-w-284 flex-col items-center bg-white shadow-[0_0_0_100vw_white]">
       <div className="w-full shrink-0 border-b border-gray-100 bg-white">
         <div className="my-6 flex shrink-0 flex-col justify-center gap-1">
           <h2 className="text-[24px] font-semibold text-gray-800">요청 관리</h2>
@@ -206,12 +206,12 @@ export default function RequestPage() {
           <div className="pointer-events-none absolute top-0 left-0 z-10 flex h-[40px]">
             <div className="relative w-[90px]">
               {unreadInfo.received && (
-                <span className="absolute top-[14px] right-[12px] h-1.5 w-1.5 rounded-full bg-red-500" />
+                <span className="absolute top-[14px] right-[2px] h-1.5 w-1.5 rounded-full bg-red-500" />
               )}
             </div>
             <div className="relative w-[90px]">
               {unreadInfo.sent && (
-                <span className="absolute top-[14px] right-[12px] h-1.5 w-1.5 rounded-full bg-red-500" />
+                <span className="absolute top-[14px] right-[2px] h-1.5 w-1.5 rounded-full bg-red-500" />
               )}
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function RequestPage() {
         </div>
       </div>
 
-      <main className="w-full flex-1 overflow-y-auto px-6 py-10">
+      <main className="w-full px-6 py-10 pb-20">
         <div className="space-y-6">
           {isLoading ? (
             <div className="flex h-60 items-center justify-center font-medium text-gray-400">
