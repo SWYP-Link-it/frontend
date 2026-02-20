@@ -239,7 +239,7 @@ export default function SkillRequestClient() {
                         className="flex cursor-pointer flex-col items-center gap-[17px]"
                       >
                         <CategoryFigure
-                          category={'DESIGN'}
+                          category={skill.skillCategoryType}
                           isActive={isSelected}
                           size="lg"
                         />

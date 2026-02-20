@@ -47,7 +47,7 @@ export default async function Skills({
                 게시글을 확인하고 진짜 실력자에게 스킬을 배워보세요!
               </span>
             </div>
-            <CategoryTab category={selectedCategory} />
+            <CategoryTab currentCategory={selectedCategory} />
           </div>
         </div>
         <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-1 flex-col pb-[126px]">

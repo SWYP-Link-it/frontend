@@ -25,6 +25,7 @@ export const SkillDetail = ({
     skillTitle,
     skillDescription,
     skillProficiency,
+    skillCategoryType,
     exchangeDuration,
     imageUrls,
   } = mainSkill;
@@ -42,7 +43,11 @@ export const SkillDetail = ({
             숙련도 - {PROFICIENCY_LABELS[skillProficiency]}
           </div>
         </div>
-        <CategoryFigure category={'DESIGN'} isActive={true} size="lg" />
+        <CategoryFigure
+          category={skillCategoryType}
+          isActive={true}
+          size="lg"
+        />
       </div>
       <div className="border-y border-gray-200 py-6">
         <div className="grid w-fit grid-cols-2 gap-x-25 text-sm font-semibold text-gray-600">

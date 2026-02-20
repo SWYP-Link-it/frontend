@@ -6,9 +6,9 @@ import { Category } from '@/src/types/skill';
 import { CATEGORY_LABELS } from '@/src/constants/skill';
 
 type SkillCategoriesProps = {
-  category: Category;
+  currentCategory: Category;
 };
-export const CategoryTab = ({ category }: SkillCategoriesProps) => {
+export const CategoryTab = ({ currentCategory }: SkillCategoriesProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -25,7 +25,7 @@ export const CategoryTab = ({ category }: SkillCategoriesProps) => {
         key: category as Category,
         label,
       }))}
-      currentItem={category}
+      currentItem={currentCategory}
       onClickItem={handleCategoryClick}
     />
   );
