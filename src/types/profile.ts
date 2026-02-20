@@ -1,9 +1,11 @@
+import { Category } from './skill';
+
 export type SkillProficiency = 'LOW' | 'MEDIUM' | 'HIGH';
 export type ExchangeType = 'ONLINE' | 'OFFLINE' | 'BOTH' | null;
 
 export interface UserSkill {
   id: number;
-  skillCategoryType: string;
+  skillCategoryType: Exclude<Category, 'ALL'>;
   skillCategoryName: string;
   skillName: string;
   skillTitle: string;

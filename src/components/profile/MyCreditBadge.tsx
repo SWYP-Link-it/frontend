@@ -9,7 +9,7 @@ type MyCreditBadgeProps = {
 export const MyCreditBadge = ({ className }: MyCreditBadgeProps) => {
   const { data: credit } = useQueryCreditBalance();
 
-  return credit ? (
+  return credit !== undefined ? (
     <span
       className={`text-brand-600 w-fit rounded-lg bg-[#F4F2FF] px-3 py-[5px] text-base font-semibold ${className}`}
     >

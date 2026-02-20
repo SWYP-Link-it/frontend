@@ -9,7 +9,7 @@ export const useFormInfoFromSearchParams = () => {
   const skillId = searchParams.get('skillId');
 
   return {
-    mentorId: Number(mentorId),
-    skillId: Number(skillId),
+    mentorId: mentorId ? Number(mentorId) : null,
+    skillId: skillId ? Number(skillId) : null,
   };
 };

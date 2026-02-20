@@ -1,28 +1,31 @@
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
 import { SkillList } from '@/src/features/skills/SkillList';
-import { Category, SkillCardDto } from '@/src/types/skill';
+import { CATEGORIES, Category, SkillCardDto } from '@/src/types/skill';
 import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
 import { CategoryTab } from '@/src/features/skills/CategoryTab';
+import { redirect } from 'next/navigation';
 
 export default async function Skills({
   searchParams,
 }: {
   searchParams: Promise<{ category?: string; searchKeyword?: string }>;
 }) {
-  const selectedCategory: Category =
-    ((await searchParams).category as Category) || 'ALL';
+  const { category, searchKeyword } = await searchParams;
 
-  const searchKeyword = (await searchParams).searchKeyword;
+  if (category && !CATEGORIES.includes(category as Category)) {
+    redirect('/skills');
+  }
+
+  const selectedCategory: Category = (category as Category) || 'ALL';
 
   const params = new URLSearchParams();
-
   if (selectedCategory !== 'ALL') params.append('category', selectedCategory);
   if (searchKeyword) params.append('searchKeyword', searchKeyword);
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills?${params.toString()}`,
-    { next: { revalidate: 20 } },
+    { cache: 'no-store' },
   );
 
   if (!res.ok) {
@@ -44,7 +47,7 @@ export default async function Skills({
                 게시글을 확인하고 진짜 실력자에게 스킬을 배워보세요!
               </span>
             </div>
-            <CategoryTab category={selectedCategory} />
+            <CategoryTab currentCategory={selectedCategory} />
           </div>
         </div>
         <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-1 flex-col pb-[126px]">

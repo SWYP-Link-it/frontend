@@ -24,7 +24,11 @@ export const SkillItem = ({ skill }: SkillItemProps) => {
   return (
     <div className="flex gap-4 border-b border-gray-100 p-4 first:pt-0 last:border-0 last:pb-0">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100">
-        <CategoryFigure category={'DESIGN'} isActive={true} size="sm" />
+        <CategoryFigure
+          category={skill.skillCategoryType}
+          isActive={true}
+          size="sm"
+        />
       </div>
       <div className="flex-1">
         <div className="mb-2 flex items-center gap-2">
