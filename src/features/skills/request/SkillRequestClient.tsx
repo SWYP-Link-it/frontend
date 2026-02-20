@@ -49,7 +49,7 @@ export default function SkillRequestClient() {
     onSuccess: () => {
       toast.success('신청이 완료되었습니다!');
       queryClient.invalidateQueries({
-        queryKey: [profileQueryKey.creditBalance],
+        queryKey: profileQueryKey.creditBalance,
       });
       router.push('/skills');
     },

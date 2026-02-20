@@ -9,4 +9,5 @@ export const useQueryCreditBalance = () =>
       const res = await getCreditBalance();
       return res.data.data.creditBalance as number;
     },
+    staleTime: 5 * 60 * 1000,
   });
