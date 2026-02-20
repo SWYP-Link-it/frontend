@@ -8,7 +8,7 @@ const tabs = [
   'introduction',
   'time',
   'portfolio',
-  // 'reviews',
+  'reviews',
 ] as const;
 
 export const TAB_LABELS = {
@@ -16,7 +16,7 @@ export const TAB_LABELS = {
   introduction: '소개',
   time: '시간',
   portfolio: '포트폴리오',
-  // reviews: '후기',
+  reviews: '후기',
 };
 
 export const DetailSectionTab = () => {

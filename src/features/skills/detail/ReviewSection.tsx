@@ -1,45 +1,33 @@
-import { Review } from '@/src/types/skill';
+import { SkillReviewDto } from '@/src/types/skill';
 import Image from 'next/image';
 
 type ReviewSectionProps = {
-  reviews: Review[];
-};
-
-const calculateAverageRating = (reviews: Review[]): number => {
-  if (reviews.length === 0) return 0;
-  const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
-  return Number((sum / reviews.length).toFixed(1));
-};
-
-const calculateRatingDistribution = (
-  reviews: Review[],
-): Record<number, number> => {
-  const distribution: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-
-  reviews.forEach((review) => {
-    distribution[review.rating]++;
-  });
-
-  const total = reviews.length;
-  return {
-    5: total > 0 ? Math.round((distribution[5] / total) * 100) : 0,
-    4: total > 0 ? Math.round((distribution[4] / total) * 100) : 0,
-    3: total > 0 ? Math.round((distribution[3] / total) * 100) : 0,
-    2: total > 0 ? Math.round((distribution[2] / total) * 100) : 0,
-    1: total > 0 ? Math.round((distribution[1] / total) * 100) : 0,
+  reviews: SkillReviewDto[];
+  skillRating: {
+    avgRating: number;
+    star1Percentage: number;
+    star2Percentage: number;
+    star3Percentage: number;
+    star4Percentage: number;
+    star5Percentage: number;
   };
 };
 
-export const ReviewSection = ({ reviews }: ReviewSectionProps) => {
-  const averageRating = calculateAverageRating(reviews);
-  const ratingDistribution = calculateRatingDistribution(reviews);
-
-  return reviews.length > 0 ? (
+export const ReviewSection = ({ reviews, skillRating }: ReviewSectionProps) => {
+  const {
+    avgRating,
+    star1Percentage,
+    star2Percentage,
+    star3Percentage,
+    star4Percentage,
+    star5Percentage,
+  } = skillRating;
+  return (
     <div className="flex flex-col">
       <div className="flex items-center gap-[49px]">
-        <div className="flex flex-col gap-1">
+        <div className="flex shrink-0 flex-col gap-1">
           <div className="flex items-center gap-2 text-4xl leading-11 font-semibold text-gray-800">
-            {averageRating}
+            {avgRating}
             <Image src={'/icons/star.svg'} alt="별" width={20} height={20} />
           </div>
           <div className="text-xs leading-[18px] font-normal text-gray-400">
@@ -47,31 +35,35 @@ export const ReviewSection = ({ reviews }: ReviewSectionProps) => {
           </div>
         </div>
         <div className="flex w-full flex-col">
-          <PercentageBar label="5" percentage={ratingDistribution[5]} />
-          <PercentageBar label="4" percentage={ratingDistribution[4]} />
-          <PercentageBar label="3" percentage={ratingDistribution[3]} />
-          <PercentageBar label="2" percentage={ratingDistribution[2]} />
-          <PercentageBar label="1" percentage={ratingDistribution[1]} />
+          <PercentageBar label="5" percentage={star5Percentage} />
+          <PercentageBar label="4" percentage={star4Percentage} />
+          <PercentageBar label="3" percentage={star3Percentage} />
+          <PercentageBar label="2" percentage={star2Percentage} />
+          <PercentageBar label="1" percentage={star1Percentage} />
         </div>
       </div>
       <div className="mt-15 flex gap-5 overflow-x-auto pb-[30px]">
-        {reviews.map((review) => (
-          <div
-            key={review.id}
-            className="flex w-[370px] shrink-0 flex-col gap-[10px] rounded-3xl bg-gray-100 px-8 py-[29px]"
-          >
-            <div className="line-clamp-3 leading-6 text-gray-800">
-              {review.content}
+        {reviews.length > 0 &&
+          reviews.map(({ reviewId, content, reviewerNickname }) => (
+            <div
+              key={reviewId}
+              className="flex w-[370px] shrink-0 flex-col gap-[10px] rounded-3xl bg-gray-100 px-8 py-[29px]"
+            >
+              <div className="line-clamp-3 leading-6 text-gray-800">
+                {content}
+              </div>
+              <span className="text-sm leading-[1.5] font-semibold text-gray-500">
+                {reviewerNickname} 님
+              </span>
             </div>
-            <span className="text-sm leading-[1.5] font-semibold text-gray-500">
-              {review.reviewerNickname} 님
-            </span>
+          ))}
+        {reviews.length <= 0 && (
+          <div className="flex h-20 w-full items-center justify-center text-sm text-gray-400">
+            이용 후기가 아직 없습니다.
           </div>
-        ))}
+        )}
       </div>
     </div>
-  ) : (
-    <div>후기가 아직 없습니다.</div>
   );
 };
 
