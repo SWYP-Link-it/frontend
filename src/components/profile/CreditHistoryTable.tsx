@@ -20,7 +20,8 @@ export const CreditHistoryTable = ({
         </thead>
         <tbody className="divide-y divide-gray-50">
           {transactions.map((tx) => {
-            const isPlus = tx.changeAmount > 0;
+            const isPlus =
+              tx.statusLabel === '리워드' || tx.statusLabel === '정산';
             const isSystem =
               !tx.targetNickname || tx.targetNickname === '시스템';
 
@@ -76,9 +77,9 @@ export const CreditHistoryTable = ({
                 </td>
                 <td className={`px-6 py-4 text-right tabular-nums`}>
                   <span
-                    className={`text-base font-bold ${isPlus ? 'text-brand-600' : 'text-gray-900'}`}
+                    className={`text-base font-bold ${isPlus ? 'text-brand-600' : 'text-red-600'}`}
                   >
-                    {isPlus ? `+${tx.changeAmount}` : tx.changeAmount}
+                    {isPlus ? `+${tx.changeAmount}` : `-${tx.changeAmount}`}
                   </span>
                 </td>
               </tr>
