@@ -56,7 +56,7 @@ export default function ProfileReviewPage() {
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
-      <div className="w-full px-28">
+      <div className="w-full bg-white px-28">
         <div className="mx-auto my-6 flex max-w-284 flex-col justify-center">
           <h1 className="text-[24px] font-semibold text-gray-800">내 리뷰</h1>
           <p className="text-[12px] text-gray-400">
@@ -65,13 +65,13 @@ export default function ProfileReviewPage() {
         </div>
       </div>
 
-      <div className="w-full flex-1 px-28 pb-[126px]">
-        <div className="mx-auto flex h-full max-w-284">
-          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink-0 self-start">
+      <div className="w-full flex-1 bg-white px-28 pb-[126px]">
+        <div className="mx-auto flex h-full max-w-284 items-start">
+          <aside className="sticky top-[100px] mr-[100px] w-full max-w-64 flex-shrink-0">
             <ProfileTab />
           </aside>
 
-          <div className="flex-1">
+          <div className="min-w-0 flex-1 bg-white">
             <div className="mb-8 flex justify-end">
               <div className="flex w-fit rounded-2xl bg-gray-100 p-1">
                 <button
@@ -131,7 +131,7 @@ export default function ProfileReviewPage() {
               </div>
             )}
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 bg-white">
               {hasReviews ? (
                 <>
                   {filteredReviews.map((review: any) => (
@@ -155,7 +155,7 @@ export default function ProfileReviewPage() {
                   )}
                 </>
               ) : (
-                <div className="flex h-[400px] flex-col items-center justify-center text-gray-300">
+                <div className="flex h-[400px] flex-col items-center justify-center bg-white text-gray-300">
                   <p className="text-sm font-medium">리뷰 내역이 없습니다.</p>
                 </div>
               )}
