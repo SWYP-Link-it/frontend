@@ -4,6 +4,7 @@ export type SkillCardDto = {
   nickname: string;
   skillTitle: string;
   skillName: string;
+  avgRating: number;
 };
 
 export type Review = {
