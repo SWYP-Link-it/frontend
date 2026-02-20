@@ -7,7 +7,15 @@ import { ProfileTab } from '@/src/components/profile/ProfileTab';
 import { useCredit } from '@/src/hooks/useCredit';
 
 export default function CreditPage() {
-  const { balance, history, isLoading } = useCredit();
+  const {
+    balance,
+    history,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useCredit();
+
   const [filter, setFilter] = useState<'all' | 'ADD' | 'USE'>('all');
 
   const filteredTransactions = history.filter((tx: any) => {
@@ -113,6 +121,18 @@ export default function CreditPage() {
             </div>
 
             <CreditHistoryTable transactions={filteredTransactions} />
+
+            {hasNextPage && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  className="rounded-lg border border-gray-200 px-6 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isFetchingNextPage ? '로딩 중...' : '더 불러오기'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
