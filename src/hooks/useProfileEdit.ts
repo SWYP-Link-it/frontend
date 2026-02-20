@@ -13,7 +13,7 @@ import {
   PROFICIENCY_MAP,
 } from '@/src/constants/profile';
 
-export function useProfileEdit() {
+export const useProfileEdit = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { userInfo } = useUserStore();
@@ -22,7 +22,7 @@ export function useProfileEdit() {
   const [isNewProfile, setIsNewProfile] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
-  const { isLoading } = useQuery({
+  const { data: serverData, isLoading: isQueryLoading } = useQuery({
     queryKey: ['profile', userInfo?.userId, 'edit'],
     queryFn: async () => {
       try {
@@ -56,22 +56,16 @@ export function useProfileEdit() {
           imageFiles: [],
         }));
 
-        const processed = {
+        return {
           ...profileData,
           availableSchedules: splitSchedules,
           skills: skillsWithImages,
           exchangeType: profileData.exchangeType || null,
         };
-
-        if (!localProfile && !isDirty) {
-          setLocalProfile(processed);
-        }
-
-        return processed;
       } catch (err: any) {
         if (err.response?.status === 404) {
           setIsNewProfile(true);
-          const newData = {
+          return {
             nickname: userInfo?.nickname || '',
             experienceDescription: '',
             timesTaught: 0,
@@ -81,10 +75,6 @@ export function useProfileEdit() {
             preferredRegion: '',
             detailedLocation: '',
           };
-          if (!localProfile && !isDirty) {
-            setLocalProfile(newData);
-          }
-          return newData;
         }
         throw err;
       }
@@ -93,6 +83,12 @@ export function useProfileEdit() {
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
+
+  if (!localProfile && serverData && !isDirty) {
+    setLocalProfile(serverData);
+  }
+
+  const isLoading = isQueryLoading || (!localProfile && !isNewProfile);
 
   const isValid = useMemo(() => {
     if (!localProfile) return false;
@@ -224,4 +220,4 @@ export function useProfileEdit() {
     handleSave,
     setIsDirty,
   };
-}
+};

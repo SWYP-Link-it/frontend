@@ -66,3 +66,23 @@ export type SkillFormData = {
   existingImages: string[];
   newFiles: File[];
 };
+
+export type CreditTransactionType =
+  | 'CANCEL'
+  | 'REQUEST'
+  | 'REJECT'
+  | 'REWARD'
+  | 'COMPLETED';
+
+export type CreditStatusLabel = '리워드' | '요청' | '취소' | '거절' | '정산';
+
+export interface CreditTransaction {
+  creditHistoryId: number;
+  targetNickname: string | null;
+  contentName: string;
+  createdAt: string;
+  statusLabel: CreditStatusLabel;
+  changeAmount: number;
+  targetProfileImageUrl?: string | null;
+  skillId?: number | null;
+}

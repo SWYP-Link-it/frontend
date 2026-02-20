@@ -84,7 +84,7 @@ export const Sidebar = () => {
               >
                 <Icon size={20} />
                 {hasNotification && (
-                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+                  <span className="absolute top-1 left-7 h-1.5 w-1.5 rounded-full bg-red-500" />
                 )}
               </div>
               <span className="text-sm leading-[1.5] font-medium">
