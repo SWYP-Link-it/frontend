@@ -4,10 +4,29 @@ import { SkillCard } from './SkillCard';
 import { SkillCardDto } from '@/src/types/skill';
 
 type SkillListProps = {
-  list?: SkillCardDto[];
+  category: string;
+  searchKeyword?: string;
 };
 
-export const SkillList = ({ list }: SkillListProps) => {
+export const SkillList = async ({
+  category,
+  searchKeyword,
+}: SkillListProps) => {
+  const params = new URLSearchParams();
+  if (category !== 'ALL') params.append('category', category);
+  if (searchKeyword) params.append('searchKeyword', searchKeyword);
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills?${params}`,
+    { cache: 'no-store' },
+  );
+
+  if (!res.ok) {
+    return null;
+  }
+
+  const list: SkillCardDto[] = (await res.json()).data;
+
   return (
     <>
       {list && list.length > 0 && (
