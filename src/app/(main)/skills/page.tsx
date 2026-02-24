@@ -1,12 +1,10 @@
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
 import { SkillList } from '@/src/features/skills/SkillList';
-import { CATEGORIES, Category } from '@/src/types/skill';
+import { CATEGORIES, Category, SkillCardDto } from '@/src/types/skill';
 import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
 import { CategoryTab } from '@/src/features/skills/CategoryTab';
 import { redirect } from 'next/navigation';
-import { Suspense } from 'react';
-import { LoaderView } from '@/src/components/LoaderView';
 
 export default async function Skills({
   searchParams,
@@ -20,6 +18,24 @@ export default async function Skills({
   }
 
   const selectedCategory: Category = (category as Category) || 'ALL';
+
+  const params = new URLSearchParams();
+  if (selectedCategory !== 'ALL') params.append('category', selectedCategory);
+  if (searchKeyword) params.append('searchKeyword', searchKeyword);
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/v2?${params}&size=11`,
+    { cache: 'no-store' },
+  );
+
+  if (!res.ok) {
+    return null;
+  }
+
+  const { skills, nextCursorId } = (await res.json()).data as {
+    skills: SkillCardDto[];
+    nextCursorId: number | null;
+  };
 
   return (
     <>
@@ -42,12 +58,12 @@ export default async function Skills({
             <CreditInfoBanner />
           </div>
           <MyCreditBadge className="mb-6" />
-          <Suspense fallback={<LoaderView loadingText="불러오는 중..." />}>
-            <SkillList
-              category={selectedCategory}
-              searchKeyword={searchKeyword}
-            />
-          </Suspense>
+          <SkillList
+            selectedCategory={selectedCategory}
+            searchKeyword={searchKeyword}
+            initialData={skills}
+            initialCursorId={nextCursorId}
+          />
         </div>
       </div>
       <ScrollToTop deps={[selectedCategory]} />
