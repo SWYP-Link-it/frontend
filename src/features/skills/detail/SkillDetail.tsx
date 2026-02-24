@@ -59,11 +59,11 @@ export const SkillDetail = ({ skillDetail, reviews }: SkillDetailProps) => {
       </div>
       <div className="border-y border-gray-200 py-6">
         <div className="grid w-fit grid-cols-2 gap-x-25 text-sm font-semibold text-gray-600">
-          <div className="py-2">
-            <span className="mr-4 inline-block w-16 font-normal text-gray-500">
+          <div className="flex py-2">
+            <div className="mr-4 w-16 shrink-0 font-normal text-gray-500">
               경력
-            </span>
-            {experienceDescription}
+            </div>
+            <div>{experienceDescription}</div>
           </div>
           <div className="py-2">
             <span className="mr-4 inline-block w-16 font-normal text-gray-500">

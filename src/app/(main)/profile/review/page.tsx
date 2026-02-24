@@ -3,12 +3,12 @@
 import { useState, useMemo } from 'react';
 import { ProfileTab } from '@/src/components/profile/ProfileTab';
 import { ReviewCard } from '@/src/components/profile/ReviewCard';
-import { Star } from 'lucide-react';
 import { useReview } from '@/src/hooks/useReview';
 import { BaseModal } from '@/src/components/BaseModal';
 import { SkillReviewModalContent } from '@/src/components/request/SkillReviewModalContent';
 import { DeleteConfirmModal } from '@/src/components/edit/DeleteConfirmModal';
 import { useQueryClient } from '@tanstack/react-query';
+import { ReviewStats } from '@/src/components/profile/ReviewStats';
 
 export default function ProfileReviewPage() {
   const queryClient = useQueryClient();
@@ -109,24 +109,11 @@ export default function ProfileReviewPage() {
                   ))}
                 </div>
                 {hasReviews && (
-                  <div className="flex flex-col items-center rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-                    <span className="mb-1 text-[10px] font-bold text-gray-400 uppercase">
-                      평균 평점
-                    </span>
-                    <span className="text-2xl font-black text-gray-900">
-                      4.6
-                    </span>
-                    <div className="mt-1 flex gap-0.5 text-orange-400">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={12}
-                          fill={i < 4 ? 'currentColor' : 'transparent'}
-                          className={i < 4 ? '' : 'text-gray-200'}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <ReviewStats
+                    rating={calculateAverage(
+                      filteredReviews.map(({ rating }) => rating),
+                    )}
+                  />
                 )}
               </div>
             )}
@@ -200,3 +187,10 @@ export default function ProfileReviewPage() {
     </div>
   );
 }
+
+const calculateAverage = (list: number[]) => {
+  if (list.length === 0) return 0;
+
+  const sum = list.reduce((acc, cur) => acc + cur, 0);
+  return Number((sum / list.length).toFixed(1));
+};
