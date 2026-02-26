@@ -20,6 +20,9 @@ export async function generateMetadata({
       title: '스킬 장터 둘러보기 | 링킷',
       description: getSkillListDescription({ category, searchKeyword }),
     },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/skills`,
+    },
   };
 }
 
