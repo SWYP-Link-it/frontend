@@ -1,0 +1,28 @@
+import type { MetadataRoute } from 'next';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills`,
+    { next: { revalidate: 3600 } },
+  );
+
+  const skills = (await res.json()).data;
+
+  return [
+    // 정적 페이지
+    // {
+    //   url: process.env.NEXT_PUBLIC_FRONTEND_URL,
+    //   lastModified: new Date(),
+    // },
+    {
+      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/skills`,
+      lastModified: new Date(),
+    },
+
+    // 동적 상세 페이지
+    ...skills.map((skill: { id: number; updatedAt: string }) => ({
+      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/skills/detail/${skill.id}`,
+      lastModified: new Date(skill.updatedAt),
+    })),
+  ];
+}
