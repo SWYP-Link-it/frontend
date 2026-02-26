@@ -6,7 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { next: { revalidate: 3600 } },
   );
 
-  const skills = (await res.json()).data;
+  const skills = (await res.json()).data as { skillId: number }[];
 
   return [
     // 정적 페이지
@@ -20,9 +20,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
 
     // 동적 상세 페이지
-    ...skills.map((skill: { id: number; updatedAt: string }) => ({
-      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/skills/detail/${skill.id}`,
-      lastModified: new Date(skill.updatedAt),
+    ...skills.map(({ skillId }) => ({
+      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/skills/detail/${skillId}`,
+      lastModified: new Date(),
     })),
   ];
 }
