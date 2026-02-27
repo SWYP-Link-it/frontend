@@ -15,7 +15,13 @@ export const getAvailableDates = async (
   month: Date,
 ) => {
   const response = await api.get<{ data: { availableDates: string[] } }>(
-    `/exchange/mentors/${mentorId}/available-dates?mentorSkillId=${skillId}&month=${formatDate(month, 'YYYY-MM')}`,
+    `/exchange/mentors/${mentorId}/available-dates`,
+    {
+      params: {
+        mentorSkillId: skillId,
+        month: formatDate(month, 'YYYY-MM'),
+      },
+    },
   );
   return response.data.data.availableDates;
 };
@@ -27,9 +33,12 @@ export const getAvailableTimes = async (
 ) => {
   const response = await api.get<{
     data: { slots: { startTime: string; endTime: string }[] };
-  }>(
-    `/exchange/mentors/${mentorId}/available-slots?mentorSkillId=${skillId}&date=${formatDate(date, 'YYYY-MM-DD')}`,
-  );
+  }>(`/exchange/mentors/${mentorId}/available-slots`, {
+    params: {
+      mentorSkillId: skillId,
+      date: formatDate(date, 'YYYY-MM-DD'),
+    },
+  });
   return response.data.data.slots;
 };
 
