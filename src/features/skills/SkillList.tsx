@@ -30,7 +30,7 @@ export const SkillList = ({
       queryFn: async ({ pageParam }) => {
         const res = await api.get<{
           data: { skills: SkillCardDto[]; nextCursorId: number | null };
-        }>(`/market/skills/v2`, {
+        }>(`/market/skills`, {
           params: {
             size: pageParam.size,
             cursorId: pageParam.cursor,
