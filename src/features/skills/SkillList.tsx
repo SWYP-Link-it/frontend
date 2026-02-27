@@ -85,6 +85,7 @@ export const SkillList = ({
 
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   return (
     <>
       {list && list.length > 0 && (

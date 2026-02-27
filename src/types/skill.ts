@@ -80,10 +80,6 @@ export type SkillDetailDto = {
   }[];
 };
 
-export type SkillReviewListResponseDto = {
-  contents: SkillReviewDto[];
-};
-
 export type SkillReviewDto = {
   reviewId: number;
   reviewerNickname: string;
