@@ -4,10 +4,12 @@ export default function robots(): MetadataRoute.Robots {
   return {
     // 크롤링 규칙
     rules: [
-      { userAgent: '*', disallow: '/' }, // 전부 막기
-      { userAgent: '*', allow: '/' }, // 홈 크롤링 허용
-      { userAgent: '*', allow: '/skills', disallow: ['/skills/request'] }, // /skills 크롤링 허용
+      {
+        userAgent: '*',
+        allow: ['/$', '/skills$', '/skills/detail/'],
+        disallow: '/',
+      },
     ],
-    sitemap: 'https://linkit.co.kr/sitemap.xml',
+    sitemap: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/sitemap.xml`,
   };
 }
