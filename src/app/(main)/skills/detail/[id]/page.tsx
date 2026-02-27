@@ -5,6 +5,39 @@ import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList'
 import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { SkillDetailDto, SkillReviewListResponseDto } from '@/src/types/skill';
 import { DetailFooter } from '@/src/features/skills/detail/DetailFooter';
+import { notFound } from 'next/navigation';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const skillId = Number(id);
+  const detailRes = await fetchSkillDetail(skillId, {
+    next: { revalidate: 60 },
+  });
+
+  if (!detailRes.ok) {
+    notFound();
+  }
+
+  const skillDetail: SkillDetailDto = (await detailRes.json()).data;
+
+  const {
+    nickname,
+    mainSkill: { skillName },
+  } = skillDetail;
+  return {
+    title: `스킬 상세보기 · ${skillName} | 링킷`,
+    description: `${nickname}님이 공유한 ${skillName} 스킬을 확인해보세요`,
+    openGraph: {
+      title: `스킬 상세보기 · ${skillName} | 링킷`,
+      description: `${nickname}님이 공유한 ${skillName} 스킬을 확인해보세요`,
+    },
+  };
+}
 
 export default async function SkillDetailPage({
   params,
@@ -16,13 +49,8 @@ export default async function SkillDetailPage({
   const skillId = Number(id);
 
   const [detailRes, reviewRes] = await Promise.all([
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/${skillId}`, {
-      cache: 'no-store',
-    }),
-    fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/skills/${skillId}?size=5`,
-      { next: { revalidate: 60 } },
-    ),
+    fetchSkillDetail(skillId, { cache: 'no-store' }),
+    fetchSkillReviews(skillId),
   ]);
   if (!detailRes.ok) {
     return <div>존재하지 않는 스킬입니다.</div>;
@@ -61,3 +89,12 @@ export default async function SkillDetailPage({
     </>
   );
 }
+
+const fetchSkillDetail = (skillId: number, init?: RequestInit) =>
+  fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/${skillId}`, init);
+
+const fetchSkillReviews = (skillId: number) =>
+  fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/skills/${skillId}?size=5`,
+    { next: { revalidate: 30 } },
+  );

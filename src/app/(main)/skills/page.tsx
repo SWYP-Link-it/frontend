@@ -5,6 +5,26 @@ import { CATEGORIES, Category, SkillCardDto } from '@/src/types/skill';
 import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
 import { CategoryTab } from '@/src/features/skills/CategoryTab';
 import { redirect } from 'next/navigation';
+import { CATEGORY_LABELS } from '@/src/constants/skill';
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string; searchKeyword?: string }>;
+}) {
+  const { category, searchKeyword } = await searchParams;
+  return {
+    title: '스킬 장터 둘러보기 | 링킷',
+    description: getSkillListDescription({ category, searchKeyword }),
+    openGraph: {
+      title: '스킬 장터 둘러보기 | 링킷',
+      description: getSkillListDescription({ category, searchKeyword }),
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/skills`,
+    },
+  };
+}
 
 export default async function Skills({
   searchParams,
@@ -25,7 +45,7 @@ export default async function Skills({
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills/v2?${params}&size=11`,
-    { cache: 'no-store' },
+    { next: { revalidate: 30 } },
   );
 
   if (!res.ok) {
@@ -70,3 +90,24 @@ export default async function Skills({
     </>
   );
 }
+
+const getSkillListDescription = ({
+  category,
+  searchKeyword,
+}: {
+  category?: string;
+  searchKeyword?: string;
+}) => {
+  if (searchKeyword) {
+    if (category) {
+      return `${CATEGORY_LABELS[category as Category]} 분야에서 '${searchKeyword}' 관련 스킬을 찾아보세요`;
+    }
+    return `'${searchKeyword}' 관련 스킬을 탐색해보세요`;
+  }
+
+  if (category) {
+    return `${CATEGORY_LABELS[category as Category]} 분야의 다양한 스킬을 탐색해보세요`;
+  }
+
+  return '링킷 유저들이 공유한 다양한 스킬을 탐색해보세요';
+};

@@ -11,8 +11,8 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Link it',
-  description: 'Skill shop for amateur teachers and learners',
+  title: '링킷 | 스킬 공유 플랫폼',
+  description: '스킬을 공유하고 크레딧으로 성장하는 새로운 배움을 경험해보세요',
   icons: {
     icon: '/favicon.ico',
   },
