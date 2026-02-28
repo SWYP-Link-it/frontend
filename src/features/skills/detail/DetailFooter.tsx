@@ -55,7 +55,11 @@ export const DetailFooter = ({ mentorId, skillId }: DetailFooterProps) => {
         <MyCreditBadge />
         <div className="flex flex-1 gap-[15px]">
           <Tooltip
-            showTooltipDefault={localStorage.getItem(HAS_SEEN_TOOLTIP) === null}
+            showTooltipDefault={
+              typeof window !== 'undefined'
+                ? localStorage.getItem(HAS_SEEN_TOOLTIP) === null
+                : false
+            }
             tooltipContent={
               <p className="text-sm font-medium">
                 소개 확인 후 <span className="text-brand-400">스킬 요청</span>
@@ -67,7 +71,11 @@ export const DetailFooter = ({ mentorId, skillId }: DetailFooterProps) => {
               </p>
             }
             tailPosition="right"
-            onClose={() => localStorage.setItem(HAS_SEEN_TOOLTIP, 'true')}
+            onClose={() => {
+              if (typeof window !== 'undefined') {
+                localStorage.setItem(HAS_SEEN_TOOLTIP, 'true');
+              }
+            }}
           >
             <RequiredAuth>
               <div className="ml-auto w-full max-w-[380px]">
