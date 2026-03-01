@@ -1,7 +1,9 @@
+'use client';
+
 import { SkillDetailDto, SkillReviewDto } from '@/src/types/skill';
 import Image from 'next/image';
 import { ReviewSection } from './ReviewSection';
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import { CursorBoxIcon } from '@/src/components/icons/CursorBoxIcon';
 import { ClockIcon } from '@/src/components/icons/ClockIcon';
 import { ImageIcon } from '@/src/components/icons/ImageIcon';
@@ -12,6 +14,7 @@ import {
 } from '@/src/constants/profile';
 import { CategoryFigure } from '@/src/components/skill/CategoryFigure';
 import { EditIcon } from '@/src/components/icons/EditIcon';
+import { ReviewListModal } from './ReviewListModal';
 
 type SkillDetailProps = {
   skillDetail: SkillDetailDto;
@@ -19,6 +22,8 @@ type SkillDetailProps = {
 };
 
 export const SkillDetail = ({ skillDetail, reviews }: SkillDetailProps) => {
+  const [isReviewListModalOpen, setIsReviewListModalOpen] = useState(false);
+
   const {
     mainSkill: {
       skillName,
@@ -159,9 +164,18 @@ export const SkillDetail = ({ skillDetail, reviews }: SkillDetailProps) => {
         <SectionTitle
           icon={<EditIcon size={18} className="text-gray-800" />}
           title="이용 후기"
+          showMore={reviews.length > 0}
+          onClickMore={() => setIsReviewListModalOpen(true)}
         />
         <ReviewSection reviews={reviews} skillRating={skillRating} />
       </div>
+      <ReviewListModal
+        isOpen={isReviewListModalOpen}
+        onClose={() => setIsReviewListModalOpen(false)}
+        nickname={skillDetail.nickname}
+        skillName={skillDetail.mainSkill.skillName}
+        skillId={skillDetail.mainSkill.id}
+      />
     </div>
   );
 };
@@ -169,9 +183,13 @@ export const SkillDetail = ({ skillDetail, reviews }: SkillDetailProps) => {
 const SectionTitle = ({
   icon,
   title,
+  showMore = false,
+  onClickMore,
 }: {
   icon: ReactElement;
   title: string;
+  showMore?: boolean;
+  onClickMore?: () => void;
 }) => {
   return (
     <div className="flex items-center gap-2">
@@ -179,6 +197,16 @@ const SectionTitle = ({
       <div className="text-lg leading-7 font-semibold text-gray-800">
         {title}
       </div>
+      {showMore && (
+        <span
+          className="ml-auto text-lg font-semibold text-gray-600 hover:cursor-pointer hover:opacity-80"
+          onClick={() => {
+            onClickMore?.();
+          }}
+        >
+          더보기
+        </span>
+      )}
     </div>
   );
 };

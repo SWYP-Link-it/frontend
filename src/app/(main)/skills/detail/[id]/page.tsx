@@ -3,7 +3,7 @@ import { UserProfile } from '@/src/features/skills/detail/UserProfile';
 import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
 import { ScrollToTop } from '@/src/components/ScrollToTop';
-import { SkillDetailDto, SkillReviewListResponseDto } from '@/src/types/skill';
+import { SkillDetailDto, SkillReviewDto } from '@/src/types/skill';
 import { DetailFooter } from '@/src/features/skills/detail/DetailFooter';
 import { notFound } from 'next/navigation';
 
@@ -57,7 +57,7 @@ export default async function SkillDetailPage({
   }
 
   const skillDetail: SkillDetailDto = (await detailRes.json()).data;
-  const reviewList: SkillReviewListResponseDto = (await reviewRes.json()).data;
+  const reviewList: SkillReviewDto[] = (await reviewRes.json()).data.contents;
 
   return (
     <>
@@ -74,10 +74,7 @@ export default async function SkillDetailPage({
         </div>
         <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-1 gap-5 pt-12 pb-9">
           <div className="w-0 flex-1">
-            <SkillDetail
-              skillDetail={skillDetail}
-              reviews={reviewList.contents}
-            />
+            <SkillDetail skillDetail={skillDetail} reviews={reviewList} />
           </div>
           <div className="sticky top-75 h-fit w-[173px]">
             <ProfileSkillList list={skillDetail.skills} currentId={skillId} />

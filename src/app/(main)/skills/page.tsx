@@ -59,7 +59,7 @@ export default async function Skills({
 
   return (
     <>
-      <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col">
         <div className="sticky top-18 z-50 bg-white px-28">
           <div className="mx-auto max-w-284">
             <div className="my-6 flex flex-col gap-[2px]">
