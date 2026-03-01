@@ -40,6 +40,7 @@ export const ReviewListModal = ({
         });
         return res.data.data;
       },
+      staleTime: 5 * 60 * 1000,
       initialPageParam: undefined as number | undefined,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     });
@@ -47,11 +48,10 @@ export const ReviewListModal = ({
   const list = data ? data.pages.flatMap((page) => page.contents) : [];
 
   useEffect(() => {
-    if (!loadMoreRef.current) return;
+    if (!isOpen || !loadMoreRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        console.log('isIntersecting', entry.isIntersecting);
         if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
@@ -65,7 +65,7 @@ export const ReviewListModal = ({
     observer.observe(loadMoreRef.current);
 
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [isOpen, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-[750px]">
