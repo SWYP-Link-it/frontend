@@ -35,7 +35,7 @@ export const SkillList = ({
             size: pageParam.size,
             cursorId: pageParam.cursor,
             category: selectedCategory !== 'ALL' ? selectedCategory : undefined,
-            keyword: searchKeyword,
+            searchKeyword,
           },
         });
         return res.data.data;
@@ -85,6 +85,7 @@ export const SkillList = ({
 
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   return (
     <>
       {list && list.length > 0 && (

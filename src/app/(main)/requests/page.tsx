@@ -194,7 +194,7 @@ export default function RequestPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-[calc(100%-224px)] max-w-284 flex-col items-center bg-white shadow-[0_0_0_100vw_white]">
+    <div className="mx-auto flex w-[calc(100%-224px)] max-w-284 flex-col items-center bg-white shadow-[0_0_0_100vw_white]">
       <div className="w-full shrink-0 border-b border-gray-100 bg-white">
         <div className="my-6 flex shrink-0 flex-col justify-center gap-1">
           <h2 className="text-[24px] font-semibold text-gray-800">요청 관리</h2>

@@ -57,7 +57,7 @@ export const Sidebar = () => {
   }, [fetchNotifications, pathname]);
 
   return (
-    <aside className="flex h-screen w-20 shrink-0 flex-col items-center bg-gray-800">
+    <aside className="sticky top-0 left-0 flex min-h-full w-20 shrink-0 flex-col items-center bg-gray-800">
       <nav className="mt-11 flex flex-col gap-5">
         {menuItems.map((item) => {
           const Icon = item.icon;
