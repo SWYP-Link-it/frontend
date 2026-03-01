@@ -35,7 +35,7 @@ export const SkillList = ({
             size: pageParam.size,
             cursorId: pageParam.cursor,
             category: selectedCategory !== 'ALL' ? selectedCategory : undefined,
-            keyword: searchKeyword,
+            searchKeyword,
           },
         });
         return res.data.data;
