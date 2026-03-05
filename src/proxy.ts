@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get('refreshToken')?.value;
 
-  console.log('[Middleware] refreshToken:', refreshToken);
   const isLoggedIn = Boolean(refreshToken);
 
   const protectedPaths = [
