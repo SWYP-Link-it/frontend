@@ -45,13 +45,13 @@ export const SkillList = ({
         pageParams: [
           {
             cursor: undefined,
-            size: 11,
+            size: 19,
           },
         ],
       },
       initialPageParam: {
         cursor: undefined,
-        size: 11,
+        size: 19,
       } as {
         cursor?: number;
         size: number;
@@ -60,7 +60,7 @@ export const SkillList = ({
         lastPage.nextCursorId
           ? {
               cursor: lastPage.nextCursorId,
-              size: 12,
+              size: 20,
             }
           : undefined,
     });
