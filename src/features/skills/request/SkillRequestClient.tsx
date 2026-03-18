@@ -50,6 +50,7 @@ export default function SkillRequestClient() {
       queryClient.invalidateQueries({
         queryKey: profileQueryKey.creditBalance,
       });
+      refreshAvailableInfo();
       router.push('/skills');
     },
     onError: (error) => {
@@ -104,6 +105,21 @@ export default function SkillRequestClient() {
     staleTime: 5 * 60 * 1000,
     retry: 0,
   });
+
+  const refreshAvailableInfo = () => {
+    queryClient.invalidateQueries({
+      queryKey: ['exchange', 'availableDates', mentorId, skillId, currentMonth],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [
+        'exchange',
+        'availableTimes',
+        mentorId,
+        skillId,
+        formData.date,
+      ],
+    });
+  };
 
   const handleFormUpdate = (data: Partial<RequestFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));

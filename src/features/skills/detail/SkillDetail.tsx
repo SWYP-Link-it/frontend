@@ -87,7 +87,7 @@ export const SkillDetail = ({ skillDetail, reviews }: SkillDetailProps) => {
               선호 지역
             </span>
             {REGION_LABELS[preferredRegion]
-              ? `${REGION_LABELS[preferredRegion]} ${detailedLocation}`
+              ? `${REGION_LABELS[preferredRegion]} ${detailedLocation ?? ''}`
               : '-'}
           </div>
         </div>
