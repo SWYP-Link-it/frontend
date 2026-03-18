@@ -1,16 +1,9 @@
-'use client';
+import { OnboardingClient } from '@/src/features/auth/OnboardingClient';
 
-import { ProgressBar } from '@/src/components/ProgressBar';
-import { OnboardingStep } from '@/src/features/auth/OnboardingStep';
-import { useState } from 'react';
+export const metadata = {
+  title: '환영합니다! | 링킷',
+};
 
 export default function Onboarding() {
-  const [step, setStep] = useState(1);
-
-  return (
-    <div className="mx-auto flex h-full w-[490px] flex-col items-center justify-center">
-      <ProgressBar step={step} totalSteps={3} />
-      <OnboardingStep step={step} setStep={setStep} />
-    </div>
-  );
+  return <OnboardingClient />;
 }
