@@ -325,10 +325,14 @@ export default function SkillRequestClient() {
             </div>
             <textarea
               placeholder="간단한 메세지를 남겨보세요."
-              className="focus:border-brand-600 mb-9 h-[215px] resize-none rounded-[15px] border border-gray-200 p-6 text-sm text-gray-800 placeholder-gray-400 outline-none"
+              className="focus:border-brand-600 h-[215px] resize-none rounded-[15px] border border-gray-200 p-6 text-sm text-gray-800 placeholder-gray-400 outline-none"
               value={formData.message}
+              maxLength={200}
               onChange={(e) => handleFormUpdate({ message: e.target.value })}
             />
+            <span className="mt-1 mb-9 text-xs text-gray-400">
+              {formData.message.length}자/200자
+            </span>
             <Button
               text="작성 완료"
               mode={isFormCompleted ? 'active' : 'inactive'}
