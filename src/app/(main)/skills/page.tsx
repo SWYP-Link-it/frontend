@@ -1,4 +1,3 @@
-import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { CreditInfoBanner } from '@/src/features/skills/CreditInfoBanner';
 import { CATEGORIES, Category } from '@/src/types/skill';
 import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
@@ -70,7 +69,6 @@ export default async function Skills({
           </Suspense>
         </div>
       </div>
-      <ScrollToTop deps={[selectedCategory]} />
     </>
   );
 }

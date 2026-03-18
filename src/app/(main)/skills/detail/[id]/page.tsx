@@ -2,7 +2,6 @@ import { DetailSectionTab } from '@/src/features/skills/detail/DetailSectionTab'
 import { UserProfile } from '@/src/features/skills/detail/UserProfile';
 import { SkillDetail } from '@/src/features/skills/detail/SkillDetail';
 import { ProfileSkillList } from '@/src/features/skills/detail/ProfileSkillList';
-import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { SkillDetailDto, SkillReviewDto } from '@/src/types/skill';
 import { DetailFooter } from '@/src/features/skills/detail/DetailFooter';
 import { notFound } from 'next/navigation';
@@ -82,7 +81,6 @@ export default async function SkillDetailPage({
         </div>
         <DetailFooter mentorId={skillDetail.userId} skillId={skillId} />
       </div>
-      <ScrollToTop deps={[id]} />
     </>
   );
 }

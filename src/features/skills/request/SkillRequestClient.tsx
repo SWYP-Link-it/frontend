@@ -12,7 +12,6 @@ import { Button } from '@/src/components/Button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useFormInfoFromSearchParams } from './hooks/useFormInfoFromSearchParams';
 import { toast } from 'sonner';
-import { ScrollToTop } from '@/src/components/ScrollToTop';
 import { CategoryFigure } from '@/src/components/skill/CategoryFigure';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { profileQueryKey } from '../../profile/queryKeys';
@@ -341,7 +340,6 @@ export default function SkillRequestClient() {
           </div>
         </div>
       </div>
-      <ScrollToTop deps={[]} />
     </>
   );
 }
