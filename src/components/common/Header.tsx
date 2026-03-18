@@ -89,7 +89,7 @@ export const Header = () => {
               }}
             >
               <div
-                className="flex h-fit w-[728px] flex-col gap-7 rounded-[22px] bg-white p-6"
+                className="flex h-fit w-[calc(100%-80px)] max-w-[728px] flex-col gap-7 rounded-[22px] bg-white p-6"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div
@@ -110,6 +110,11 @@ export const Header = () => {
 
                         if (!searchKeyword) {
                           toast.warning('검색어를 입력해주세요.');
+                          return;
+                        }
+
+                        if (searchKeyword.length > 50) {
+                          toast.warning('50자 이내로 입력해주세요.');
                           return;
                         }
 

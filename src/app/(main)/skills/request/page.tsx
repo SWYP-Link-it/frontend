@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 
 export const metadata = {
   robots: 'noindex',
+  title: '스킬 요청하기 | 링킷',
 };
 
 export default function SkillRequest() {

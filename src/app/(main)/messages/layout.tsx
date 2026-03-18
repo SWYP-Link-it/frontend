@@ -1,5 +1,9 @@
 import { ChatSidebar } from '@/src/components/chat/ChatSidebar';
 
+export const metadata = {
+  title: '메세지 관리 | 링킷',
+};
+
 export default function ChatLayout({
   children,
 }: {
