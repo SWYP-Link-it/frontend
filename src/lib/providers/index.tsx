@@ -1,6 +1,6 @@
 'use client';
 
-import { useScrollToTop } from '@/src/hooks/useScrollToTop';
+import { ScrollToTop } from '@/src/components/common/ScrollToTop';
 import { AuthProvider } from './AuthProvider';
 import { MSWProvider } from './MSWProvider';
 import { QueryProvider } from './QueryProvider';
@@ -10,12 +10,13 @@ export const ClientProviders = ({
 }: {
   children: React.ReactNode;
 }) => {
-  useScrollToTop();
-
   return (
     <MSWProvider>
       <QueryProvider>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ScrollToTop />
+          {children}
+        </AuthProvider>
       </QueryProvider>
     </MSWProvider>
   );
