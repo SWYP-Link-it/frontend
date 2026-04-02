@@ -125,7 +125,7 @@ export const useChat = (roomId: number) => {
   const sendMessage = async (content: string, file?: File) => {
     if (!content.trim() && !file) return;
     try {
-      const fileUrl = null;
+      let fileUrl = null;
 
       if (file) {
         const formData = new FormData();
@@ -141,11 +141,11 @@ export const useChat = (roomId: number) => {
 
         // console.log('1. 이미지 업로드 응답:', uploadRes.data);
 
-        // if (uploadRes.data.success) {
-        //   // 서버 응답 구조가 { data: "http://..." } 인지 확인 필요
-        //   fileUrl = uploadRes.data.data;
-        //   console.log('2. 설정된 fileUrl:', fileUrl);
-        // }
+        if (uploadRes.data.success) {
+          // 서버 응답 구조가 { data: "http://..." } 인지 확인 필요
+          fileUrl = uploadRes.data.data;
+          // console.log('2. 설정된 fileUrl:', fileUrl);
+        }
       }
 
       // console.log('3. 최종 소켓 전송 데이터:', { roomId, content, fileUrl });
