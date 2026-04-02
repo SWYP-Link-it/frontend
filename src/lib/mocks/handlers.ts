@@ -27,6 +27,143 @@ export const handlers = [
   //   );
   // }),
 
+  http.get(`${API_URL}/notifications`, () => {
+    return HttpResponse.json({
+      data: {
+        notifications: [
+          {
+            id: 1,
+            notificationType: 'CHAT_MESSAGE',
+            message: '홍길동님이 메시지를 보냈습니다.',
+            refId: 42,
+            read: false,
+            createdAt: '2026-04-02T10:00:00Z',
+          },
+          {
+            id: 2,
+            notificationType: 'CHAT_MESSAGE',
+            message: '김철수님이 메시지를 보냈습니다.',
+            refId: 7,
+            read: true,
+            createdAt: '2026-04-01T18:30:00Z',
+          },
+          {
+            id: 3,
+            notificationType: 'SYSTEM',
+            message: '링킷 서비스를 이용해 주셔서 감사합니다.',
+            refId: 0,
+            read: false,
+            createdAt: '2026-03-31T09:00:00Z',
+          },
+          {
+            id: 1,
+            notificationType: 'CHAT_MESSAGE',
+            message: '홍길동님이 메시지를 보냈습니다.',
+            refId: 42,
+            read: false,
+            createdAt: '2026-04-02T10:00:00Z',
+          },
+          {
+            id: 2,
+            notificationType: 'CHAT_MESSAGE',
+            message: '김철수님이 메시지를 보냈습니다.',
+            refId: 7,
+            read: true,
+            createdAt: '2026-04-01T18:30:00Z',
+          },
+          {
+            id: 3,
+            notificationType: 'SYSTEM',
+            message: '링킷 서비스를 이용해 주셔서 감사합니다.',
+            refId: 0,
+            read: false,
+            createdAt: '2026-03-31T09:00:00Z',
+          },
+          {
+            id: 1,
+            notificationType: 'CHAT_MESSAGE',
+            message: '홍길동님이 메시지를 보냈습니다.',
+            refId: 42,
+            read: false,
+            createdAt: '2026-04-02T10:00:00Z',
+          },
+          {
+            id: 2,
+            notificationType: 'CHAT_MESSAGE',
+            message: '김철수님이 메시지를 보냈습니다.',
+            refId: 7,
+            read: true,
+            createdAt: '2026-04-01T18:30:00Z',
+          },
+          {
+            id: 3,
+            notificationType: 'SYSTEM',
+            message: '링킷 서비스를 이용해 주셔서 감사합니다.',
+            refId: 0,
+            read: false,
+            createdAt: '2026-03-31T09:00:00Z',
+          },
+          {
+            id: 1,
+            notificationType: 'CHAT_MESSAGE',
+            message: '홍길동님이 메시지를 보냈습니다.',
+            refId: 42,
+            read: false,
+            createdAt: '2026-04-02T10:00:00Z',
+          },
+          {
+            id: 2,
+            notificationType: 'CHAT_MESSAGE',
+            message: '김철수님이 메시지를 보냈습니다.',
+            refId: 7,
+            read: true,
+            createdAt: '2026-04-01T18:30:00Z',
+          },
+          {
+            id: 3,
+            notificationType: 'SYSTEM',
+            message: '링킷 서비스를 이용해 주셔서 감사합니다.',
+            refId: 0,
+            isRead: false,
+            createdAt: '2026-03-31T09:00:00Z',
+          },
+          {
+            id: 1,
+            notificationType: 'CHAT_MESSAGE',
+            message: '홍길동님이 메시지를 보냈습니다.',
+            refId: 42,
+            read: false,
+            createdAt: '2026-04-02T10:00:00Z',
+          },
+          {
+            id: 2,
+            notificationType: 'CHAT_MESSAGE',
+            message: '김철수님이 메시지를 보냈습니다.',
+            refId: 7,
+            read: true,
+            createdAt: '2026-04-01T18:30:00Z',
+          },
+          {
+            id: 3,
+            notificationType: 'SYSTEM',
+            message: '링킷 서비스를 이용해 주셔서 감사합니다.',
+            refId: 0,
+            read: false,
+            createdAt: '2026-03-31T09:00:00Z',
+          },
+        ],
+      },
+    });
+  }),
+
+  http.get(`${API_URL}/notifications/unread-count`, () => {
+    return HttpResponse.json({
+      data: {
+        messageTabCount: 120,
+      },
+    });
+  }),
+
   http.post(`${API_URL}/signup`, async ({ request }) => {
     const data = (await request.json()) as { email: string; password: string };
 

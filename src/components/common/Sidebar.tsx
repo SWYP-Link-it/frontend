@@ -10,6 +10,7 @@ import {
   LOGGED_IN_MENU_ITEMS,
   LOGGED_OUT_MENU_ITEMS,
 } from '@/src/constants/navigation';
+import { NotificationButton } from './NotificationButton';
 
 export const Sidebar = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -99,6 +100,11 @@ export const Sidebar = () => {
             </div>
           );
         })}
+        {isLoggedIn && (
+          <div className="mx-auto mt-2">
+            <NotificationButton />
+          </div>
+        )}
       </nav>
     </aside>
   );
