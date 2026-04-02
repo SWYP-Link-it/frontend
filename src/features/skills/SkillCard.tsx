@@ -1,12 +1,13 @@
 import { SkillCardDto } from '@/src/types/skill';
 import Link from 'next/link';
 import Image from 'next/image';
+import { memo } from 'react';
 
 type SkillCardProps = {
   skill: SkillCardDto;
 };
 
-export const SkillCard = ({ skill }: SkillCardProps) => {
+export const SkillCard = memo(({ skill }: SkillCardProps) => {
   const { skillId, skillTitle, skillName, nickname, avgRating } = skill;
 
   return (
@@ -41,4 +42,6 @@ export const SkillCard = ({ skill }: SkillCardProps) => {
       </Link>
     </li>
   );
-};
+});
+
+SkillCard.displayName = 'SkillCard';
