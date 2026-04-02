@@ -12,28 +12,28 @@ type RequiredAuthProps = {
 export const RequiredAuth = ({ children }: RequiredAuthProps) => {
   const isLoggedIn = useIsLoggedIn();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = (e: React.MouseEvent) => {
     if (isLoggedIn) return;
 
     e.stopPropagation();
     e.preventDefault();
 
-    setIsOpen(true);
+    setIsLoginModalOpen(true);
   };
 
   return (
     <>
-      <div className="contents" onClickCapture={(e) => handleClick(e)}>
+      <div className="contents" onClickCapture={handleClick}>
         {children}
       </div>
-      {isOpen
+      {isLoginModalOpen
         ? createPortal(
             <div
               className="fixed top-0 left-0 z-[999] flex h-screen w-screen items-center justify-center bg-black/20"
               onClick={() => {
-                setIsOpen(false);
+                setIsLoginModalOpen(false);
               }}
             >
               <div onClick={(e) => e.stopPropagation()}>

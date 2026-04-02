@@ -15,8 +15,8 @@ export const SkillListWrapper = async ({
   if (searchKeyword) params.append('searchKeyword', searchKeyword);
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills?${params}&size=11`,
-    { cache: 'no-store' },
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/market/skills?${params}&size=19`,
+    { next: { revalidate: 30 } },
   );
 
   if (!res.ok) {
