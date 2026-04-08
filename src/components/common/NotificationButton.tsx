@@ -1,20 +1,16 @@
 'use client';
 
-import { memo, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/src/lib/api/api';
 import { BellIcon } from '@/src/components/icons/BellIcon';
 import { Popover } from '@/src/components/Popover';
-
-interface Notification {
-  id: number;
-  notificationType: string;
-  message: string;
-  refId: number;
-  read: boolean;
-  createdAt: string;
-}
+import { StompSubscription } from '@stomp/stompjs';
+import { connectSocket, subscribeNotification } from '@/src/utils/socket';
+import { useUserStore } from '@/src/stores/userStore';
+import { useAuthStore } from '@/src/stores/authStore';
+import { Notification } from '@/src/types/notification';
 
 interface UnreadCountResponse {
   messageTabCount: number;
@@ -30,36 +26,113 @@ const fetchUnreadCount = async (): Promise<UnreadCountResponse> => {
   return res.data?.data ?? { messageTabCount: 0 };
 };
 
+const NOTIFICATION_LIST_QUERY_KEY = ['notifications'] as const;
+const UNREAD_COUNT_QUERY_KEY = ['notifications', 'unread-count'] as const;
+
 export const NotificationButton = () => {
+  const queryClient = useQueryClient();
+
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const { userInfo } = useUserStore();
+
+  const subscriptionRef = useRef<StompSubscription | null>(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
   const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications'],
+    queryKey: NOTIFICATION_LIST_QUERY_KEY,
     queryFn: fetchNotifications,
     enabled: isOpen,
   });
 
   const { data: unreadData } = useQuery({
-    queryKey: ['notifications', 'unread-count'],
+    queryKey: UNREAD_COUNT_QUERY_KEY,
     queryFn: fetchUnreadCount,
+  });
+
+  const { mutate: markAsRead } = useMutation({
+    mutationFn: async (notificationId: number) => {
+      await api.post(`/notifications/read/${notificationId}`);
+    },
+    onSuccess: () => {
+      refreshNotifications();
+    },
   });
 
   const badgeCount = unreadData?.messageTabCount ?? 0;
 
   const handleItemClick = (notification: Notification) => {
-    if (notification.notificationType === 'CHAT_MESSAGE') {
-      router.push(`/messages/${notification.refId}`);
+    markAsRead(notification.id);
+    switch (notification.notificationType) {
+      case 'CHAT_MESSAGE':
+        router.push(`/messages/${notification.refId}`);
+        break;
+      case 'REQUEST_RECEIVED':
+        router.push('/requests');
+        break;
+      case 'REQUEST_SENT':
+      case 'REQUEST_STATUS_CHANGED':
+        router.push('/requests');
+        break;
+      default:
+        return;
     }
     setIsOpen(false);
   };
 
+  const refreshNotifications = () => {
+    queryClient.invalidateQueries({
+      queryKey: NOTIFICATION_LIST_QUERY_KEY,
+    });
+    queryClient.invalidateQueries({
+      queryKey: UNREAD_COUNT_QUERY_KEY,
+    });
+  };
+
+  useEffect(() => {
+    const initNotificationSubscription = async () => {
+      if (!accessToken) return;
+
+      const currentUserId = userInfo?.userId;
+      if (!currentUserId) return;
+
+      try {
+        await connectSocket(accessToken);
+
+        subscriptionRef.current?.unsubscribe();
+
+        subscriptionRef.current = subscribeNotification(
+          currentUserId,
+          (notification) => {
+            if (notification.notificationType === 'CHAT_MESSAGE') {
+              window.dispatchEvent(new Event('chat-update'));
+            }
+
+            refreshNotifications();
+          },
+        );
+      } catch (error) {
+        console.error('알림 구독 에러:', error);
+      }
+    };
+
+    initNotificationSubscription();
+
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+      }
+    };
+  }, []);
+
   const trigger = (
     <button
       onClick={() => setIsOpen((prev) => !prev)}
-      className="group hover:text-brand-600 flex flex-col items-center text-gray-400 transition-colors"
+      className="hover:text-brand-600 flex cursor-pointer flex-col items-center text-gray-400 transition-colors"
     >
-      <div className="relative rounded-lg p-[6px] transition-colors group-hover:bg-gray-700">
+      <div className="relative rounded-lg p-[6px] transition-colors hover:bg-gray-700">
         <BellIcon size={20} />
         {badgeCount > 0 && (
           <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">

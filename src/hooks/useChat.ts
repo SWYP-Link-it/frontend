@@ -8,19 +8,19 @@ import {
   enterRoom,
   subscribeToRoom,
   exitRoom,
-  disconnectSocket,
   sendMessage as sendSocketMessage,
   ChatPayload,
 } from '@/src/utils/socket';
 import { useAuthStore } from '../stores/authStore';
 import { parseJwt } from '../utils/parseJwt';
+import { StompSubscription } from '@stomp/stompjs';
 
 export const useChat = (roomId: number) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [roomInfo, setRoomInfo] = useState<ChatRoomDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const accessToken = useAuthStore((state) => state.accessToken);
-  const subscriptionRef = useRef<any>(null);
+  const subscriptionRef = useRef<StompSubscription | null>(null);
 
   const getMyId = useCallback(() => {
     if (!accessToken) return 0;
@@ -118,7 +118,6 @@ export const useChat = (roomId: number) => {
         subscriptionRef.current = null;
       }
       exitRoom(roomId);
-      disconnectSocket();
     };
   }, [roomId, accessToken, getMyId, markAsRead]);
 
