@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { api } from '../lib/api/api';
+import { api } from '@/src/lib/api/api';
 import { useUserStore } from './userStore';
+import { disconnectSocket } from '@/src/utils/socket';
 
 interface AuthState {
   accessToken: string | null;
@@ -38,6 +39,8 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
           .replace(/^ +/, '')
           .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
       });
+
+      disconnectSocket();
 
       window.location.href = '/login';
     }

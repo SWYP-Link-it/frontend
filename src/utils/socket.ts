@@ -1,6 +1,7 @@
 // src/utils/socket.ts
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { NotificationType } from '../types/notification';
 
 // 백엔드 소켓 주소 (환경변수 없으면 하드코딩)
 const SOCKET_URL = process.env.NEXT_PUBLIC_SERVER_URL
@@ -21,6 +22,14 @@ export interface ChatPayload {
   system: boolean;
   readUpToMessageId?: number;
   readerId?: number;
+}
+
+export interface NotificationPayload {
+  notificationId: number;
+  notificationType: NotificationType;
+  message: string;
+  refId: number;
+  createdAt: string;
 }
 
 // 1. 소켓 연결
@@ -91,6 +100,7 @@ export const exitRoom = (roomId: number) => {
   }
 };
 
+// 5. 메시지 전송
 export const sendMessage = (
   roomId: number,
   text: string,
@@ -111,6 +121,24 @@ export const sendMessage = (
       body: JSON.stringify(payload),
     });
   }
+};
+
+// 6. 알림 구독
+export const subscribeNotification = (
+  userId: number,
+  onNewNotification: (notification: NotificationPayload) => void,
+): StompSubscription | null => {
+  if (!stompClient?.connected) return null;
+
+  return stompClient.subscribe(
+    `/topic/notification.${userId}`,
+    (message: IMessage) => {
+      if (message.body) {
+        const notification: NotificationPayload = JSON.parse(message.body);
+        onNewNotification(notification);
+      }
+    },
+  );
 };
 
 // 6. 연결 해제
