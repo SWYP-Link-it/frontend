@@ -8,19 +8,19 @@ import {
   enterRoom,
   subscribeToRoom,
   exitRoom,
-  disconnectSocket,
   sendMessage as sendSocketMessage,
   ChatPayload,
 } from '@/src/utils/socket';
 import { useAuthStore } from '../stores/authStore';
 import { parseJwt } from '../utils/parseJwt';
+import { StompSubscription } from '@stomp/stompjs';
 
 export const useChat = (roomId: number) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [roomInfo, setRoomInfo] = useState<ChatRoomDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const accessToken = useAuthStore((state) => state.accessToken);
-  const subscriptionRef = useRef<any>(null);
+  const subscriptionRef = useRef<StompSubscription | null>(null);
 
   const getMyId = useCallback(() => {
     if (!accessToken) return 0;
@@ -118,14 +118,13 @@ export const useChat = (roomId: number) => {
         subscriptionRef.current = null;
       }
       exitRoom(roomId);
-      disconnectSocket();
     };
   }, [roomId, accessToken, getMyId, markAsRead]);
 
   const sendMessage = async (content: string, file?: File) => {
     if (!content.trim() && !file) return;
     try {
-      const fileUrl = null;
+      let fileUrl = null;
 
       if (file) {
         const formData = new FormData();
@@ -141,11 +140,11 @@ export const useChat = (roomId: number) => {
 
         // console.log('1. 이미지 업로드 응답:', uploadRes.data);
 
-        // if (uploadRes.data.success) {
-        //   // 서버 응답 구조가 { data: "http://..." } 인지 확인 필요
-        //   fileUrl = uploadRes.data.data;
-        //   console.log('2. 설정된 fileUrl:', fileUrl);
-        // }
+        if (uploadRes.data.success) {
+          // 서버 응답 구조가 { data: "http://..." } 인지 확인 필요
+          fileUrl = uploadRes.data.data;
+          // console.log('2. 설정된 fileUrl:', fileUrl);
+        }
       }
 
       // console.log('3. 최종 소켓 전송 데이터:', { roomId, content, fileUrl });
