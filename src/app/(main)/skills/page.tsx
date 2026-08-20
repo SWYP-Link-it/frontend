@@ -4,7 +4,7 @@ import { MyCreditBadge } from '@/src/components/profile/MyCreditBadge';
 import { CategoryTab } from '@/src/features/skills/CategoryTab';
 import { redirect } from 'next/navigation';
 import { CATEGORY_LABELS } from '@/src/constants/skill';
-import { SkillListWrapper } from '@/src/features/skills/SkillListWrapper';
+import { SkillListWrapper } from '@/src/app/(main)/skills/SkillListWrapper';
 import { Suspense } from 'react';
 import { LoaderView } from '@/src/components/LoaderView';
 

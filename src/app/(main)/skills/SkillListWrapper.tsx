@@ -1,5 +1,5 @@
 import { Category, SkillCardDto } from '@/src/types/skill';
-import { SkillList } from './SkillList';
+import { SkillList } from '../../../features/skills/SkillList';
 
 type SkillListWrapperProps = {
   selectedCategory: Category;
@@ -19,14 +19,15 @@ export const SkillListWrapper = async ({
     { next: { revalidate: 30 } },
   );
 
-  if (!res.ok) {
-    return null;
-  }
+  let skills: SkillCardDto[] = [];
+  let nextCursorId: number | null = null;
 
-  const { skills, nextCursorId } = (await res.json()).data as {
-    skills: SkillCardDto[];
-    nextCursorId: number | null;
-  };
+  if (res.ok) {
+    ({ skills, nextCursorId } = (await res.json()).data as {
+      skills: SkillCardDto[];
+      nextCursorId: number | null;
+    });
+  }
 
   return (
     <SkillList
