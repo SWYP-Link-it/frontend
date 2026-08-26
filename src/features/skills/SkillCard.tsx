@@ -11,7 +11,7 @@ export const SkillCard = memo(({ skill }: SkillCardProps) => {
   const { skillId, skillTitle, skillName, nickname, avgRating } = skill;
 
   return (
-    <li className="h-[234px]">
+    <li className="h-[234px] list-none">
       <Link
         href={`/skills/detail/${skillId}`}
         className="flex h-full cursor-pointer flex-col rounded-xl bg-white p-6"
