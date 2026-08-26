@@ -169,6 +169,65 @@ export const handlers = [
     });
   }),
 
+  http.get(`${API_URL}/market/skills`, ({ request }) => {
+    const url = new URL(request.url);
+    const size = Math.min(Number(url.searchParams.get('size')) || 20, 100);
+    const cursorId = Number(url.searchParams.get('cursorId')) || null;
+    const category = url.searchParams.get('category');
+    const searchKeyword = url.searchParams.get('searchKeyword')?.toLowerCase();
+    const categories = [
+      'DEVELOPMENT',
+      'DESIGN',
+      'EDITING',
+      'MARKETING',
+      'LANGUAGE',
+      'FINANCE',
+      'SPORTS',
+      'MUSIC',
+      'ETC',
+    ];
+
+    const skills = Array.from({ length: 1500 }, (_, index) => ({
+      skillId: index + 1,
+      profileImageUrl: '/icons/avatar.svg',
+      nickname: `링킷 사용자 ${(index % 50) + 1}`,
+      skillTitle: `${categories[index % categories.length]} 스킬을 함께 나눠요 ${index + 1}`,
+      skillName: `스킬 ${index + 1}`,
+      avgRating:
+        index % 5 === 0 ? 0 : Number((3.5 + (index % 15) / 10).toFixed(1)),
+      category: categories[index % categories.length],
+    }));
+
+    const filteredSkills = skills.filter((skill) => {
+      const matchesCategory = !category || skill.category === category;
+      const matchesKeyword =
+        !searchKeyword ||
+        `${skill.skillTitle} ${skill.skillName} ${skill.nickname}`
+          .toLowerCase()
+          .includes(searchKeyword);
+
+      return matchesCategory && matchesKeyword;
+    });
+    const startIndex = cursorId
+      ? Math.max(
+          filteredSkills.findIndex((skill) => skill.skillId === cursorId) + 1,
+          0,
+        )
+      : 0;
+    const page = filteredSkills.slice(startIndex, startIndex + size);
+    const lastSkill = page.at(-1);
+
+    return HttpResponse.json({
+      data: {
+        skills: page.map(({ category: _category, ...skill }) => skill),
+        nextCursorId:
+          startIndex + page.length < filteredSkills.length
+            ? (lastSkill?.skillId ?? null)
+            : null,
+      },
+    });
+  }),
+
   http.post(`${API_URL}/signup`, async ({ request }) => {
     return passthrough();
     const data = (await request.json()) as { email: string; password: string };
