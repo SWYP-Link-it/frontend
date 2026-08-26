@@ -45,15 +45,15 @@ export const SkillList = ({
       },
       initialData: {
         pages: [{ skills: initialData, nextCursorId: initialCursorId }],
-        pageParams: [{ cursor: undefined, size: 19 }],
+        pageParams: [{ cursor: undefined, size: 47 }],
       },
       initialPageParam: {
         cursor: undefined as number | undefined,
-        size: 19,
+        size: 47,
       },
       getNextPageParam: (lastPage) =>
         lastPage.nextCursorId
-          ? { cursor: lastPage.nextCursorId, size: 20 }
+          ? { cursor: lastPage.nextCursorId, size: 48 }
           : undefined,
     });
 
