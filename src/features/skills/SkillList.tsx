@@ -6,8 +6,8 @@ import { Category, SkillCardDto } from '@/src/types/skill';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { api } from '@/src/lib/api/api';
 import { LoaderIcon } from 'lucide-react';
-import { Virtuoso } from 'react-virtuoso';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useEffect, useRef } from 'react';
 
 const COLUMN_COUNT = 4;
 type SkillListItem = SkillCardDto | 'banner' | null;
@@ -67,57 +67,76 @@ export const SkillList = ({
     }
   }
 
-  const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(
-    undefined,
-  );
-
-  // 컴포넌트가 마운트된 후, 자신을 감싼 가장 가까운 스크롤 가능한 부모 요소를 찾음
-  useEffect(() => {
-    if (containerRef.current) {
-      const parent = containerRef.current.closest<HTMLElement>(
+  // TanStack Virtual 설정
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () =>
+      containerRef.current?.closest<HTMLElement>(
         '.overflow-y-auto, main, body',
-      );
-      if (parent) {
-        setScrollParent(parent);
-      }
-    }
-  }, []);
+      ) ?? null,
+    estimateSize: () => 250, // 각 행의 예상 높이 (px)
+    overscan: 3, // 상하로 미리 렌더링할 행의 개수
+  });
 
-  const handleEndReached = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
+  const virtualItems = rowVirtualizer.getVirtualItems();
+
+  // 스크롤이 끝에 도달했을 때 다음 페이지 로드
+  useEffect(() => {
+    const lastItem = virtualItems[virtualItems.length - 1];
+    if (!lastItem) return;
+
+    if (
+      lastItem.index >= rows.length - 1 &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [
+    virtualItems,
+    rows.length,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  ]);
 
   return (
     <div ref={containerRef} className="w-full">
       {list && list.length > 0 && (
-        <Virtuoso
-          customScrollParent={scrollParent}
-          data={rows}
-          endReached={handleEndReached}
-          overscan={200}
-          defaultItemHeight={234}
-          itemContent={(index, rowItems) => (
-            <div className="grid grid-cols-4 gap-4 pb-4">
-              {rowItems.map((item, columnIndex) => {
-                if (item === 'banner') return <CardBanner key="banner" />;
-                if (!item) return <div key={`empty-${columnIndex}`} />;
-                return <SkillCard key={item.skillId} skill={item} />;
-              })}
-            </div>
-          )}
-          components={{
-            Footer: () => (
-              <div className="flex h-20 items-center justify-center">
-                {isFetchingNextPage && (
-                  <LoaderIcon className="animate-spin text-gray-700" />
-                )}
-              </div>
-            ),
+        <div
+          className="relative w-full"
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
           }}
-        />
+        >
+          {virtualItems.map((virtualRow) => {
+            const rowItems = rows[virtualRow.index];
+            return (
+              <div
+                key={virtualRow.key}
+                className="absolute top-0 left-0 w-full"
+                style={{
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                <div className="grid grid-cols-4 gap-4 pb-4">
+                  {rowItems.map((item, columnIndex) => {
+                    if (item === 'banner') return <CardBanner key="banner" />;
+                    if (!item) return <div key={`empty-${columnIndex}`} />;
+                    return <SkillCard key={item.skillId} skill={item} />;
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
+
+      <div className="flex h-20 items-center justify-center">
+        {isFetchingNextPage && (
+          <LoaderIcon className="animate-spin text-gray-700" />
+        )}
+      </div>
     </div>
   );
 };
