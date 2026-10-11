@@ -31,7 +31,7 @@ export const handlers = [
   }),
 
   http.get(`${API_URL}/notifications`, () => {
-    return passthrough();
+    // return passthrough();
     return HttpResponse.json({
       data: {
         notifications: [
@@ -170,33 +170,16 @@ export const handlers = [
   }),
 
   http.get(`${API_URL}/market/skills`, ({ request }) => {
+    console.log(
+      '[MSW handler]',
+      typeof window === 'undefined' ? 'SERVER' : 'BROWSER',
+      'market/skills',
+    );
     const url = new URL(request.url);
     const size = Math.min(Number(url.searchParams.get('size')) || 20, 100);
     const cursorId = Number(url.searchParams.get('cursorId')) || null;
     const category = url.searchParams.get('category');
     const searchKeyword = url.searchParams.get('searchKeyword')?.toLowerCase();
-    const categories = [
-      'DEVELOPMENT',
-      'DESIGN',
-      'EDITING',
-      'MARKETING',
-      'LANGUAGE',
-      'FINANCE',
-      'SPORTS',
-      'MUSIC',
-      'ETC',
-    ];
-
-    const skills = Array.from({ length: 1500 }, (_, index) => ({
-      skillId: index + 1,
-      profileImageUrl: '/icons/avatar.svg',
-      nickname: `링킷 사용자 ${(index % 50) + 1}`,
-      skillTitle: `${categories[index % categories.length]} 스킬을 함께 나눠요 ${index + 1}`,
-      skillName: `스킬 ${index + 1}`,
-      avgRating:
-        index % 5 === 0 ? 0 : Number((3.5 + (index % 15) / 10).toFixed(1)),
-      category: categories[index % categories.length],
-    }));
 
     const filteredSkills = skills.filter((skill) => {
       const matchesCategory = !category || skill.category === category;
@@ -269,7 +252,7 @@ export const handlers = [
   http.get(
     `${API_URL}/exchange/mentors/:mentorId/available-slots?mentorSkillId=:skillId&date=:formattedDate`,
     () => {
-      return passthrough();
+      // return passthrough();
       return HttpResponse.json({
         data: {
           date: '2026-01-25',
@@ -295,7 +278,7 @@ export const handlers = [
   http.get(
     `${API_URL}/exchange/mentors/:mentorId/available-dates?month=:formattedDate`,
     () => {
-      return passthrough();
+      // return passthrough();
       return HttpResponse.json({
         data: {
           month: '2026-02',
@@ -310,3 +293,25 @@ export const handlers = [
     },
   ),
 ];
+
+const categories = [
+  'DEVELOPMENT',
+  'DESIGN',
+  'EDITING',
+  'MARKETING',
+  'LANGUAGE',
+  'FINANCE',
+  'SPORTS',
+  'MUSIC',
+  'ETC',
+];
+
+const skills = Array.from({ length: 1500 }, (_, index) => ({
+  skillId: index + 1,
+  profileImageUrl: '/icons/avatar.svg',
+  nickname: `링킷 사용자 ${(index % 50) + 1}`,
+  skillTitle: `${categories[index % categories.length]} 스킬을 함께 나눠요 ${index + 1}`,
+  skillName: `스킬 ${index + 1}`,
+  avgRating: index % 5 === 0 ? 0 : Number((3.5 + (index % 15) / 10).toFixed(1)),
+  category: categories[index % categories.length],
+}));

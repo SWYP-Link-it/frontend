@@ -8,6 +8,7 @@ import { api } from '@/src/lib/api/api';
 import { LoaderIcon } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useRef } from 'react';
+import { AlertIcon } from '@/src/components/icons/AlertIcon';
 
 const COLUMN_COUNT = 4;
 type SkillListItem = SkillCardDto | 'banner' | null;
@@ -75,7 +76,11 @@ export const SkillList = ({
         '.overflow-y-auto, main, body',
       ) ?? null,
     estimateSize: () => 250, // 각 행의 예상 높이 (px)
-    overscan: 3, // 상하로 미리 렌더링할 행의 개수
+    overscan: 7, // 상하로 미리 렌더링할 행의 개수
+    initialRect: {
+      width: 1200,
+      height: 5000,
+    },
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
@@ -101,7 +106,7 @@ export const SkillList = ({
   ]);
 
   return (
-    <div ref={containerRef} className="w-full">
+    <div ref={containerRef} className="h-full w-full">
       {list && list.length > 0 && (
         <div
           className="relative w-full"
@@ -132,6 +137,12 @@ export const SkillList = ({
         </div>
       )}
 
+      {(!list || list.length === 0) && (
+        <div className="bg-brand-100 flex h-full w-full flex-col items-center justify-center gap-3 rounded-xl text-gray-400">
+          <AlertIcon size={24} />
+          <span className="text-center leading-[1.5] font-semibold whitespace-pre-wrap">{`아직 게시글이 없네요.\n게시글을 올려 게시판에 등록해보세요!`}</span>
+        </div>
+      )}
       <div className="flex h-20 items-center justify-center">
         {isFetchingNextPage && (
           <LoaderIcon className="animate-spin text-gray-700" />
