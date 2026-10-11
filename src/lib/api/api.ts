@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/src/stores/authStore';
 import axios from 'axios';
 import { refreshAccessToken } from './auth';
+import { startMsw } from '../mocks/start';
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
@@ -8,7 +9,8 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    await startMsw();
     const token = useAuthStore.getState().accessToken;
 
     if (token) {
