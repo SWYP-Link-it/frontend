@@ -76,7 +76,7 @@ export const SkillList = ({
         '.overflow-y-auto, main, body',
       ) ?? null,
     estimateSize: () => 250, // 각 행의 예상 높이 (px)
-    overscan: 7, // 상하로 미리 렌더링할 행의 개수
+    overscan: 3, // 상하로 미리 렌더링할 행의 개수
     initialRect: {
       width: 1200,
       height: 5000,
