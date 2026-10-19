@@ -109,7 +109,6 @@ src/
  
 ```bash
 git clone https://github.com/SWYP-Link-it/frontend.git
-cd frontend
  
 cp .env.example .env    # NEXT_PUBLIC_SERVER_URL, NEXT_PUBLIC_FRONTEND_URL 설정
 pnpm install
