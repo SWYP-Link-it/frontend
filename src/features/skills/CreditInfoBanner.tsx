@@ -7,6 +7,8 @@ export const CreditInfoBanner = () => {
         src={'/images/main_banner.jpg'}
         alt={'배너 이미지'}
         fill
+        fetchPriority="high"
+        loading="eager"
         className="object-cover object-right"
       />
       <div className="z-10 flex flex-col gap-2 py-10 pl-7">
